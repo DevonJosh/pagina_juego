@@ -159,13 +159,13 @@
                 <span class="nav-btn-ico">💡</span>
                 <span class="nav-btn-txt">Ayuda</span>
             </a>
-            <a href="inicial.html" class="nav-btn nav-inicial" data-nav="inicial">
-                <span class="nav-btn-ico">🐝</span>
-                <span class="nav-btn-txt">Inicial</span>
+            <a href="beebot.html" class="nav-btn nav-inicial" data-nav="inicial">
+                <img src="assets/robots/beebot.png" alt="" class="nav-robot-img">
+                <span class="nav-btn-txt">Inicial · BeeBot</span>
             </a>
-            <a href="primaria.html" class="nav-btn nav-primaria" data-nav="primaria">
-                <span class="nav-btn-ico">🏎️</span>
-                <span class="nav-btn-txt">Primaria</span>
+            <a href="rayet.html" class="nav-btn nav-primaria" data-nav="primaria">
+                <img src="assets/robots/rayet.png" alt="" class="nav-robot-img">
+                <span class="nav-btn-txt">Primaria · Rugged</span>
             </a>
         </nav>
 
@@ -1186,9 +1186,9 @@
             <span class="footer-dot">•</span>
             <a href="#ayuda" class="footer-nav-link">💡 Ayuda</a>
             <span class="footer-dot">•</span>
-            <a href="inicial.html" class="footer-nav-link">🐝 Inicial</a>
+            <a href="beebot.html" class="footer-nav-link">🐝 Inicial</a>
             <span class="footer-dot">•</span>
-            <a href="primaria.html" class="footer-nav-link">🏎️ Primaria</a>
+            <a href="rayet.html" class="footer-nav-link">🏎️ Primaria</a>
         </nav>
 
         <p class="footer-copy">
@@ -1197,84 +1197,53 @@
     </div>
 </footer>
 
-<!-- ============================================================
-     SISTEMA DE PANTALLA COMPLETA CENTRALIZADO
-     ============================================================ -->
+<!-- VISOR CON PESTAÑA DESPLAZABLE Y RESTAURACIÓN DE PANTALLA COMPLETA -->
 <style>
-    #visor-juego {
-        position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-        background: #000; z-index: 9999999; display: none; flex-direction: column;
-    }
-    #visor-juego.activo { display: flex; }
-    
-    #frame-juego { width: 100%; height: 100%; border: none; background: #fff; display: block; }
-    
-    .hover-zone-cerrar {
-        position: absolute;
-        top: max(15px, env(safe-area-inset-top)); 
-        right: 0;
-        width: 150px; height: 80px;
-        z-index: 10000000;
-        background: transparent;
-    }
-
-    .btn-cerrar-juego {
-        position: absolute; 
-        top: max(15px, env(safe-area-inset-top)); 
-        right: -250px; 
-        z-index: 10000001; 
-        background: #e74c3c; color: white; border: 3px solid #c0392b;
-        padding: 10px 20px; border-radius: 15px; font-family: 'Fredoka', sans-serif;
-        font-size: 16px; font-weight: bold; cursor: pointer; box-shadow: 0 5px 0 #c0392b;
-        opacity: 0;
-        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-    
-    .btn-cerrar-juego:active { transform: translateY(4px); box-shadow: none; }
-
-    .hover-zone-cerrar:hover ~ .btn-cerrar-juego,
-    .btn-cerrar-juego:hover {
-        right: max(15px, env(safe-area-inset-right));
-        opacity: 1;
-    }
+#visor-juego{position:fixed;inset:0;width:100%;height:100dvh;background:#000;z-index:9999999;display:none}
+#visor-juego.activo{display:block}
+#frame-juego{width:100%;height:100%;border:0;background:#fff;display:block}
+#visor-juego .visor-exit-tab{position:absolute;left:0;top:50%;z-index:3;width:24px;height:52px;padding:0;border:0;border-radius:0 12px 12px 0;background:#263d53b8;color:#fff;font-size:23px;font-weight:bold;opacity:.6;cursor:grab;touch-action:none;user-select:none;transition:background .2s,opacity .2s}
+#visor-juego .visor-exit-tab:hover,#visor-juego .visor-exit-tab:focus-visible,#visor-juego .visor-exit-tab[aria-expanded=true]{opacity:1;background:#00e5ff;color:#172338}
+#visor-juego .visor-exit-tab:active{cursor:grabbing}
+#visor-juego .visor-exit-panel[hidden]{display:none}
+#visor-juego .visor-exit-panel{position:absolute;z-index:4;top:50%;left:50%;transform:translate(-50%,-50%);width:min(380px,calc(100% - 32px));padding:24px;border-radius:20px;background:#fff;color:#253449;text-align:center;box-shadow:0 12px 60px #0008;font-family:'Nunito',sans-serif}
+#visor-juego .visor-exit-panel p{margin:0 0 18px;font-size:19px;font-weight:800}
+#visor-juego .visor-exit-actions{display:flex;justify-content:center;flex-wrap:wrap;gap:10px}
+#visor-juego .visor-exit-actions button{border:0;padding:12px 15px;border-radius:12px;font-size:14px;font-weight:800;cursor:pointer;background:#e9eef5;color:#253449}
+#visor-juego #visorFullscreen{background:#00e5ff;color:#172338}
+#visor-juego #visorConfirmExit{background:#d84d4d;color:white}
+#visor-juego .visor-exit-actions button:hover{filter:brightness(.92)}
+#visor-juego button:focus-visible{outline:3px solid #00e5ff;outline-offset:3px}
 </style>
-
 <div id="visor-juego">
-    <div class="hover-zone-cerrar"></div>
-    <button class="btn-cerrar-juego" onclick="cerrarJuego()">❌ Volver al Portal</button>
-    <iframe id="frame-juego" src="" allowfullscreen></iframe>
+ <iframe id="frame-juego" src="" allowfullscreen title="Juego educativo"></iframe>
+ <button type="button" id="visorExitTab" class="visor-exit-tab" aria-label="Opciones del juego" aria-controls="visorExitPanel" aria-expanded="false" title="Toca para opciones · Arrastra para mover">‹</button>
+ <div id="visorExitPanel" class="visor-exit-panel" role="dialog" aria-label="Opciones del juego" hidden>
+  <p>¿Quieres volver a Ludio?</p>
+  <div class="visor-exit-actions">
+   <button type="button" id="visorContinue">Seguir jugando</button>
+   <button type="button" id="visorFullscreen">⛶ Pantalla completa</button>
+   <button type="button" id="visorConfirmExit">Salir del juego</button>
+  </div>
+ </div>
 </div>
-
 <script>
-    document.querySelectorAll('.game-card-link').forEach(enlace => {
-        enlace.addEventListener('click', function(e) {
-            // Evita que los juegos desactivados (próximamente) abran el visor
-            if (this.closest('.disabled')) {
-                e.preventDefault();
-                return;
-            }
-
-            e.preventDefault(); 
-            const urlJuego = this.getAttribute('href');
-            const visor = document.getElementById('visor-juego');
-            document.getElementById('frame-juego').src = urlJuego;
-            
-            visor.classList.add('activo');
-            
-            if (visor.requestFullscreen) { visor.requestFullscreen(); } 
-            else if (visor.webkitRequestFullscreen) { visor.webkitRequestFullscreen(); }
-        });
-    });
-
-    function cerrarJuego() {
-        const visor = document.getElementById('visor-juego');
-        if (document.fullscreenElement || document.webkitFullscreenElement) { 
-            if(document.exitFullscreen) document.exitFullscreen();
-            else if(document.webkitExitFullscreen) document.webkitExitFullscreen();
-        }
-        visor.classList.remove('activo');
-        document.getElementById('frame-juego').src = ""; 
-    }
+(function(){
+ const visor=document.getElementById('visor-juego'),frame=document.getElementById('frame-juego'),tab=document.getElementById('visorExitTab'),panel=document.getElementById('visorExitPanel');
+ let dragging=false,moved=false,startY=0,startTop=0;
+ function panelVisible(show){panel.hidden=!show;tab.setAttribute('aria-expanded',String(show));if(show)document.getElementById('visorContinue').focus()}
+ tab.addEventListener('pointerdown',e=>{dragging=true;moved=false;startY=e.clientY;startTop=tab.getBoundingClientRect().top-visor.getBoundingClientRect().top;tab.setPointerCapture(e.pointerId)});
+ tab.addEventListener('pointermove',e=>{if(!dragging)return;const dy=e.clientY-startY;if(Math.abs(dy)>7)moved=true;if(moved)tab.style.top=Math.max(0,Math.min(visor.clientHeight-tab.offsetHeight,startTop+dy))+'px'});
+ tab.addEventListener('pointerup',()=>dragging=false);tab.addEventListener('pointercancel',()=>dragging=false);
+ tab.addEventListener('click',e=>{if(moved){e.preventDefault();moved=false;return}panelVisible(panel.hidden)});
+ document.getElementById('visorContinue').addEventListener('click',()=>panelVisible(false));
+ document.getElementById('visorFullscreen').addEventListener('click',()=>{panelVisible(false);if(!document.fullscreenElement&&!document.webkitFullscreenElement){if(visor.requestFullscreen)visor.requestFullscreen().catch(()=>{});else if(visor.webkitRequestFullscreen)visor.webkitRequestFullscreen()}});
+ document.getElementById('visorConfirmExit').addEventListener('click',()=>window.cerrarJuego());
+ document.querySelectorAll('.game-card-link').forEach(link=>link.addEventListener('click',e=>{if(link.closest('.disabled,.is-coming-soon')){e.preventDefault();return}const url=link.getAttribute('href');if(!url||url==='#')return;e.preventDefault();frame.src=url;visor.classList.add('activo');panelVisible(false);if(visor.requestFullscreen)visor.requestFullscreen().catch(()=>{});else if(visor.webkitRequestFullscreen)visor.webkitRequestFullscreen()}));
+ window.cerrarJuego=function(){visor.classList.remove('activo');panelVisible(false);frame.src='';if(document.fullscreenElement||document.webkitFullscreenElement){if(document.exitFullscreen)document.exitFullscreen().catch(()=>{});else if(document.webkitExitFullscreen)document.webkitExitFullscreen()}};
+ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&visor.classList.contains('activo')&&!document.fullscreenElement&&!document.webkitFullscreenElement){e.preventDefault();panelVisible(panel.hidden)}});
+ // Si el selector de archivos cancela fullscreen, el iframe y el juego permanecen abiertos.
+})();
 </script>
 
 <script src="js/ludio.js"></script>

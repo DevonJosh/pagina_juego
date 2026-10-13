@@ -1937,3 +1937,8 @@ body.world-portal {
 }
 /* Iconos de navegación entre niveles */
 .nav-robot-img{width:22px;height:22px;object-fit:contain;flex-shrink:0}
+
+/* Accesos a los otros niveles en Ludio */
+.portal-secundaria .main-nav a.nav-inicial, .portal-secundaria .main-nav a.nav-primaria {display:inline-flex;align-items:center;gap:7px;visibility:visible;opacity:1;white-space:nowrap;}
+.portal-secundaria .main-nav a.nav-inicial:hover {color:#7ed957;background:rgba(126,217,87,.14);}
+.portal-secundaria .main-nav a.nav-primaria:hover {color:#ffae65;background:rgba(255,140,66,.14);}
