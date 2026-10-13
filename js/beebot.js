@@ -729,13 +729,48 @@ const BGM = (() => {
     if (!visor || !frame) return;
 
     let juegoActivo = false;
-    let timerControles = null;
+    const tab = $('#visorExitTab');
+    const panel = $('#visorExitPanel');
+    const continuar = $('#visorContinue');
+    const confirmar = $('#visorConfirmExit');
+    let dragging = false;
+    let moved = false;
+    let startY = 0;
+    let startTop = 0;
 
-    function mostrarControles() {
-        visor.classList.add('mostrar-controles');
-        clearTimeout(timerControles);
-        timerControles = setTimeout(() => visor.classList.remove('mostrar-controles'), 2600);
+    function showExitPanel(show) {
+        if (!panel || !tab) return;
+        panel.hidden = !show;
+        tab.setAttribute('aria-expanded', String(show));
+        if (show) continuar?.focus();
+        else tab.focus();
     }
+
+    // La pestaña solo ocupa 24 × 52 px. Se puede desplazar si tapa un control.
+    if (tab) {
+        tab.addEventListener('pointerdown', e => {
+            dragging = true; moved = false; startY = e.clientY;
+            startTop = tab.getBoundingClientRect().top - visor.getBoundingClientRect().top;
+            tab.setPointerCapture(e.pointerId);
+        });
+        tab.addEventListener('pointermove', e => {
+            if (!dragging) return;
+            const dy = e.clientY - startY;
+            if (Math.abs(dy) > 7) moved = true;
+            if (moved) {
+                const max = Math.max(0, visor.clientHeight - tab.offsetHeight);
+                tab.style.top = Math.max(0, Math.min(max, startTop + dy)) + 'px';
+            }
+        });
+        tab.addEventListener('pointerup', () => { dragging = false; });
+        tab.addEventListener('pointercancel', () => { dragging = false; });
+        tab.addEventListener('click', e => {
+            if (moved) { e.preventDefault(); moved = false; return; }
+            showExitPanel(panel.hidden);
+        });
+    }
+    continuar?.addEventListener('click', () => showExitPanel(false));
+    confirmar?.addEventListener('click', () => window.cerrarJuego());
 
     /* ---- Abrir juego ---- */
     function abrirJuego(url) {
@@ -747,7 +782,8 @@ const BGM = (() => {
         frame.src = url;
         visor.classList.add('activo');
         juegoActivo = true;
-        mostrarControles();
+        if (panel) panel.hidden = true;
+        if (tab) tab.setAttribute('aria-expanded', 'false');
 
         // Intentar fullscreen nativo (silencioso si el navegador lo bloquea)
         if (visor.requestFullscreen) {
@@ -765,7 +801,8 @@ const BGM = (() => {
         }
 
         visor.classList.remove('activo', 'mostrar-controles');
-        clearTimeout(timerControles);
+        if (panel) panel.hidden = true;
+        if (tab) tab.setAttribute('aria-expanded', 'false');
         frame.src = '';
         juegoActivo = false;
 
@@ -797,21 +834,13 @@ const BGM = (() => {
         }
     });
 
-    /* Mostrar brevemente la salida al acercarse a la parte superior */
-    visor.addEventListener('mousemove', (e) => {
-        if (juegoActivo && e.clientY <= 110) mostrarControles();
-    });
-    visor.addEventListener('touchstart', (e) => {
-        const touch = e.touches && e.touches[0];
-        if (juegoActivo && touch && touch.clientY <= 110) mostrarControles();
-    }, { passive: true });
-
-    /* ---- ESC cierra el visor ---- */
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && juegoActivo) {
-            if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-                window.cerrarJuego();
-            }
+    /* Escape: el navegador sale del fullscreen nativo y cierra el visor.
+       Sin fullscreen nativo, Escape abre/cierra la confirmación. */
+    document.addEventListener('keydown', e => {
+        if (!juegoActivo || e.key !== 'Escape') return;
+        if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+            e.preventDefault();
+            showExitPanel(panel?.hidden ?? true);
         }
     });
 
@@ -832,11 +861,6 @@ const BGM = (() => {
     document.addEventListener('fullscreenchange', onFullscreenChange);
     document.addEventListener('webkitfullscreenchange', onFullscreenChange);
 
-    /* ---- Botones que cierran el visor ---- */
-    const btnCerrar = $('.btn-cerrar-juego');
-    if (btnCerrar) {
-        btnCerrar.addEventListener('click', window.cerrarJuego);
-    }
 })();
 
 

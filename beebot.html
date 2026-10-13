@@ -1119,25 +1119,18 @@
 </footer>
 
 
-<!-- ============================================================
-     VISOR DE JUEGO EN PANTALLA COMPLETA
-     ------------------------------------------------------------
-     El botón "Salir del juego" aparece al pasar el mouse por la
-     parte superior (igual que el botón nativo del navegador).
-     Toda la lógica está en js/beebot.js → módulo 15.
-     ============================================================ -->
+<!-- VISOR: pestaña lateral mínima, desplazable y confirmación de salida -->
 <div id="visor-juego">
-    <div class="hover-zone-top" aria-hidden="true"></div>
-    <button class="btn-cerrar-juego" onclick="cerrarJuego()" aria-label="Salir del juego">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="18" y1="6" x2="6" y2="18"/>
-            <line x1="6" y1="6" x2="18" y2="18"/>
-        </svg>
-        <span>Salir del juego</span>
-    </button>
-    <iframe id="frame-juego" src="" allowfullscreen></iframe>
+    <iframe id="frame-juego" src="" allowfullscreen title="Juego educativo"></iframe>
+    <button type="button" class="visor-exit-tab" id="visorExitTab" aria-label="Opciones para salir del juego" aria-expanded="false" aria-controls="visorExitPanel" title="Mantén y arrastra para mover · Toca para salir">‹</button>
+    <div class="visor-exit-panel" id="visorExitPanel" role="dialog" aria-modal="false" aria-label="Salir del juego" hidden>
+        <p>¿Quieres volver a BeeBot?</p>
+        <div class="visor-exit-actions">
+            <button type="button" id="visorContinue">Seguir jugando</button>
+            <button type="button" id="visorConfirmExit">Salir del juego</button>
+        </div>
+    </div>
 </div>
-
 
 <!-- ============================================================
      SCRIPT ÚNICO
