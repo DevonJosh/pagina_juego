@@ -2137,3 +2137,7 @@ a:focus-visible {
     .bee, .butterfly, .flower, .cloud, .rainbow { animation: none; }
     .game-coming-soon-badge span { animation: none; }
 }
+
+/* Acción para volver a extender el juego sin cerrarlo */
+#visor-juego #visorFullscreen { background: #ffe8a6; color: #483615; }
+#visor-juego #visorFullscreen:hover { background: #ffd25a; }

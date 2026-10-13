@@ -1805,3 +1805,5 @@ body.world-portal {
     .road-lines { animation: none; }
     .speed-lines { animation: none; }
 }
+/* Iconos de navegación entre niveles */
+.nav-robot-img{width:22px;height:22px;object-fit:contain;flex-shrink:0}

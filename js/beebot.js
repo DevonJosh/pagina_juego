@@ -733,6 +733,7 @@ const BGM = (() => {
     const panel = $('#visorExitPanel');
     const continuar = $('#visorContinue');
     const confirmar = $('#visorConfirmExit');
+    const ampliar = $('#visorFullscreen');
     let dragging = false;
     let moved = false;
     let startY = 0;
@@ -771,6 +772,13 @@ const BGM = (() => {
     }
     continuar?.addEventListener('click', () => showExitPanel(false));
     confirmar?.addEventListener('click', () => window.cerrarJuego());
+    ampliar?.addEventListener('click', () => {
+        showExitPanel(false);
+        if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+            if (visor.requestFullscreen) visor.requestFullscreen().catch(() => {});
+            else if (visor.webkitRequestFullscreen) visor.webkitRequestFullscreen();
+        }
+    });
 
     /* ---- Abrir juego ---- */
     function abrirJuego(url) {
@@ -844,22 +852,11 @@ const BGM = (() => {
         }
     });
 
-    /* ---- Salida del fullscreen nativo → cerrar visor ---- */
-    function onFullscreenChange() {
-        if (!juegoActivo) return;
-        const isFS = document.fullscreenElement || document.webkitFullscreenElement;
-        if (!isFS) {
-            setTimeout(() => {
-                if (juegoActivo &&
-                    !document.fullscreenElement &&
-                    !document.webkitFullscreenElement) {
-                    window.cerrarJuego();
-                }
-            }, 150);
-        }
-    }
-    document.addEventListener('fullscreenchange', onFullscreenChange);
-    document.addEventListener('webkitfullscreenchange', onFullscreenChange);
+    /* Al abrir el selector de archivos, algunos navegadores abandonan fullscreen.
+       El juego debe seguir abierto: solo se restaura con el botón del panel. */
+    document.addEventListener('fullscreenchange', () => {
+        if (juegoActivo && !document.fullscreenElement && panel) panel.hidden = true;
+    });
 
 })();
 

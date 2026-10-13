@@ -1935,3 +1935,5 @@ body.world-portal {
     .data-stream { animation: none; }
     .binary-drop { animation: none; }
 }
+/* Iconos de navegación entre niveles */
+.nav-robot-img{width:22px;height:22px;object-fit:contain;flex-shrink:0}
