@@ -423,6 +423,19 @@ footer { color: #c6a493; }
 .tile.memory-miss { border:2px solid #ff493c;box-shadow:0 0 17px #ff493c80;animation:memory-shake .25s ease-in-out; }
 @keyframes memory-shake { 0%,100%{transform:translateX(0)}25%{transform:translateX(-3px)}75%{transform:translateX(3px)} }
 @media(prefers-reduced-motion:reduce){.tile.memory-miss{animation:none}}
+
+.memory-grid[data-difficulty="easy"]{grid-template-columns:repeat(3,1fr);max-width:560px}
+.memory-grid[data-difficulty="normal"]{grid-template-columns:repeat(4,1fr);max-width:640px}
+.memory-grid[data-difficulty="hard"]{grid-template-columns:repeat(6,1fr);max-width:900px}
+.sequence-pads[data-difficulty="easy"]{grid-template-columns:repeat(2,1fr);max-width:480px}
+@media(max-width:550px){.memory-grid[data-difficulty="normal"],.memory-grid[data-difficulty="hard"]{grid-template-columns:repeat(3,1fr)}}
+
+/* Misión final: escenario y tablero hechos con HTML/CSS. */
+.quest-progress{margin:12px 0 24px;padding:16px;border:1px solid #ff8a3255;border-radius:14px;background:#160c09}.quest-progress progress{width:100%;height:12px;accent-color:#ff8a32}.quest-progress p{margin:6px 0;color:#ffd5aa;font-size:14px}.final-layout{display:grid;grid-template-columns:1.1fr 1fr;gap:24px;padding:0 24px 24px}.final-board{display:grid;gap:6px;padding:12px;background:#150c0a;border:2px solid #b95529;border-radius:18px;box-shadow:0 0 35px #f0441d22;max-width:510px;margin:auto;width:100%}.final-cell{aspect-ratio:1;position:relative;display:grid;place-items:center;background:linear-gradient(145deg,#71311e,#35150e);border-radius:8px;border:1px solid #e7915044;font-size:clamp(20px,4vw,38px)}.final-cell.wall{background:#161310;border-color:#30271e;color:#554738}.final-cell.lit{background:#895321;box-shadow:inset 0 0 18px #ffd36988}.final-cell.goal{background:#b14721}.final-cell .direction{position:absolute;right:-9px;top:-10px;display:grid;place-items:center;width:23px;height:23px;background:#ffbd55;color:#241007;border-radius:50%;font-size:20px;font-weight:900}.final-cell .guide{position:absolute;font-size:32px;transition:transform .25s;z-index:2;filter:drop-shadow(0 0 8px #ffcb52)}.final-cell.visited{border-color:#ffd88a}.final-status{color:#ffd17d;text-align:center;min-height:48px;padding:12px;font-weight:700}.command-panel{background:#1a0e0b;border:1px solid #a1472b;border-radius:16px;padding:18px}.command-panel h3{margin:0 0 10px}.command-controls{display:grid;grid-template-columns:1fr 1fr;gap:8px}.command-controls button{padding:12px 8px;border:1px solid #a14e2b;border-radius:10px;background:#472015;color:#ffe7c9;font-size:14px}.command-controls button:hover{background:#71351e}.command-list{display:flex;flex-wrap:wrap;gap:6px;align-content:start;min-height:95px;max-height:230px;overflow:auto;padding:12px 0;list-style:none;counter-reset:command}.command-chip{border:1px solid #954421;border-radius:8px;background:#3d1e12;color:#ffdfb0;padding:8px;min-width:44px;cursor:pointer}.command-chip.active{background:#ff9b38;color:#180c08;box-shadow:0 0 18px #ff842d}.command-chip::before{counter-increment:command;content:counter(command) '. ';font-size:11px}.command-list:empty::before{content:'Tu programa aparecerá aquí. Añade instrucciones con los botones.';color:#c9a590;font-size:14px}.final-tools{display:flex;gap:8px;flex-wrap:wrap}.final-tools button{padding:10px 14px}.peña-scene{height:170px;position:relative;overflow:hidden;background:radial-gradient(ellipse at 50% 10%,#8a492a,#1b100c 80%);border-radius:14px;border:1px solid #c86b31;margin:0 auto 16px;max-width:510px;transition:background 1s,box-shadow 1s}.peña-scene::before{content:'PEÑA EMBRUJADA';position:absolute;top:21px;left:0;width:100%;text-align:center;font-weight:900;letter-spacing:3px;color:#926c49;transition:color 1s,text-shadow 1s}.peña-scene .musicians{position:absolute;bottom:26px;left:0;width:100%;text-align:center;font-size:40px;filter:grayscale(1);opacity:.35;transition:filter 1s,opacity 1s}.peña-scene .bulbs{position:absolute;top:3px;left:0;width:100%;display:flex;justify-content:space-around}.bulbs i{width:13px;height:16px;background:#694127;border-radius:50%;transition:background 1s,box-shadow 1s}.peña-scene.restored{background:radial-gradient(ellipse at 50% 10%,#e57322,#542012 70%);box-shadow:0 0 50px #ff972866}.peña-scene.restored::before{color:#ffeb9b;text-shadow:0 0 16px #ffe06a}.peña-scene.restored .musicians{filter:none;opacity:1;animation:jarana-dance 1s ease-in-out infinite}.restored .bulbs i{background:#ffdb72;box-shadow:0 0 16px #ffcb44}.confetti{position:absolute;top:-20px;width:7px;height:14px;animation:confetti-fall 3s linear infinite;background:#ffc35e;pointer-events:none}.victory-scene{height:220px;max-width:none}.mission-checkpoints{display:grid;gap:8px;text-align:left;margin:20px 0}.mission-checkpoints button{display:flex;justify-content:space-between;gap:12px;padding:12px;background:#3d2014;border:1px solid #a85530;border-radius:10px;color:#ffe4c5}.mission-checkpoints span{white-space:nowrap;color:#ffb85e}
+@keyframes jarana-dance{50%{transform:translateY(-7px) rotate(2deg)}}@keyframes confetti-fall{to{transform:translateY(260px) rotate(300deg)}}
+@media(max-width:760px){.final-layout{grid-template-columns:1fr;padding:0 12px 16px;gap:14px}.final-cell{font-size:28px}.final-cell .guide{font-size:28px}.peña-scene{height:145px}.command-list{min-height:65px;max-height:160px}.command-panel{padding:14px}.command-controls button{font-size:13px}.final-board{max-width:400px}.mission-checkpoints button{font-size:13px}}@media(prefers-reduced-motion:reduce){.confetti{display:none}.peña-scene.restored .musicians{animation:none}.final-cell .guide{transition:none}}
+
+#best{color:#fff5e6;text-shadow:0 2px 12px #000;font-variant-numeric:tabular-nums}#final-mission{grid-column:1/-1;border:2px solid #ef8138;background:linear-gradient(120deg,#512415,#21120e);min-height:180px}#final-mission.unlocked{border-color:#ffdb76;box-shadow:0 0 25px #ffbd4433}#mission-home-status{color:#ffdda6;font-weight:700}#storage-note{color:#ffc786;margin-top:10px;font-size:13px}
 </style>
 </head>
 <body>
@@ -489,11 +502,11 @@ footer { color: #c6a493; }
 <h2>Elige tu reto</h2>
 <span class="mini">Cinco retos · Acceso libre · Aventura completa</span>
 </div>
-<div class="cards">
+<div class="cards"><button class="card" id="final-mission"><span class="icon">🧭</span><h3>Misión final · Enciende la Peña</h3><p>Programa pasos y giros, recoge las luces y devuelve la vida al escenario.</p><div class="card-foot"><span id="mission-home-status">0/5 metas · 0/500 energía</span><span id="mission-home-action">Ver progreso →</span></div></button>
 <button class="card" data-game="ghost">
 <span class="icon">👻</span>
 <h3>Caza Fantasmas</h3>
-<p>Captura a los fantasmas traviesos antes de que escapen. ¡Cuidado con las trampas!</p>
+<p>Captura fantasmas con metas, tamaños y trampas según tu dificultad.</p>
 <div class="card-foot">
 <span>Jugar</span>
 <span class="tag">Reflejos</span>
@@ -502,7 +515,7 @@ footer { color: #c6a493; }
 <button class="card" data-game="catch">
 <span class="icon">🍬</span>
 <h3>Rescate Criollo</h3>
-<p>Recupera guitarras, dulces y melodías. Mueve la canasta y evita las travesuras.</p>
+<p>Atrapa objetos con distintas velocidades y metas según tu dificultad.</p>
 <div class="card-foot">
 <span>Jugar</span>
 <span class="tag">Agilidad</span>
@@ -520,7 +533,7 @@ footer { color: #c6a493; }
 <button class="card" data-game="memory">
 <span class="icon">🎃</span>
 <h3>Memoria Embrujada</h3>
-<p>Seis parejas escondidas. Recuerda cada carta y recupera los símbolos de la peña.</p>
+<p>Encuentra 3, 6 o 9 parejas según la dificultad que elijas.</p>
 <div class="card-foot">
 <span>Jugar</span>
 <span class="tag">Memoria</span>
@@ -529,7 +542,7 @@ footer { color: #c6a493; }
 <button class="card" data-game="sequence">
 <span class="icon">🎶</span>
 <h3>Ritmo de Medianoche</h3>
-<p>Escucha, observa y repite la secuencia. Cinco rondas para encender el escenario.</p>
+<p>Repite 3, 5 o 7 rondas musicales con secuencias de longitud creciente.</p>
 <div class="card-foot">
 <span>Jugar</span>
 <span class="tag">Memoria musical</span>
@@ -555,10 +568,10 @@ footer { color: #c6a493; }
 </div>
 </div>
 <div class="panel">
-<div class="mini">Mejor aventura</div>
+<div class="mini">Mejor aventura · puntos acumulados</div>
 <div class="record" id="best">0 <span style="font-size:16px">puntos</span>
 </div>
-<div class="mini" style="margin-top:12px">Supera tu marca en este navegador.</div>
+<div class="mini" style="margin-top:12px">Suma tus mejores puntos de los cinco juegos, también jugando desde sus tarjetas. Reintentar no duplica los puntos.</div><div id="free-best" class="mini" style="margin-top:10px">Mejor juego libre: 0 puntos</div><div id="storage-note" role="status"></div>
 </div>
 </div>
 </section>
@@ -575,6 +588,7 @@ footer { color: #c6a493; }
 </div>
 <button class="soft" id="pause">Ⅱ Pausa</button>
 </div>
+<div class="quest-progress hidden" id="quest-progress" aria-live="polite"></div>
 <div class="stage">
 <div class="game-heading">
 <div class="eyebrow" id="chapter">
@@ -623,6 +637,7 @@ footer { color: #c6a493; }
 <div class="memory-grid" id="memory-grid">
 </div>
 </div>
+<div id="finale-area" class="hidden"><div class="final-layout"><div><div id="final-scene" class="peña-scene"></div><div id="final-board" class="final-board" role="group" aria-label="Tablero de la misión final"></div><div id="final-status" class="final-status" role="status" aria-live="polite"></div></div><div class="command-panel"><h3>Programa el camino</h3><p class="mini">La flecha indica hacia dónde miras. Girar cambia tu orientación; avanzar y retroceder mueven una casilla. Toca una instrucción del programa para eliminarla.</p><div class="command-controls"><button id="cmd-forward">↑ Un paso adelante</button><button id="cmd-back">↓ Un paso atrás</button><button id="cmd-left">↶ Giro a la izquierda</button><button id="cmd-right">↷ Giro a la derecha</button></div><div id="command-count" class="mini" style="margin-top:12px"></div><ol id="command-list" class="command-list" aria-label="Tu programa"></ol><div class="final-tools"><button class="primary" id="run-program">▶ Ejecutar</button><button class="soft" id="undo-program">Deshacer</button><button class="soft" id="clear-program">Borrar</button><button class="soft" id="reset-program">Volver al inicio</button></div><p id="final-tip" class="mini" style="margin-top:14px"></p></div></div></div>
 <div class="feedback" id="feedback" role="status" aria-live="polite">
 </div>
 </div>
@@ -636,36 +651,72 @@ footer { color: #c6a493; }
 <div class="toast hidden" id="toast" role="status">
 </div>
 
-<!-- JUEGOS: lógica, sonido, controles y progreso. -->
+<!-- JUEGOS: cinco retos + misión final de pensamiento computacional. -->
 <script>
 'use strict';
 const $=id=>document.getElementById(id),cfg={
   easy:{
-    duration:40,speed:115,interval:.78,travel:2.1,window:.25,memory:100
+    ghostGoal:8,ghostLives:5,ghostTime:65,ghostTTL:5,ghostInterval:1.35,ghostTrap:.08,ghostSize:88,ghostMax:2,ghostMotion:3,
+    catchGoal:140,catchLives:6,catchTime:75,speed:85,interval:1.05,catchHazard:.08,
+    memoryPairs:3,memory:150,memoryPreview:3.5,memoryMismatch:1.5,
+    sequenceRounds:3,sequencePads:2,sequenceStart:1,sequenceLives:5,sequenceReplays:2,sequenceGap:.6,sequenceBase:1.2
   },normal:{
-    duration:40,speed:160,interval:.62,travel:1.7,window:.21,memory:80
+    ghostGoal:18,ghostLives:4,ghostTime:65,ghostTTL:3.2,ghostInterval:.85,ghostTrap:.2,ghostSize:76,ghostMax:3,ghostMotion:7,
+    catchGoal:300,catchLives:5,catchTime:65,speed:145,interval:.75,catchHazard:.22,
+    memoryPairs:6,memory:100,memoryPreview:1.5,memoryMismatch:1,
+    sequenceRounds:5,sequencePads:4,sequenceStart:2,sequenceLives:3,sequenceReplays:1,sequenceGap:.3,sequenceBase:.85
   },hard:{
-    duration:45,speed:220,interval:.46,travel:1.35,window:.17,memory:65
+    ghostGoal:28,ghostLives:3,ghostTime:60,ghostTTL:2,ghostInterval:.48,ghostTrap:.32,ghostSize:60,ghostMax:5,ghostMotion:16,
+    catchGoal:550,catchLives:3,catchTime:60,speed:225,interval:.48,catchHazard:.35,
+    memoryPairs:9,memory:85,memoryPreview:0,memoryMismatch:.7,
+    sequenceRounds:7,sequencePads:4,sequenceStart:3,sequenceLives:2,sequenceReplays:0,sequenceGap:.12,sequenceBase:.55
   }
 };
+function gameTimeLimit(){
+  const c=cfg[difficulty];
+  if(mode==='finale')return Infinity;
+  return mode==='ghost'?c.ghostTime:mode==='catch'?c.catchTime:mode==='memory'?c.memory:mode==='sequence'?sequenceTimeLimit():mathTimeLimit();
+}
+function gameDescription(k){
+  const c=cfg[difficulty];
+  if(k==='finale')return 'Recoge todas las luces ✨ y llega al escenario 🎪. Programa pasos y giros para encender la peña. Puedes corregir tu programa sin perder vidas.';
+  if(k==='ghost')return 'Captura '+c.ghostGoal+' fantasmas. Evita las calaveras. Tienes '+c.ghostLives+' vidas. '+(difficulty==='easy'?'Fantasmas grandes y pausados.':difficulty==='normal'?'Más fantasmas y trampas.':'Fantasmas más pequeños, rápidos y con más movimiento.');
+  if(k==='catch')return 'Recupera dulces, guitarras y melodías. Meta: '+c.catchGoal+' puntos. Tienes '+c.catchLives+' vidas. '+(difficulty==='easy'?'Caída lenta y pocas trampas.':difficulty==='normal'?'Caída moderada y más trampas.':'Caída rápida y muchas trampas.');
+  if(k==='memory')return 'Encuentra '+c.memoryPairs+' parejas ('+(c.memoryPairs*2)+' cartas). '+(c.memoryPreview?'Puedes observar las cartas durante '+c.memoryPreview+' segundos al comenzar.':'Sin vista previa: recuerda cada carta que voltees.');
+  if(k==='sequence')return 'Repite '+c.sequenceRounds+' rondas musicales con '+c.sequencePads+' instrumentos. Empiezas con '+c.sequenceStart+' sonido'+(c.sequenceStart===1?'':'s')+'. Tienes '+c.sequenceLives+' vidas y '+c.sequenceReplays+' repetición'+(c.sequenceReplays===1?'':'es')+' extra por ronda.';
+  return mathDifficultyDescription();
+}
 let difficulty='normal',mode='',campaign=false,chapter=0,total=0,score=0,elapsed=0,paused=false,running=false,last=0,raf=0,feedbackUntil=0;
 let saved={
-  best:0,medals:[]
+  best:0,medals:[],missionBest:0,progress:{},finalBonus:0
 };
 try{
   saved={
     ...saved,...JSON.parse(localStorage.getItem('pena-v1')||'{}')
   }
 }catch{
-}function save(){
+}
+if(!Array.isArray(saved.medals))saved.medals=[];
+if(!saved.progress||typeof saved.progress!=='object'||Array.isArray(saved.progress))saved.progress={};
+// Old medals prove a completed goal. Scores were not stored per game before this version.
+['ghost','catch','memory','rhythm','sequence'].forEach(k=>{
+  const r=saved.progress[k]||{};
+  saved.progress[k]={score:Math.max(0,Number(r.score)||0),quality:Math.max(0,Number(r.quality)||0),won:Boolean(r.won)};
+  if(saved.medals.includes(k)&&!saved.progress[k].won){saved.progress[k].won=true;saved.progress[k].quality=Math.max(80,saved.progress[k].quality)}
+});
+let storageAvailable=true;
+function progressPoints(){return ['ghost','catch','memory','rhythm','sequence'].reduce((sum,k)=>sum+(saved.progress[k]?.score||0),0)+(saved.finalBonus||0)}
+function save(){
   try{
-    localStorage.setItem('pena-v1',JSON.stringify(saved))
-  }catch{
-  }
+    localStorage.setItem('pena-v1',JSON.stringify(saved));storageAvailable=true
+  }catch{storageAvailable=false}
 }function paintRecords(){
-  $('best').innerHTML=Number(saved.best||0)+' <span style="font-size:16px">puntos</span>';
+  $('best').innerHTML=Math.max(Number(saved.best)||0,progressPoints(),Number(saved.freeBest)||0)+' <span style="font-size:16px">puntos</span>';
+  $('free-best').textContent='Mejor juego libre: '+Number(saved.freeBest||0)+' puntos';
+  paintHomeMission();
+  $('storage-note').textContent=storageAvailable?'':'Este navegador no permite guardar el avance. Los puntos cuentan mientras mantengas esta página abierta.';
   ['ghost','catch','rhythm','memory','sequence','adventure'].forEach(k=>$('medal-'+k).classList.toggle('earned',saved.medals.includes(k)))
-}paintRecords();
+}
 let audio=null,sound=true,musicBeat=-1,audioUnlocked=false;
 // PERSONALIZA AQUÍ LAS RUTAS si quieres incluir los archivos con tu página.
 // Ejemplo: fondo: 'audios/mi-cancion.mp3', imagen: 'imagenes/carta-1.png'.
@@ -762,11 +813,15 @@ async function loadConfiguredSample(src) {
     return await audio.decodeAudioData(await response.arrayBuffer());
   } catch { return loadNativeSample(src); }
 }
-function sequenceInterval() {
-  const base = difficulty === 'easy' ? .85 : difficulty === 'hard' ? .52 : .68;
-  return Math.max(base, ...personalMedia.samples.map(buffer => buffer ? Math.min(2,buffer.duration) + .18 : 0));
+function sequenceInterval(){
+  const c=cfg[difficulty];
+  const longest=Math.max(0,...personalMedia.samples.slice(0,c.sequencePads).map(sample=>sample?Math.min(2,sample.duration):0));
+  return Math.max(c.sequenceBase,longest+c.sequenceGap);
 }
-function sequenceTimeLimit() { return Math.max(120, Math.ceil(personalMedia.sequenceInterval * 70 + 30)); }
+function sequenceTimeLimit(){
+  const c=cfg[difficulty],count=c.sequenceRounds*(2*c.sequenceStart+c.sequenceRounds-1)/2;
+  return Math.max(120,Math.ceil(count*personalMedia.sequenceInterval*(1+c.sequenceReplays)+count*2+60));
+}
 function renderMemoryFace(button, symbol) {
   const i = symbols.indexOf(symbol), src = personalMedia.images[i];
   button.replaceChildren();
@@ -999,21 +1054,21 @@ function modal(html){
     syncPersonalMusic();
     keys={
     }
-  }modal('<div class="big">👻</div><h2 id="modal-title">Bienvenido a la peña</h2><p>Una fiesta de Halloween con cajón, guitarra y palmas.</p><ul><li><b>Aventura:</b> completa los cinco retos y suma sus puntos.</li><li><b>Caza Fantasmas:</b> captura 18 fantasmas. Evita las calaveras. Tienes 3 vidas.</li><li><b>Ritmo de Medianoche:</b> repite los sonidos en orden con A, S, D y F. Supera cinco rondas.</li><li><b>Dulces:</b> flechas ← →, botones o arrastra en el escenario. 🍬 y 🎸 +20 · ♪ +35 · 🎃 −1 vida · 🦇 −1 vida.</li><li><b>Operaciones Criollas:</b> lee las operaciones de abajo y toca el número correcto de su columna mientras cae. Hay una respuesta correcta entre tres. Completa 8 operaciones con 5 vidas. Suavecito: sumas y restas; Con sabor: multiplicaciones y divisiones fáciles; ¡Qué tal jarana!: multiplicaciones y divisiones más complejas.</li><li><b>Parejas:</b> toca dos cartas. Encuentra seis parejas antes de que termine el tiempo.</li><li>Gana una medalla al alcanzar la meta de cada reto. Puedes volver a intentar las veces que quieras.</li></ul><button class="primary" id="close-help">¡Entendido!</button>');
+  }modal('<div class="big">👻</div><h2 id="modal-title">Bienvenido a la peña</h2><p>Una fiesta de Halloween con cajón, guitarra y palmas.</p><ul><li><b>Aventura:</b> completa las cinco metas y consigue 400 de 500 puntos de energía para desbloquear Enciende la Peña. Un reto con 1, 2 o 3 estrellas da 60, 80 o 100 de energía. Puedes mejorar cada reto desde el panel final. Las tarjetas de juego libre también cuentan; tu progreso se conserva al volver al menú y al recargar. Los puntos reales se guardan tras cada juego; los reintentos no los duplican.</li><li><b>Enciende la Peña:</b> programa pasos, retrocesos y giros, recoge las luces y llega al escenario. La flecha marca la orientación. Sin tiempo límite ni pérdida de vidas.</li><li><b>Caza Fantasmas:</b> captura 8, 18 o 28 fantasmas según tu dificultad. Cambian el tamaño, movimiento, trampas y vidas.</li><li><b>Ritmo de Medianoche:</b> Suavecito usa 2 instrumentos y 3 rondas; Con sabor usa 4 instrumentos y 5 rondas; ¡Qué tal jarana! usa 4 instrumentos y 7 rondas más largas.</li><li><b>Dulces:</b> flechas ← →, botones o arrastra en el escenario. 🍬 y 🎸 +20 · ♪ +35 · 🎃 y 🦇 −1 vida. Meta: 140, 300 o 550 puntos según tu dificultad.</li><li><b>Operaciones Criollas:</b> lee las operaciones de abajo y toca el número correcto de su columna mientras cae. Hay una respuesta correcta entre tres. Completa 8 operaciones con 5 vidas. Suavecito: sumas y restas; Con sabor: multiplicaciones y divisiones fáciles; ¡Qué tal jarana!: multiplicaciones y divisiones más complejas.</li><li><b>Parejas:</b> encuentra 3, 6 o 9 parejas. Suavecito permite una vista previa larga; Con sabor, una vista breve; ¡Qué tal jarana!, ninguna.</li><li>Gana una medalla al alcanzar la meta de cada reto. La medalla Rey de la Jarana se obtiene al recuperar la peña en la misión final. Puedes volver a intentar las veces que quieras.</li></ul><button class="primary" id="close-help">¡Entendido!</button>');
   $('close-help').onclick=()=>{
     closeModal();
     if(running) { paused=false; syncPersonalMusic(); }
   }
 }$('help').onclick=help;
 const order=['ghost','catch','memory','rhythm','sequence'],titles={
-  ghost:'Caza Fantasmas',sequence:'Ritmo de Medianoche',catch:'Rescate Criollo',rhythm:'Operaciones Criollas',memory:'Memoria Embrujada'
+  ghost:'Caza Fantasmas',sequence:'Ritmo de Medianoche',catch:'Rescate Criollo',rhythm:'Operaciones Criollas',memory:'Memoria Embrujada',finale:'Enciende la Peña'
 },descs={
   ghost:'Captura 18 fantasmas. Las calaveras son trampas. Tienes 3 vidas.',sequence:'Observa y escucha. Después repite la secuencia con A, S, D y F.',catch:'Atrapa 🍬 y ♪. Esquiva 🎃 y 🦇. Meta: 300 puntos.',rhythm:'Resuelve las 3 operaciones de abajo y toca la respuesta correcta de cada columna mientras cae. Meta: 8 aciertos. Tienes 5 vidas.',memory:'Encuentra las 6 parejas antes de que termine el tiempo.'
 };
 function begin(k,isCampaign=false){
   campaign=isCampaign;
   chapter=0;
-  total=0;
+  total=progressPoints();
   difficulty=$('difficulty').value;
   prepare(k)
 }document.querySelectorAll('[data-game]').forEach(b=>b.onclick=()=>begin(b.dataset.game));
@@ -1030,11 +1085,11 @@ function prepare(k){
   cancelAnimationFrame(raf);
   $('home').classList.add('hidden');
   $('game').classList.remove('hidden');
-  if(k==='rhythm')descs.rhythm=mathDifficultyDescription();
+  descs[k]=gameDescription(k);
   $('game-title').textContent=titles[k];
   $('game-description').textContent=descs[k];
-  $('chapter').textContent=campaign?'Aventura · Reto '+(chapter+1)+' de 5 · '+$('difficulty').selectedOptions[0].textContent:'Juego libre · '+$('difficulty').selectedOptions[0].textContent;
-  ['ghost','catch','rhythm','memory','sequence'].forEach(x=>$(x+'-area').classList.toggle('hidden',x!==k));
+  $('chapter').textContent=campaign?(k==='finale'?'Aventura · Misión final · ':'Aventura · Reto '+(chapter+1)+' de 5 · ')+$('difficulty').selectedOptions[0].textContent:'Juego libre · '+$('difficulty').selectedOptions[0].textContent;
+  ['ghost','catch','rhythm','memory','sequence','finale'].forEach(x=>$(x+'-area').classList.toggle('hidden',x!==k));
   score=0;
   elapsed=0;
   paused=false;
@@ -1047,11 +1102,13 @@ function prepare(k){
   if(k==='catch')setupCatch();
   if(k==='rhythm')setupRhythm();
   if(k==='memory')setupMemory();
+  if(k==='finale')setupFinale();
+  paintQuestProgress();
   updateStats();
   modal('<div class="big">'+({
-    ghost:'👻',sequence:'🎶',catch:'🍬',rhythm:'➕',memory:'🎃'
+    ghost:'👻',sequence:'🎶',catch:'🍬',rhythm:'➕',memory:'🎃',finale:'🧭'
   }[k])+'</div><h2 id="modal-title">'+titles[k]+'</h2><p>'+descs[k]+'</p><p>'+({
-    ghost:'Haz clic o toca los fantasmas. También puedes seleccionarlos con Tab y capturarlos con Enter. Las trampas y los fantasmas que escapan rompen tu racha.',sequence:'Cajón: A · Guitarra: S · Palmas: D · Melodía: F. Cada ronda añade un sonido. Puedes escuchar una vez más por ronda.',catch:'Mueve la canasta con las flechas o con el dedo. Tienes 5 vidas.',rhythm:'Toca o haz clic en el número que responde a la operación de su columna. Puedes elegirlo mientras cae. Los errores y respuestas que escapan cuestan una vida.',memory:'Cada pareja suma 100 puntos. Al terminar, el tiempo restante suma puntos extra.'
+    ghost:'Toca los fantasmas o selecciónalos con Tab y Enter. Las trampas cuestan una vida. Los fantasmas que escapan rompen la racha.',sequence:difficulty==='easy'?'Cajón: A · Guitarra: S. Cada ronda añade un sonido; puedes repetirla dos veces.':'Cajón: A · Guitarra: S · Palmas: D · Melodía: F. Cada ronda añade un sonido. Las repeticiones disponibles dependen de tu dificultad.',catch:'Mueve la canasta con las flechas, los botones o el dedo. Evita las calabazas y los murciélagos.',rhythm:'Toca o haz clic en el número que responde a la operación de su columna. Puedes elegirlo mientras cae. Los errores y respuestas que escapan cuestan una vida.',memory:'Cada pareja suma 100 puntos. Al terminar, el tiempo restante suma puntos extra.',finale:'Añade instrucciones, ejecútalas y observa al guía 🧭. Si choca o le faltan luces, corrige el programa. No hay límite de tiempo.'
   }[k])+'</p><button class="primary" id="start">¡Vamos a jugar!</button>');
   $('start').onclick=async()=>{
     $('start').disabled=true;
@@ -1065,62 +1122,46 @@ function prepare(k){
     raf=requestAnimationFrame(loop)
   }
 }function updateStats(){
+  trackLiveScore();
   $('score').textContent=score;
-  $('time').textContent=Math.max(0,Math.ceil((mode==='memory'?cfg[difficulty].memory:mode==='sequence'?sequenceTimeLimit():mode==='rhythm'?mathTimeLimit():cfg[difficulty].duration)-elapsed))+' s';
-  $('extra').innerHTML=mode==='catch'?'Vidas <b>'+lives+' ♥</b>':mode==='memory'?'Parejas <b>'+pairs+'/6</b>':mode==='ghost'?'Vidas <b>'+ghostLives+' ♥</b>':mode==='sequence'?'Vidas <b>'+sequenceLives+' ♥</b>':'Vidas <b>'+mathLives+' ♥</b> · Aciertos <b>'+hits+'/8</b>'
+  $('time').textContent=mode==='finale'?'Sin límite':Math.max(0,Math.ceil(gameTimeLimit()-elapsed))+' s';
+  $('extra').innerHTML=mode==='finale'?'Luces <b>'+finalCollected.size+'/'+finalLevel.lights.length+'</b>':mode==='catch'?'Vidas <b>'+lives+' ♥</b>':mode==='memory'?'Parejas <b>'+pairs+'/'+cfg[difficulty].memoryPairs+'</b>':mode==='ghost'?'Vidas <b>'+ghostLives+' ♥</b>':mode==='sequence'?'Vidas <b>'+sequenceLives+' ♥</b>':'Vidas <b>'+mathLives+' ♥</b> · Aciertos <b>'+hits+'/8</b>'
 }function finish(reason=''){
+  if(!running)return;
   running=false;
   stopSamples();
   syncPersonalMusic();
   cancelAnimationFrame(raf);
   keys={
   };
-  const won=mode==='ghost'?ghostHits>=18:mode==='sequence'?sequenceCompleted===5:mode==='catch'?score>=300:mode==='rhythm'?hits>=8:pairs===6;
-  const stars=!won?0:mode==='ghost'?(ghostMistakes===0?3:ghostMistakes<=2?2:1):mode==='sequence'?(sequenceMistakes===0?3:sequenceMistakes===1?2:1):mode==='memory'?(moves<=8?3:moves<=12?2:1):mode==='rhythm'?(misses===0?3:misses<=2?2:1):(lives===5?3:lives>=3?2:1);
-  total+=score;
-  if(campaign)campaignWins[chapter]=won;
-  if(won&&!saved.medals.includes(mode)){
-    saved.medals.push(mode);
-    toast('¡Nueva medalla en tu colección!')
-  }
+  const won=mode==='ghost'?ghostHits>=cfg[difficulty].ghostGoal:mode==='sequence'?sequenceCompleted===cfg[difficulty].sequenceRounds:mode==='catch'?score>=cfg[difficulty].catchGoal:mode==='rhythm'?hits>=8:pairs===cfg[difficulty].memoryPairs;
+  const stars=!won?0:mode==='ghost'?(ghostMistakes===0?3:ghostMistakes<=2?2:1):mode==='sequence'?(sequenceMistakes===0?3:sequenceMistakes===1?2:1):mode==='memory'?(moves<=cfg[difficulty].memoryPairs+2?3:moves<=cfg[difficulty].memoryPairs*2?2:1):mode==='rhythm'?(misses===0?3:misses<=2?2:1):(lives===cfg[difficulty].catchLives?3:lives>=Math.ceil(cfg[difficulty].catchLives/2)?2:1);
+  const old=saved.progress[mode]||{score:0,quality:0,won:false};
+  const quality=won?(stars===3?100:stars===2?80:60):Math.min(50,Math.round(stageProgress()*50));
+  saved.progress[mode]={score:Math.max(old.score,score),quality:Math.max(old.quality,quality),won:old.won||won};
+  campaignResults=order.map(k=>saved.progress[k]);
+  campaignWins=campaignResults.map(r=>r.won);
+  total=progressPoints();
+  saved.best=Math.max(Number(saved.best)||0,total);
+  saved.missionBest=Math.max(saved.missionBest||0,questEnergy());
+  if(!campaign)saved.freeBest=Math.max(saved.freeBest||0,score);
+  if(won&&!saved.medals.includes(mode)){saved.medals.push(mode);toast('¡Nueva medalla en tu colección!')}
+  save();paintRecords();paintQuestProgress();tone(won?659:220,.3);
   const final=campaign&&chapter===order.length-1;
-  if(final){
-    saved.best=Math.max(saved.best,total);
-    if(campaignWins.length===order.length&&campaignWins.every(Boolean)&&!saved.medals.includes('adventure'))saved.medals.push('adventure')
-  }
-  save();
-  paintRecords();
-  tone(won?659:220,.3);
-  modal('<div class="big">'+(won?'🌟':'👻')+'</div><div class="eyebrow">'+(campaign?'Reto '+(chapter+1)+' de '+order.length:'Juego libre')+'</div><h2 id="modal-title">'+(final?'¡La peña vuelve a sonar!':won?'¡Reto completado!':'¡Inténtalo otra vez!')+'</h2><div class="result-stars">'+('★'.repeat(stars)+'☆'.repeat(3-stars))+'</div><p>'+reason+'</p><p>'+(won?'Recuperaste una parte de la fiesta. ¡Buen trabajo!':'La meta aún está pendiente. Puedes reintentar este reto.')+'</p><div class="result-stats"><div><b>'+score+'</b><span>Puntos del reto</span></div>'+(campaign?'<div><b>'+total+'</b><span>Total aventura</span></div>':'')+'</div><div class="modal-actions">'+(campaign&&!final?'<button class="primary" id="next">Siguiente reto</button><button class="soft" id="retry">Reintentar reto</button>':'<button class="primary" id="again">'+(final?'Repetir aventura':'Volver a jugar')+'</button>')+'<button class="soft" id="home-btn">Menú principal</button></div>');
-  if($('next'))$('next').onclick=()=>{
-    closeModal();
-    chapter++;
-    prepare(order[chapter])
-  };
-  if($('retry'))$('retry').onclick=()=>{
-    closeModal();
-    total-=score;
-    prepare(mode)
-  };
-  if($('again'))$('again').onclick=()=>{
-    closeModal();
-    if(final){
-      campaignWins=[];
-      begin('ghost',true)
-    }else{
-      total-=score;
-      prepare(mode)
-    }
-  };
-  $('home-btn').onclick=()=>{
-    closeModal();
-    home()
-  };
+  modal('<div class="big">'+(won?'🌟':'👻')+'</div><div class="eyebrow">'+(campaign?'Reto '+(chapter+1)+' de 5':'Juego libre')+'</div><h2 id="modal-title">'+(won?'¡Reto completado!':'¡Inténtalo otra vez!')+'</h2><div class="result-stars">'+('★'.repeat(stars)+'☆'.repeat(3-stars))+'</div><p>'+reason+'</p><p>'+(won?'Recuperaste una parte de la fiesta. ¡Buen trabajo!':'Puedes reintentar para alcanzar la meta.')+'</p><div class="result-stats"><div><b>'+score+'</b><span>Puntos del reto</span></div>'+(campaign?'<div><b>'+total+'</b><span>Total aventura</span></div>':'')+'</div>'+(campaign?'<p>Energía de la peña: <b>'+questEnergy()+'/500</b> · Necesitas 400 y completar las cinco metas.</p>':'')+'<div class="modal-actions">'+(campaign?'<button class="primary" id="next">'+(reviewingCheckpoint?'Volver al panel de misión':final?'Preparar misión final':'Siguiente reto')+'</button><button class="soft" id="retry">Reintentar reto</button>':'<button class="primary" id="again">Volver a jugar</button>')+'<button class="primary" id="open-final-progress">'+(finaleUnlocked()?'¡Ir a la misión final!':'Ver avance de la misión')+'</button><button class="soft" id="home-btn">Menú principal</button></div>');
+  if($('next'))$('next').onclick=()=>{closeModal();if(final||reviewingCheckpoint)missionHub();else{chapter++;prepare(order[chapter])}};
+  if($('retry'))$('retry').onclick=()=>{closeModal();prepare(mode)};
+  if($('again'))$('again').onclick=()=>{closeModal();prepare(mode)};
+  $('open-final-progress').onclick=()=>{closeModal();missionHub()};
+  $('home-btn').onclick=home;
 }
-let campaignWins=[];
+
+let campaignWins=[],campaignResults=[],reviewingCheckpoint=false;
 const oldBegin=begin;
 begin=function(k,c=false){
   campaignWins=[];
+  campaignResults=order.map(k=>saved.progress[k]);
+  reviewingCheckpoint=false;
   oldBegin(k,c)
 };
 function home(){
@@ -1132,6 +1173,7 @@ function home(){
   closeModal();
   $('game').classList.add('hidden');
   $('home').classList.remove('hidden');
+  paintRecords();
   syncPersonalMusic();
   $('adventure').focus()
 }function pause(){
@@ -1181,6 +1223,7 @@ document.addEventListener('keydown',e=>{
       }
     }return
   }if(!running||paused)return;
+  if(mode==='finale'&&!e.repeat&&['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)){e.preventDefault();addCommand({ArrowUp:'forward',ArrowDown:'back',ArrowLeft:'left',ArrowRight:'right'}[e.key]);return}
   if(['ArrowLeft','ArrowRight',' '].includes(e.key))e.preventDefault();
   if(e.key==='Escape'||e.key==='p'){
     pause();
@@ -1206,7 +1249,7 @@ function setupCatch(){
   playerX=480;
   items=[];
   spawn=.3;
-  lives=5;
+  lives=cfg[difficulty].catchLives;
   flash=0;
   drawCatch()
 }function drawCatch(){
@@ -1240,10 +1283,8 @@ function setupCatch(){
   spawn-=dt;
   if(spawn<=0){
     spawn=cfg[difficulty].interval;
-    let r=Math.random();
-    items.push({
-      x:40+Math.random()*880,y:-35,type:r<.4?'🍬':r<.58?'🎸':r<.73?'♪':r<.9?'🎃':'🦇',speed:cfg[difficulty].speed*(.9+Math.random()*.35)+elapsed*.8
-    })
+    const c=cfg[difficulty],hazard=Math.random()<c.catchHazard,r=Math.random();
+    items.push({x:40+Math.random()*880,y:-35,type:hazard?(Math.random()<.5?'🎃':'🦇'):(r<.5?'🍬':r<.8?'🎸':'♪'),speed:c.speed*(.9+Math.random()*.2)})
   }items.forEach(it=>{
     it.y+=it.speed*dt;
     if(it.y>325&&it.y<396&&Math.abs(it.x-playerX)<48){
@@ -1252,9 +1293,9 @@ function setupCatch(){
         score+=it.type==='♪'?35:20;
         tone(it.type==='🍬'?659:880,.07);
         say(it.type==='♪'?'+35 ¡La música vuelve a la peña!':'+20 ¡Objeto recuperado!')
-      }else{
+      }else if(flash<=0){
         lives--;
-        flash=.25;
+        flash=.65;
         tone(130,.12,'sawtooth',.035);
         say('¡Travesura! Pierdes una vida.')
       }
@@ -1263,7 +1304,8 @@ function setupCatch(){
   items=items.filter(it=>!it.dead&&it.y<470);
   flash=Math.max(0,flash-dt);
   drawCatch();
-  if(lives<=0)finish('Se acabaron las vidas.')
+  if(lives<=0)finish('Se acabaron las vidas.');
+  else if(score>=cfg[difficulty].catchGoal)finish('¡Meta alcanzada! Recuperaste '+score+' puntos.');
 }function pointer(e){
   if(!running||paused||mode!=='catch')return;
   let r=canvas.getBoundingClientRect();
@@ -1300,7 +1342,8 @@ function mathDifficultyDescription() {
   return MATH_DIFFICULTIES[difficulty].description + ' Lee las 3 operaciones de abajo y toca la respuesta correcta de cada columna mientras cae. Hay 3 opciones y solo una correcta. Meta: 8 aciertos. Tienes 5 vidas.';
 }
 function updateDifficultyHint() {
-  $('difficulty-hint').textContent=MATH_DIFFICULTIES[$('difficulty').value].description;
+  const key=$('difficulty').value,c=cfg[key];
+  $('difficulty-hint').textContent=c.ghostGoal+' fantasmas · '+c.memoryPairs+' parejas · '+c.sequenceRounds+' rondas musicales · '+MATH_DIFFICULTIES[key].description;
 }
 $('difficulty').addEventListener('change',updateDifficultyHint);
 updateDifficultyHint();
@@ -1400,7 +1443,8 @@ function rhythmTick() {
 }
 
 let deck=[],first=null,second=null,lock=false,pairs=0,moves=0,revealUntil=0;
-const symbols=['🎸','🥁','👏','🎃','👻','🍬'];
+const symbols=['🥁','🎸','👏','🎃','👻','🍬','🦇','🕯️','🎭'];
+let memoryPreviewUntil=0;
 function shuffle(a){
   for(let i=a.length-1;
   i>0;
@@ -1409,7 +1453,10 @@ function shuffle(a){
     [a[i],a[j]]=[a[j],a[i]]
   }return a
 }function setupMemory(){
-  deck=shuffle([...symbols,...symbols]);
+  const c=cfg[difficulty],chosen=symbols.slice(0,c.memoryPairs);
+  deck=shuffle([...chosen,...chosen]);
+  memoryPreviewUntil=c.memoryPreview;
+  $('memory-grid').dataset.difficulty=difficulty;
   first=null;
   second=null;
   lock=false;
@@ -1417,9 +1464,12 @@ function shuffle(a){
   moves=0;
   revealUntil=0;
   $('memory-grid').innerHTML=deck.map((s,i)=>'<button class="tile" data-card="'+i+'" aria-label="Carta '+(i+1)+' oculta">♫</button>').join('');
-  document.querySelectorAll('[data-card]').forEach(b=>b.onclick=()=>flip(Number(b.dataset.card)))
+  document.querySelectorAll('[data-card]').forEach(b=>{
+    b.onclick=()=>flip(Number(b.dataset.card));
+    if(memoryPreviewUntil>0){b.classList.add('flipped');b.disabled=true;renderMemoryFace(b,deck[Number(b.dataset.card)]);}
+  })
 }function flip(i){
-  if(!running||paused||lock)return;
+  if(!running||paused||lock||memoryPreviewUntil>0)return;
   const b=document.querySelector('[data-card="'+i+'"]');
   if(b.classList.contains('matched')||i===first)return;
   b.classList.add('flipped');
@@ -1442,7 +1492,7 @@ function shuffle(a){
     second=null;
     say('¡Pareja encontrada! +100');
     playSuccessSound();
-    if(pairs===6){
+    if(pairs===cfg[difficulty].memoryPairs){
       const bonus=Math.max(0,Math.ceil(cfg[difficulty].memory-elapsed))*5;
       score+=bonus;
       updateStats();
@@ -1450,12 +1500,16 @@ function shuffle(a){
     }
   }else{
     lock=true;
-    revealUntil=elapsed+1;
+    revealUntil=elapsed+cfg[difficulty].memoryMismatch;
     [first,second].forEach(n=>document.querySelector('[data-card="'+n+'"]').classList.add('memory-miss'));
     playErrorSound();
     say('Mira bien y recuerda sus lugares.')
   }updateStats()
 }function memoryTick(){
+  if(memoryPreviewUntil>0&&elapsed>=memoryPreviewUntil){
+    document.querySelectorAll('[data-card]').forEach(b=>{b.classList.remove('flipped');b.textContent='♫';b.disabled=false;});
+    memoryPreviewUntil=0;
+  }
   if(lock&&elapsed>=revealUntil){
     [first,second].forEach(i=>{
       const b=document.querySelector('[data-card="'+i+'"]');
@@ -1479,11 +1533,12 @@ function loop(now){
     else if(mode==='ghost')ghostTick(dt);
     else if(mode==='sequence')sequenceTick();
     else if(mode==='rhythm')rhythmTick();
+    else if(mode==='finale')finaleTick();
     else memoryTick();
     if(!running)return;
     updateStats();
     if(feedbackUntil&&elapsed>feedbackUntil)$('feedback').textContent='';
-    if(elapsed>=(mode==='memory'?cfg[difficulty].memory:mode==='sequence'?sequenceTimeLimit():mode==='rhythm'?mathTimeLimit():cfg[difficulty].duration)){
+    if(elapsed>=gameTimeLimit()){
       finish(mode==='rhythm'?'Operaciones resueltas: '+hits+' de 8.':'¡Tiempo cumplido!');
       return
     }
@@ -1495,21 +1550,24 @@ function setupGhost(){
   ghosts=[];
   ghostSpawnAt=.3;
   ghostHits=0;
-  ghostLives=3;
+  ghostLives=cfg[difficulty].ghostLives;
   ghostMistakes=0;
   ghostCombo=0;
   $('ghost-arena').innerHTML='';
-  $('ghost-count').textContent='0 / 18 capturas'
+  $('ghost-count').textContent='0 / '+cfg[difficulty].ghostGoal+' capturas'
 }
 function spawnGhost(){
-  const arena=$('ghost-arena'),trap=Math.random()<.22,bonus=!trap&&Math.random()<.15;
+  const c=cfg[difficulty],arena=$('ghost-arena');
+  if(ghosts.length>=c.ghostMax)return;
+  const trap=Math.random()<c.ghostTrap,bonus=!trap&&Math.random()<.15;
   const el=document.createElement('button');
   el.className='ghost-target'+(trap?' trap':'')+(bonus?' bonus':'');
   el.textContent=trap?'💀':'👻';
   el.setAttribute('aria-label',trap?'Trampa: evita la calavera':bonus?'Fantasma dorado: puntos extra':'Capturar fantasma');
-  const size=arena.clientWidth<400?64:76;
+  const size=arena.clientWidth<400?Math.min(76,c.ghostSize):c.ghostSize;
+  el.style.width=size+'px';el.style.height=size+'px';el.style.fontSize=Math.round(size*.6)+'px';
   const g={
-    el,trap,bonus,x:Math.random()*Math.max(1,arena.clientWidth-size),y:12+Math.random()*Math.max(1,arena.clientHeight-size-24),born:elapsed,ttl:difficulty==='easy'?2.8:difficulty==='hard'?1.65:2.2,phase:Math.random()*6
+    el,trap,bonus,x:Math.random()*Math.max(1,arena.clientWidth-size),y:12+Math.random()*Math.max(1,arena.clientHeight-size-24),born:elapsed,ttl:c.ghostTTL,phase:Math.random()*6,size
   };
   el.style.left=g.x+'px';
   el.style.top=g.y+'px';
@@ -1534,21 +1592,23 @@ function captureGhost(g){
     score+=points;
     tone(g.bonus?880:659,.1);
     say('+'+points+' · '+(g.bonus?'¡Fantasma dorado!':ghostCombo>=5?'¡Racha de capturas!':'¡Fantasma capturado!'));
-    $('ghost-count').textContent=ghostHits+' / 18 capturas'
+    $('ghost-count').textContent=ghostHits+' / '+cfg[difficulty].ghostGoal+' capturas'
   }updateStats();
-  if(ghostLives<=0)finish('Caíste en tres trampas. Capturas: '+ghostHits+'.');
-  else if(ghostHits>=18){
-    const bonus=Math.ceil(cfg[difficulty].duration-elapsed)*5;
+  if(ghostLives<=0)finish('Se acabaron las vidas. Capturas: '+ghostHits+'.');
+  else if(ghostHits>=cfg[difficulty].ghostGoal){
+    const bonus=Math.ceil(cfg[difficulty].ghostTime-elapsed)*5;
     score+=Math.max(0,bonus);
-    finish('18 fantasmas capturados. Bonus de tiempo: '+Math.max(0,bonus)+' puntos.')
+    finish(cfg[difficulty].ghostGoal+' fantasmas capturados. Bonus de tiempo: '+Math.max(0,bonus)+' puntos.')
   }
 }
 function ghostTick(){
   if(elapsed>=ghostSpawnAt){
     spawnGhost();
-    ghostSpawnAt=elapsed+(difficulty==='hard'?.55:.72)
+    ghostSpawnAt=elapsed+cfg[difficulty].ghostInterval
   }ghosts.forEach(g=>{
-    g.el.style.transform='translateY('+Math.sin((elapsed-g.born)*3+g.phase)*5+'px)';
+    const arena=$('ghost-arena'),motion=cfg[difficulty].ghostMotion,age=elapsed-g.born;
+    g.el.style.left=Math.max(0,Math.min(arena.clientWidth-g.size,g.x+Math.sin(age*2+g.phase)*motion))+'px';
+    g.el.style.top=Math.max(0,Math.min(arena.clientHeight-g.size,g.y+Math.sin(age*3+g.phase)*motion))+'px';
     if(elapsed>g.born+g.ttl){
       g.dead=true;
       g.el.remove();
@@ -1567,24 +1627,26 @@ function setupSequence(){
   sequence=[];
   sequenceRound=1;
   sequenceCompleted=0;
-  sequenceLives=3;
+  sequenceLives=cfg[difficulty].sequenceLives;
   sequenceMistakes=0;
-  $('sequence-pads').innerHTML=seqNames.map((name,i)=>'<button class="seq-pad" data-seq="'+i+'" aria-label="'+name+' tecla '+['A','S','D','F'][i]+'"><span class="pad-icon">'+seqIcons[i]+'</span><b>'+name+'</b><kbd>'+['A','S','D','F'][i]+'</kbd></button>').join('');
+  $('sequence-pads').dataset.difficulty=difficulty;
+  $('sequence-pads').innerHTML=seqNames.slice(0,cfg[difficulty].sequencePads).map((name,i)=>'<button class="seq-pad" data-seq="'+i+'" aria-label="'+name+' tecla '+['A','S','D','F'][i]+'"><span class="pad-icon">'+seqIcons[i]+'</span><b>'+name+'</b><kbd>'+['A','S','D','F'][i]+'</kbd></button>').join('');
   document.querySelectorAll('[data-seq]').forEach(b=>b.onclick=()=>sequenceHit(Number(b.dataset.seq)));
   $('replay-sequence').onclick=()=>{
     if(running&&!paused&&mode==='sequence'&&sequencePhase==='input'&&sequenceReplay>0){
       sequenceReplay--;
       sequencePlay();
-      $('replay-sequence').textContent='Escuchar otra vez (0)'
+      $('replay-sequence').textContent='Escuchar otra vez ('+sequenceReplay+')'
     }
   };
   sequenceNext()
 }
 function sequenceNext(){
-  sequence.push(Math.floor(Math.random()*4));
-  sequenceReplay=1;
-  $('replay-sequence').textContent='Escuchar otra vez (1)';
-  $('sequence-round').textContent='Ronda '+sequenceRound+' / 5';
+  const c=cfg[difficulty],length=c.sequenceStart+sequenceRound-1;
+  while(sequence.length<length)sequence.push(Math.floor(Math.random()*c.sequencePads));
+  sequenceReplay=c.sequenceReplays;
+  $('replay-sequence').textContent=sequenceReplay?'Escuchar otra vez ('+sequenceReplay+')':'Sin repetición extra';
+  $('sequence-round').textContent='Ronda '+sequenceRound+' / '+c.sequenceRounds;
   sequencePlay()
 }
 function sequencePlay(){
@@ -1639,7 +1701,7 @@ function sequenceTick(){
   }
 }
 function sequenceHit(i){
-  if(!running||paused||mode!=='sequence'||sequencePhase!=='input'||!Number.isInteger(i)||i<0||i>3)return;
+  if(!running||paused||mode!=='sequence'||sequencePhase!=='input'||!Number.isInteger(i)||i<0||i>=cfg[difficulty].sequencePads)return;
   seqFlash(i);
   if(i!==sequence[sequenceInput]){
     sequenceLives--;
@@ -1651,7 +1713,7 @@ function sequenceHit(i){
     $('sequence-status').textContent='Casi… escucha el mismo patrón otra vez';
     say('Pierdes una vida. La secuencia se mantiene.');
     updateStats();
-    if(sequenceLives<=0)finish('Completaste '+sequenceCompleted+' de 5 rondas.');
+    if(sequenceLives<=0)finish('Completaste '+sequenceCompleted+' de '+cfg[difficulty].sequenceRounds+' rondas.');
     return
   }const step=$('seq-step-'+sequenceInput);
   step.classList.add('correct');
@@ -1665,12 +1727,146 @@ function sequenceHit(i){
     sequencePhase='next';
     sequencePhaseAt=elapsed+.85;
     seqEnable(false);
-    if(sequenceCompleted===5){
+    if(sequenceCompleted===cfg[difficulty].sequenceRounds){
       score+=sequenceLives*100;
-      finish('Completaste las cinco secuencias. ¡El escenario vuelve a sonar!')
+      finish('Completaste las '+cfg[difficulty].sequenceRounds+' rondas. ¡El escenario vuelve a sonar!')
     }
   }updateStats()
 }
+// One shared, persistent progress record for adventure and individual games.
+function trackLiveScore(){
+  if(!saved.progress[mode]||score<=saved.progress[mode].score)return;
+  saved.progress[mode].score=score;
+  total=progressPoints();saved.best=Math.max(Number(saved.best)||0,total);
+  save();paintRecords();paintQuestProgress();
+}
+function paintHomeMission(){
+  const done=['ghost','catch','memory','rhythm','sequence'].filter(k=>saved.progress[k]?.won).length,ready=finaleUnlocked();
+  $('mission-home-status').textContent=done+'/5 metas · '+questEnergy()+'/500 energía';
+  $('mission-home-action').textContent=ready?'¡Jugar misión final! →':'Ver lo que falta →';
+  $('final-mission').classList.toggle('unlocked',ready);
+}
+// Campaign checkpoints and final computational-thinking mission.
+function stageProgress(){
+  const c=cfg[difficulty];
+  return Math.min(1,mode==='ghost'?ghostHits/c.ghostGoal:mode==='catch'?score/c.catchGoal:mode==='memory'?pairs/c.memoryPairs:mode==='sequence'?sequenceCompleted/c.sequenceRounds:hits/8);
+}
+function questEnergy(){return ['ghost','catch','memory','rhythm','sequence'].reduce((sum,k)=>sum+(saved.progress[k]?.quality||0),0)}
+function finaleUnlocked(){return ['ghost','catch','memory','rhythm','sequence'].every(k=>saved.progress[k]?.won)&&questEnergy()>=400}
+function paintQuestProgress(){
+  $('quest-progress').classList.remove('hidden');
+  const energy=questEnergy(),done=Object.values(saved.progress).filter(r=>r?.won).length;
+  $('quest-progress').innerHTML='<b>Recupera la peña · '+done+'/5 metas · '+total+' puntos</b><p>Energía '+energy+'/500 · Misión final: 400 de energía y cinco metas cumplidas</p><progress max="500" value="'+energy+'" aria-label="Energía de la peña"></progress>';
+}
+function missionHub(){
+  running=false;stopSamples();cancelAnimationFrame(raf);syncPersonalMusic();
+  total=progressPoints();campaignResults=order.map(k=>saved.progress[k]);
+  difficulty=$('difficulty').value;
+  const unlocked=finaleUnlocked();
+  modal('<div class="big">'+(unlocked?'🔥':'🕯️')+'</div><div class="eyebrow">El último desafío</div><h2 id="modal-title">'+(unlocked?'¡Enciende la Peña!':'La fiesta necesita más luz')+'</h2><p>'+ (unlocked?'La música y los recuerdos están recuperados. Falta llevar las luces al escenario: programa el camino del guía y devuelve la vida a la peña.':'Completa las cinco metas y reúne 400 de 500 de energía. No necesitas una partida perfecta: dos estrellas en cada reto bastan. Mejora el reto que prefieras; siempre conservamos tu mejor resultado.')+'</p><div class="result-stats"><div><b>'+total+'</b><span>Puntos de aventura</span></div><div><b>'+questEnergy()+'/500</b><span>Energía recuperada</span></div></div><div class="mission-checkpoints">'+order.map((k,i)=>'<button id="checkpoint-'+i+'">'+titles[k]+'<span>'+(campaignResults[i]?.won?'✓ ':'○ ')+(campaignResults[i]?.quality||0)+'/100 ↻</span></button>').join('')+'</div><div class="modal-actions">'+(unlocked?'<button class="primary" id="enter-final">¡Vamos al desafío final!</button>':'')+'<button class="soft" id="mission-home">Menú principal</button></div>');
+  order.forEach((k,i)=>$('checkpoint-'+i).onclick=()=>{closeModal();campaign=true;reviewingCheckpoint=true;chapter=i;prepare(k)});
+  if(unlocked)$('enter-final').onclick=()=>{if(!finaleUnlocked())return;campaign=true;chapter=5;closeModal();prepare('finale')};
+  $('mission-home').onclick=home;
+}
+const finalLevels={
+  easy:{size:4,limit:16,path:[[0,3],[0,2],[1,2],[2,2],[2,1],[3,1],[3,0]],lights:[2],hint:'Miras hacia arriba al inicio. Recoge una luz. Girar no cambia de casilla.'},
+  normal:{size:5,limit:30,path:[[0,4],[0,3],[0,2],[1,2],[2,2],[2,3],[3,3],[4,3],[4,2],[4,1],[3,1],[3,0],[4,0]],lights:[3,8],hint:'Recoge las dos luces antes del escenario. Prueba tu programa y corrige las instrucciones que te desvían.'},
+  hard:{size:6,limit:42,path:[[0,5],[0,4],[1,4],[2,4],[2,5],[3,5],[4,5],[4,4],[4,3],[3,3],[2,3],[2,2],[3,2],[4,2],[5,2],[5,1],[4,1],[4,0],[5,0]],lights:[4,10,15],hint:'Tres luces y un camino con más giros. Retroceder te mueve a la casilla de atrás sin cambiar tu orientación.'}
+};
+const commandInfo={forward:{icon:'↑',label:'Paso adelante'},back:{icon:'↓',label:'Paso atrás'},left:{icon:'↶',label:'Giro a la izquierda'},right:{icon:'↷',label:'Giro a la derecha'}};
+let finalLevel=null,finalPlan=[],finalPosition=null,finalDirection=0,finalCollected=new Set(),finalVisited=new Set(),finalExecuting=false,finalIndex=0,finalNextAt=0,finalWon=false,finalCelebratingAt=0;
+function sceneMarkup(celebrate=false){
+  return '<div class="bulbs">'+Array.from({length:10},()=>'<i></i>').join('')+'</div><div class="musicians">🎸 🥁 👏 🎶</div>'+(celebrate?Array.from({length:26},(_,i)=>'<i class="confetti" style="left:'+(i*3.8)+'%;animation-delay:'+(-(i%7)*.4)+'s;background:'+['#ff9238','#ffd36b','#ff4532'][i%3]+'"></i>').join(''):'');
+}
+function setupFinale(){
+  finalLevel=finalLevels[difficulty];finalPlan=[];finalWon=false;finalCelebratingAt=0;
+  $('final-scene').classList.remove('restored');$('final-scene').innerHTML=sceneMarkup();
+  $('final-tip').textContent=finalLevel.hint;
+  $('final-board').style.gridTemplateColumns='repeat('+finalLevel.size+',1fr)';
+  resetFinalPosition();renderFinalPlan();
+  $('final-status').textContent='Empiezas en la brújula 🧭, mirando hacia arriba. Lleva las luces ✨ al escenario 🎪.';
+  Object.keys(commandInfo).forEach(k=>$('cmd-'+k).onclick=()=>addCommand(k));
+  $('run-program').onclick=runFinalProgram;
+  $('undo-program').onclick=()=>{if(canEditFinal()){finalPlan.pop();renderFinalPlan()}};
+  $('clear-program').onclick=()=>{if(canEditFinal()){finalPlan=[];renderFinalPlan();resetFinalPosition()}};
+  $('reset-program').onclick=()=>{if(!running||paused||finalWon)return;resetFinalPosition();renderFinalPlan();$('final-status').textContent='De vuelta al inicio. Tu programa se conserva: puedes editarlo o volver a ejecutarlo.'};
+}
+function resetFinalPosition(){
+  finalPosition=[...finalLevel.path[0]];finalDirection=0;finalCollected=new Set();finalVisited=new Set([finalPosition.join(',')]);finalExecuting=false;finalIndex=0;renderFinalBoard();updateFinalControls();
+}
+function canEditFinal(){return running&&!paused&&!finalExecuting&&!finalWon}
+function addCommand(k){
+  if(!canEditFinal()||!commandInfo[k])return;
+  if(finalPlan.length>=finalLevel.limit){$('final-status').textContent='Programa lleno. Elimina una instrucción para añadir otra.';return}
+  finalPlan.push(k);renderFinalPlan();
+}
+function renderFinalPlan(){
+  $('command-count').textContent=finalPlan.length+' / '+finalLevel.limit+' instrucciones';
+  $('command-list').innerHTML=finalPlan.map((k,i)=>'<li><button class="command-chip'+(finalExecuting&&i===finalIndex?' active':'')+'" id="program-step-'+i+'" aria-label="Instrucción '+(i+1)+': '+commandInfo[k].label+'. Toca para eliminar.">'+commandInfo[k].icon+'</button></li>').join('');
+  finalPlan.forEach((_,i)=>$('program-step-'+i).onclick=()=>{if(canEditFinal()){finalPlan.splice(i,1);renderFinalPlan()}});
+  updateFinalControls();
+}
+function updateFinalControls(){
+  if(!finalLevel)return;
+  Object.keys(commandInfo).forEach(k=>$('cmd-'+k).disabled=finalExecuting||finalWon);
+  ['undo-program','clear-program'].forEach(k=>$(k).disabled=finalExecuting||finalWon);
+  $('run-program').disabled=finalExecuting||finalWon||!finalPlan.length;
+  $('reset-program').disabled=finalWon;
+}
+function renderFinalBoard(){
+  const path=new Set(finalLevel.path.map(p=>p.join(','))),end=finalLevel.path.at(-1),lightKeys=finalLevel.lights.map(i=>finalLevel.path[i].join(','));
+  let html='';
+  for(let y=0;y<finalLevel.size;y++)for(let x=0;x<finalLevel.size;x++){
+    const key=x+','+y,wall=!path.has(key),here=finalPosition[0]===x&&finalPosition[1]===y,goal=end[0]===x&&end[1]===y,light=lightKeys.includes(key),collected=finalCollected.has(key),arrow=['↑','→','↓','←'][finalDirection];
+    html+='<div class="final-cell'+(wall?' wall':'')+(goal?' goal':'')+(collected?' lit':'')+(finalVisited.has(key)?' visited':'')+'" aria-label="Fila '+(y+1)+', columna '+(x+1)+': '+(wall?'obstáculo':here?'guía mirando '+['arriba','derecha','abajo','izquierda'][finalDirection]:goal?'escenario':light&&!collected?'luz por recoger':'camino')+'">'+(wall?'▪':goal?'🎪':light&&!collected?'✨':collected?'🕯️':key===finalLevel.path[0].join(',')?'◎':'')+(here?'<span class="guide" aria-hidden="true">🧑‍🎤<span class="direction">'+arrow+'</span></span>':'')+'</div>';
+  }
+  $('final-board').innerHTML=html;
+}
+function runFinalProgram(){
+  if(!canEditFinal())return;
+  if(!finalPlan.length){$('final-status').textContent='Añade primero una instrucción.';return}
+  resetFinalPosition();finalExecuting=true;finalNextAt=elapsed+.55;renderFinalPlan();$('final-status').textContent='Observa: el guía ejecuta tu programa paso a paso.';
+}
+function finalProgramError(message){
+  finalExecuting=false;playErrorSound();renderFinalPlan();$('final-status').textContent=message+' Corrige tu programa y vuelve a ejecutar desde el inicio.';
+}
+function finaleTick(){
+  if(finalWon){if(finalCelebratingAt&&elapsed>=finalCelebratingAt){finalCelebratingAt=0;showFinalVictory()}return}
+  if(!finalExecuting||elapsed<finalNextAt)return;
+  const k=finalPlan[finalIndex];
+  if(k==='left')finalDirection=(finalDirection+3)%4;
+  else if(k==='right')finalDirection=(finalDirection+1)%4;
+  else{
+    const [dx,dy]=[[0,-1],[1,0],[0,1],[-1,0]][finalDirection],sign=k==='back'?-1:1,next=[finalPosition[0]+dx*sign,finalPosition[1]+dy*sign];
+    if(!finalLevel.path.some(p=>p[0]===next[0]&&p[1]===next[1])){finalProgramError('La instrucción '+(finalIndex+1)+' encuentra un obstáculo o sale del tablero.');return}
+    finalPosition=next;finalVisited.add(next.join(','));
+    if(finalLevel.lights.some(i=>finalLevel.path[i].join(',')===next.join(','))&&!finalCollected.has(next.join(','))){finalCollected.add(next.join(','));tone(880,.12);$('final-status').textContent='¡Luz recuperada! '+finalCollected.size+' de '+finalLevel.lights.length}
+  }
+  renderFinalBoard();updateStats();
+  const end=finalLevel.path.at(-1);
+  if(finalPosition[0]===end[0]&&finalPosition[1]===end[1]&&finalCollected.size===finalLevel.lights.length){completeFinale();return}
+  finalIndex++;finalNextAt=elapsed+.65;
+  if(finalIndex>=finalPlan.length){finalProgramError('El programa terminó '+(finalPosition.join(',')===end.join(',')?'pero aún faltan luces.':'antes de llegar al escenario con todas las luces.'));return}
+  renderFinalPlan();
+}
+function completeFinale(){
+  if(finalWon)return;finalWon=true;finalExecuting=false;finalCelebratingAt=elapsed+2.2;
+  score=500;saved.finalBonus=500;total=progressPoints();
+  saved.best=Math.max(saved.best||0,total);
+  if(!saved.medals.includes('adventure'))saved.medals.push('adventure');
+  save();paintRecords();paintQuestProgress();updateStats();updateFinalControls();
+  $('final-scene').innerHTML=sceneMarkup(true);$('final-scene').classList.add('restored');
+  $('final-status').textContent='¡Lo lograste! La peña recupera sus luces y la jarana vuelve a sonar.';
+  playSuccessSound();
+}
+function showFinalVictory(){
+  running=false;stopSamples();cancelAnimationFrame(raf);syncPersonalMusic();
+  modal('<div class="peña-scene restored victory-scene">'+sceneMarkup(true)+'</div><div class="eyebrow">Misión cumplida</div><h2 id="modal-title">¡Recuperaste la Peña Embrujada!</h2><p>Espantaste a los fantasmas, rescataste la fiesta y programaste el camino de las luces. ¡La guitarra, el cajón y las palmas vuelven a sonar gracias a ti!</p><div class="result-stars">★★★</div><p>🏆 <b>¡Ahora eres Rey de la Jarana!</b></p><div class="result-stats"><div><b>'+total+'</b><span>Puntos de aventura</span></div><div><b>+500</b><span>Misión final</span></div></div><div class="modal-actions"><button class="primary" id="new-adventure">Otra aventura</button><button class="soft" id="celebrate-home">Volver al menú</button></div>');
+  $('new-adventure').onclick=()=>{closeModal();begin('ghost',true)};$('celebrate-home').onclick=home;
+}
+
+paintRecords();
+$('final-mission').onclick=missionHub;
 if(document.modelContext?.registerTool){
   try{
     document.modelContext.registerTool({
