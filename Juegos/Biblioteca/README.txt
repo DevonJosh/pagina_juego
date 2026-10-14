@@ -1,0 +1,1 @@
+Abre index.html. Inicio restaurado con escenario y portadas originales. Cuento con hojas ilustradas, actividades sobre hojas vacías y animación en ambos sentidos. La música comienza al pulsar Activar música por las restricciones de reproducción automática del navegador.
