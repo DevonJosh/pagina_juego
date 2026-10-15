@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Data Hack: Fusión Matemática ⚡</title>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root { 
+            --bg-color: #050510;
+            --cyber-cyan: #00f3ff;
+            --cyber-pink: #ff0055;
+            --cyber-yellow: #f1c40f;
+            --cyber-green: #39ff14;
+            --panel-bg: #111827;
+            --card-bg: #1f2937;
+        }
+
+        body, html { 
+            font-family: 'Share Tech Mono', monospace; 
+            display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+            margin: 0; padding: 0; width: 100vw; height: 100vh; 
+            touch-action: manipulation; color: #fff; background-color: var(--bg-color); 
+            overflow: hidden; box-sizing: border-box;
+            user-select: none;
+        }
+
+        /* EFECTOS DE FONDO CRT */
+        .decorations { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; background: radial-gradient(circle at center, #0a0f24 0%, #000 100%); }
+        .grid {
+            position: absolute; inset: -50%;
+            background-image: linear-gradient(rgba(0, 243, 255, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 243, 255, 0.05) 1px, transparent 1px);
+            background-size: 40px 40px; transform: perspective(600px) rotateX(60deg) translateY(-100px); animation: gridMove 10s linear infinite;
+        }
+        @keyframes gridMove { 0% { transform: perspective(600px) rotateX(60deg) translateY(0); } 100% { transform: perspective(600px) rotateX(60deg) translateY(40px); } }
+
+        .scanlines {
+            position: fixed; inset: 0; z-index: 999; pointer-events: none;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.2) 50%);
+            background-size: 100% 4px; box-shadow: inset 0 0 100px rgba(0,0,0,0.9);
+        }
+
+        .sound-toggle { position: absolute; top: 15px; right: 15px; background: rgba(0, 0, 0, 0.8); border: 2px solid var(--cyber-cyan); border-radius: 8px; width: 45px; height: 45px; font-size: 20px; display: flex; justify-content: center; align-items: center; cursor: pointer; z-index: 1000; box-shadow: 0 0 10px rgba(0,243,255,0.3); transition: all 0.2s; color: var(--cyber-cyan);}
+        .sound-toggle:active { transform: scale(0.9); box-shadow: none; }
+
+        /* LOBBY */
+        #setup-screen {
+            position: absolute; inset: 0; z-index: 500; display: flex; flex-direction: column; justify-content: center; align-items: center;
+            background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
+        }
+
+        .setup-card {
+            background: rgba(10, 15, 30, 0.95); padding: 35px; border-radius: 12px;
+            box-shadow: 0 0 40px rgba(0,243,255,0.2), inset 0 0 20px rgba(0,243,255,0.1); border: 2px solid var(--cyber-cyan);
+            text-align: center; max-width: 90%; width: 500px; display: flex; flex-direction: column; gap: 15px;
+        }
+
+        .setup-card h1 { font-size: 40px; color: var(--cyber-cyan); margin: 0; text-shadow: 0 0 15px var(--cyber-cyan);}
+        
+        .setup-section { background: rgba(0,243,255,0.03); padding: 15px; border-radius: 8px; border: 1px dashed rgba(0,243,255,0.3); display: flex; flex-direction: column; gap: 8px; align-items: center; }
+        .setup-section h3 { margin: 0; color: #888; font-size: 16px; text-transform: uppercase; letter-spacing: 2px;}
+        
+        .setup-row { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; width: 100%;}
+        
+        .setup-btn { background: rgba(0,0,0,0.8); border: 1px solid #444; padding: 10px 18px; border-radius: 5px; font-size: 16px; font-weight: bold; color: #aaa; cursor: pointer; transition: all 0.2s; font-family: 'Rajdhani', sans-serif; text-transform: uppercase;}
+        .setup-btn.active.diff { background: rgba(0,243,255,0.15); border-color: var(--cyber-cyan); color: #fff; box-shadow: 0 0 10px rgba(0,243,255,0.4); text-shadow: 0 0 5px var(--cyber-cyan);}
+
+        .start-btn {
+            background: var(--cyber-cyan); border: none; box-shadow: 0 0 20px rgba(0,243,255,0.4); padding: 15px 40px; font-size: 24px; color: #000; border-radius: 8px; text-transform: uppercase; font-weight: bold; font-family: 'Share Tech Mono', monospace; cursor:pointer; margin-top: 10px; transition: all 0.1s; letter-spacing: 2px;
+        }
+        .start-btn:active { transform: scale(0.95); box-shadow: 0 0 10px rgba(0,243,255,0.3); }
+
+        /* PANTALLA DE JUEGO */
+        #game-screen {
+            display: none; flex-direction: column; align-items: center; justify-content: flex-start;
+            width: 100vw; height: 100vh; padding: 1.5vh 2vw; box-sizing: border-box; overflow: hidden;
+            position: relative;
+        }
+
+        .game-header { flex: 0 0 auto; display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 900px; margin-bottom: 1vh; z-index: 10; }
+        
+        .back-menu-btn { background: transparent; border: 1px solid var(--cyber-cyan); padding: 6px 15px; border-radius: 5px; font-size: 14px; color: var(--cyber-cyan); cursor: pointer; transition: all 0.2s; }
+        .back-menu-btn:active { background: var(--cyber-cyan); color: #000; }
+
+        .hud-group { display: flex; gap: 15px; align-items: center; }
+        .hud-box {
+            background: rgba(0,0,0,0.8); padding: 8px 15px; border-radius: 5px;
+            border: 1px solid var(--cyber-cyan); font-size: 16px; color: #fff; display: flex; align-items: center; gap: 8px;
+            box-shadow: 0 0 10px rgba(0,243,255,0.2);
+        }
+        .lives-box { border-color: var(--cyber-green); color: var(--cyber-green); box-shadow: 0 0 10px rgba(57,255,20,0.2); }
+
+        /* ZONA DEL ENEMIGO (TOP) */
+        .enemy-zone {
+            flex: 1; width: 100%; max-width: 900px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background: rgba(0,0,0,0.4); border: 2px solid rgba(255,0,85,0.3); border-radius: 15px; margin-bottom: 2vh;
+            position: relative; z-index: 10; box-shadow: inset 0 0 50px rgba(255,0,85,0.1);
+        }
+
+        .enemy-sprite { font-size: 80px; filter: drop-shadow(0 0 15px var(--cyber-pink)); margin-bottom: 10px; animation: float 3s ease-in-out infinite;}
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+        .enemy-hp-bar { width: 80%; max-width: 400px; height: 10px; background: #333; border-radius: 5px; overflow: hidden; margin-bottom: 15px; border: 1px solid #555;}
+        .enemy-hp-fill { height: 100%; width: 100%; background: var(--cyber-pink); transition: width 0.3s; box-shadow: 0 0 10px var(--cyber-pink);}
+
+        .target-node {
+            background: rgba(255,0,85,0.1); border: 3px solid var(--cyber-pink); padding: 15px 40px; border-radius: 10px;
+            font-size: 40px; font-weight: bold; color: #fff; box-shadow: 0 0 20px rgba(255,0,85,0.4);
+            text-shadow: 0 0 10px var(--cyber-pink); display: flex; flex-direction: column; align-items: center;
+        }
+        .target-label { font-size: 14px; color: var(--cyber-pink); text-transform: uppercase; margin-bottom: 5px; text-shadow: none;}
+
+        .attack-timer-bar {
+            position: absolute; bottom: 0; left: 0; height: 5px; background: var(--cyber-yellow); width: 100%;
+            box-shadow: 0 0 10px var(--cyber-yellow); border-radius: 0 0 15px 15px;
+        }
+
+        /* ZONA DEL JUGADOR (BOTTOM) */
+        .player-zone {
+            flex: 0 0 auto; width: 100%; max-width: 900px; display: flex; flex-direction: column; gap: 15px;
+            z-index: 10;
+        }
+
+        .cards-container {
+            display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; min-height: 100px;
+        }
+
+        .data-card {
+            width: clamp(70px, 12vh, 90px); height: clamp(90px, 16vh, 120px);
+            background: var(--card-bg); border: 2px solid var(--cyber-cyan); border-radius: 10px;
+            display: flex; justify-content: center; align-items: center; font-size: clamp(28px, 4vh, 36px); font-weight: bold; color: #fff;
+            cursor: pointer; box-shadow: 0 6px 0 #0f1621, 0 10px 15px rgba(0,0,0,0.5); transition: all 0.15s;
+            text-shadow: 0 0 8px rgba(255,255,255,0.5);
+        }
+        .data-card:active { transform: translateY(6px); box-shadow: 0 0 0 transparent; }
+        .data-card.selected { border-color: var(--cyber-yellow); background: #2c3e50; box-shadow: 0 6px 0 #1a252f, 0 0 20px rgba(241,196,15,0.4); color: var(--cyber-yellow); transform: translateY(-10px);}
+
+        .operators-container {
+            display: flex; justify-content: center; gap: 10px;
+        }
+        .op-btn {
+            background: var(--panel-bg); border: 2px solid #555; border-radius: 8px;
+            width: clamp(50px, 8vh, 70px); height: clamp(50px, 8vh, 70px); font-size: clamp(24px, 4vh, 32px); color: #aaa;
+            cursor: pointer; display: flex; justify-content: center; align-items: center; transition: all 0.1s;
+            font-family: 'Share Tech Mono', monospace; box-shadow: 0 4px 0 #0a0f18;
+        }
+        .op-btn:active { transform: translateY(4px); box-shadow: none; }
+        .op-btn.selected { border-color: var(--cyber-green); color: var(--cyber-green); box-shadow: 0 4px 0 #185a08, 0 0 15px rgba(57,255,20,0.3); background: rgba(57,255,20,0.1);}
+
+        .actions-container {
+            display: flex; justify-content: space-between; gap: 15px; margin-top: 5px;
+        }
+        .action-btn {
+            flex: 1; background: transparent; border: 1px solid #777; color: #aaa; padding: 10px; border-radius: 5px;
+            font-family: 'Share Tech Mono', monospace; font-size: 14px; cursor: pointer; transition: all 0.2s;
+        }
+        .action-btn:active { background: #333; }
+        .btn-undo:hover { border-color: var(--cyber-yellow); color: var(--cyber-yellow); }
+        .btn-reset:hover { border-color: var(--cyber-red); color: var(--cyber-red); }
+
+        /* CANVAS PARA ANIMACIONES DE ATAQUE (LASERS, EXPLOSIONES) */
+        #fxCanvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 20; mix-blend-mode: screen;}
+
+        @keyframes damageShake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-15px); } 40%, 80% { transform: translateX(15px); } }
+        .damage-shake { animation: damageShake 0.4s cubic-bezier(.36,.07,.19,.97) both; border-color: var(--cyber-red) !important; box-shadow: inset 0 0 50px rgba(255,0,85,0.4) !important;}
+
+        /* MODAL */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: flex; justify-content: center; align-items: center; z-index: 1000; visibility: hidden; opacity: 0; transition: all 0.3s; backdrop-filter: blur(5px);}
+        .modal-overlay.active { visibility: visible; opacity: 1; }
+        .modal-box { background: #050510; padding: 40px; border-radius: 10px; text-align: center; max-width: 85%; width: 450px; transform: scale(0.9); transition: transform 0.3s; border: 2px solid var(--cyber-cyan); box-shadow: 0 0 40px rgba(0,243,255,0.3);}
+        .modal-overlay.active .modal-box { transform: scale(1); }
+        .modal-title { font-size: 32px; margin-top: 0; margin-bottom: 15px; color: var(--cyber-cyan); text-shadow: 0 0 10px var(--cyber-cyan);}
+        .modal-msg { font-size: 18px; margin-bottom: 25px; color: #ddd; white-space: pre-line; line-height: 1.5; font-family: 'Rajdhani', sans-serif;}
+        .modal-btn { background: transparent; border: 2px solid var(--cyber-cyan); color: var(--cyber-cyan); padding: 12px 30px; font-size: 18px; border-radius: 5px; text-transform: uppercase; font-weight: bold; cursor:pointer; transition: all 0.2s; font-family: 'Share Tech Mono', monospace;}
+        .modal-btn:hover { background: var(--cyber-cyan); color: #000; }
+    </style>
+</head>
+<body>
+
+    <audio id="bgm" loop><source src="../assets/musicaFondo/cancion1.mp3" type="audio/mpeg"></audio>
+    <div class="decorations"><div class="grid"></div><div class="scanlines"></div></div>
+    <button id="soundToggle" class="sound-toggle" aria-label="Activar sonido">🔇</button>
+
+    <!-- LOBBY -->
+    <div id="setup-screen">
+        <div class="setup-card">
+            <h1>DATA HACK</h1>
+            <p style="margin:0; color:#888; font-size:14px;">> PROTOCOLO DE FUSIÓN MATEMÁTICA_</p>
+            
+            <div class="setup-section">
+                <h3>Nivel de Seguridad</h3>
+                <div class="setup-row">
+                    <button id="setup-diff-3" class="setup-btn diff active" onclick="selectDiff(3)">Nivel 3 (Fácil)</button>
+                    <button id="setup-diff-4" class="setup-btn diff" onclick="selectDiff(4)">Nivel 4 (Normal)</button>
+                    <button id="setup-diff-5" class="setup-btn diff" onclick="selectDiff(5)">Nivel 5 (Hacker)</button>
+                </div>
+            </div>
+
+            <button class="start-btn" onclick="startGame()">INICIAR INCURSIÓN</button>
+        </div>
+    </div>
+
+    <!-- JUEGO -->
+    <div id="game-screen">
+        <div class="game-header">
+            <button class="back-menu-btn" onclick="backToMenu()">[ ABORTAR ]</button>
+            <div class="hud-group">
+                <div class="hud-box lives-box">HP JUGADOR: <span id="player-hp-display">100</span>%</div>
+                <div class="hud-box">NÚCLEOS: <span id="score-display">0</span>/5</div>
+            </div>
+        </div>
+
+        <canvas id="fxCanvas"></canvas>
+
+        <div class="enemy-zone" id="enemy-zone">
+            <div class="enemy-hp-bar"><div class="enemy-hp-fill" id="enemy-hp-fill"></div></div>
+            <div class="enemy-sprite" id="enemy-sprite">👾</div>
+            
+            <div class="target-node">
+                <span class="target-label">Código de Ruptura</span>
+                <span id="target-display">0</span>
+            </div>
+            
+            <div class="attack-timer-bar" id="attack-timer-bar"></div>
+        </div>
+
+        <div class="player-zone">
+            <div class="cards-container" id="cards-container">
+                <!-- Tarjetas JS -->
+            </div>
+
+            <div class="operators-container">
+                <button class="op-btn" data-op="+">+</button>
+                <button class="op-btn" data-op="-">-</button>
+                <button class="op-btn" data-op="*">×</button>
+                <button class="op-btn" data-op="/">÷</button>
+            </div>
+
+            <div class="actions-container">
+                <button class="action-btn btn-undo" onclick="undoMove()">[ Deshacer Paso ]</button>
+                <button class="action-btn btn-reset" onclick="resetHand()">[ Reiniciar Mano ]</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL -->
+    <div class="modal-overlay" id="modal">
+        <div class="modal-box">
+            <h2 class="modal-title" id="m-title">Título</h2>
+            <p class="modal-msg" id="m-msg">Mensaje</p>
+            <button class="modal-btn" onclick="closeModal()">ACEPTAR</button>
+        </div>
+    </div>
+
+    <script>
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        let audioCtx; let isMuted = true;
+        const bgAudio = document.getElementById('bgm');
+        const soundToggle = document.getElementById('soundToggle');
+
+        soundToggle.addEventListener('click', () => {
+            if (!audioCtx) audioCtx = new AudioContext();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            isMuted = !isMuted;
+            if(isMuted) { bgAudio.pause(); soundToggle.innerText = '🔇'; } 
+            else { bgAudio.volume = 0.25; bgAudio.play().catch(e=>e); soundToggle.innerText = '🔊'; }
+        });
+
+        function playTone(freq, type, duration, vol = 0.1) {
+            if (!audioCtx || isMuted) return;
+            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+            osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gain.gain.setValueAtTime(vol, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+            osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + duration);
+        }
+
+        function sfxClick() { playTone(800, 'square', 0.05, 0.05); }
+        function sfxSelect() { playTone(600, 'triangle', 0.08, 0.08); }
+        function sfxMerge() { playTone(300, 'square', 0.1, 0.1); setTimeout(()=>playTone(450, 'square', 0.15, 0.1), 50); }
+        function sfxShoot() { playTone(1200, 'sawtooth', 0.1, 0.1); setTimeout(()=>playTone(800, 'sawtooth', 0.2, 0.1), 50); }
+        function sfxDamage() { playTone(150, 'sawtooth', 0.3, 0.3); setTimeout(()=>playTone(100, 'sawtooth', 0.4, 0.3), 100); }
+        function sfxError() { playTone(200, 'sawtooth', 0.2, 0.2); }
+        function sfxVictory() { let notes = [523.25, 659.25, 783.99, 1046.50]; notes.forEach((f, i) => setTimeout(() => playTone(f, 'square', 0.3, 0.1), i * 150)); }
+
+        let currentDifficulty = 3; // Number of starting cards
+        let score = 0; let maxScore = 5;
+        let playerHp = 100;
+        let enemyHp = 100;
+        let isGameActive = false;
+        
+        let initialHand = [];
+        let currentHand = [];
+        let historyStates = []; // For Undo functionality
+        let targetNumber = 0;
+
+        let selectedIndex = -1;
+        let selectedOp = null;
+
+        // Timer variables
+        let turnTimeMax = 30; // Seconds per enemy attack
+        let timeLeft = 30;
+        let lastTime = 0;
+        let animFrameId = null;
+
+        const fxCanvas = document.getElementById('fxCanvas'); const ctx = fxCanvas.getContext('2d');
+        const enemySprites = ['👾', '🤖', '👁️‍🗨️', '💠', '☢️'];
+
+        function resizeCanvas() { fxCanvas.width = fxCanvas.offsetWidth; fxCanvas.height = fxCanvas.offsetHeight; }
+        window.addEventListener('resize', resizeCanvas);
+
+        function selectDiff(d) {
+            sfxClick(); currentDifficulty = d;
+            document.querySelectorAll('.setup-btn.diff').forEach(b => b.classList.remove('active'));
+            document.getElementById('setup-diff-' + d).classList.add('active');
+        }
+
+        function startGame() {
+            if (!audioCtx && !isMuted) { audioCtx = new AudioContext(); bgAudio.play().catch(e=>e); }
+            sfxClick();
+            document.getElementById('setup-screen').style.display = 'none';
+            document.getElementById('game-screen').style.display = 'flex';
+            resizeCanvas();
+            score = 0; playerHp = 100; enemyHp = 100;
+            document.getElementById('score-display').innerText = score;
+            updateHpBars();
+            nextEnemy();
+            
+            lastTime = performance.now();
+            cancelAnimationFrame(animFrameId);
+            animFrameId = requestAnimationFrame(gameLoop);
+        }
+
+        function backToMenu() {
+            sfxClick(); isGameActive = false; cancelAnimationFrame(animFrameId);
+            document.getElementById('game-screen').style.display = 'none';
+            document.getElementById('setup-screen').style.display = 'flex';
+        }
+
+        // GENERADOR DE PUZZLE SOLUCIONABLE
+        function generatePuzzle(numCards) {
+            let maxVal = numCards === 3 ? 10 : (numCards === 4 ? 15 : 20);
+            let cards = [];
+            for(let i=0; i<numCards; i++) cards.push(Math.floor(Math.random() * maxVal) + 1);
+
+            let temp = [...cards];
+            while(temp.length > 1) {
+                let i1 = Math.floor(Math.random() * temp.length);
+                let val1 = temp.splice(i1, 1)[0];
+                let i2 = Math.floor(Math.random() * temp.length);
+                let val2 = temp.splice(i2, 1)[0];
+
+                let ops = ['+', '-', '*'];
+                if (val1 % val2 === 0 && val2 !== 0) ops.push('/1');
+                if (val2 % val1 === 0 && val1 !== 0) ops.push('/2');
+
+                let op = ops[Math.floor(Math.random() * ops.length)];
+                let res = 0;
+                
+                // Asegurar que no de negativos para no frustrar
+                if (op === '+') res = val1 + val2;
+                else if (op === '-') res = Math.abs(val1 - val2); 
+                else if (op === '*') res = val1 * val2;
+                else if (op === '/1') res = val1 / val2;
+                else if (op === '/2') res = val2 / val1;
+
+                temp.push(res);
+            }
+            return { target: temp[0], hand: cards };
+        }
+
+        function nextEnemy() {
+            let puzzle = generatePuzzle(currentDifficulty);
+            targetNumber = puzzle.target;
+            initialHand = [...puzzle.hand];
+            currentHand = [...puzzle.hand];
+            historyStates = [];
+            
+            document.getElementById('enemy-sprite').innerText = enemySprites[score % enemySprites.length];
+            document.getElementById('target-display').innerText = targetNumber;
+            
+            turnTimeMax = currentDifficulty === 3 ? 30 : (currentDifficulty === 4 ? 45 : 60);
+            timeLeft = turnTimeMax;
+            enemyHp = 100;
+            updateHpBars();
+            
+            clearSelection();
+            renderHand();
+            isGameActive = true;
+        }
+
+        function renderHand() {
+            let container = document.getElementById('cards-container');
+            container.innerHTML = '';
+            currentHand.forEach((num, index) => {
+                let card = document.createElement('div');
+                card.className = `data-card ${index === selectedIndex ? 'selected' : ''}`;
+                card.innerText = num;
+                card.onclick = () => selectCard(index);
+                container.appendChild(card);
+            });
+            
+            document.querySelectorAll('.op-btn').forEach(btn => {
+                if (btn.dataset.op === selectedOp) btn.classList.add('selected');
+                else btn.classList.remove('selected');
+            });
+        }
+
+        // LÓGICA DE SELECCIÓN Y FUSIÓN
+        document.querySelectorAll('.op-btn').forEach(btn => {
+            btn.onclick = () => {
+                if (!isGameActive) return;
+                sfxSelect();
+                if (selectedIndex !== -1) {
+                    selectedOp = btn.dataset.op;
+                    renderHand();
+                } else {
+                    sfxError(); // Must select card first
+                }
+            };
+        });
+
+        function selectCard(index) {
+            if (!isGameActive) return;
+            sfxSelect();
+            
+            if (selectedIndex === -1) {
+                // Primer carta seleccionada
+                selectedIndex = index;
+                renderHand();
+            } else if (selectedIndex === index) {
+                // Deseleccionar
+                clearSelection();
+                renderHand();
+            } else {
+                // Segunda carta seleccionada
+                if (selectedOp) {
+                    executeMerge(selectedIndex, index, selectedOp);
+                } else {
+                    // Cambió de carta base sin elegir operador
+                    selectedIndex = index;
+                    renderHand();
+                }
+            }
+        }
+
+        function clearSelection() {
+            selectedIndex = -1;
+            selectedOp = null;
+        }
+
+        function executeMerge(i1, i2, op) {
+            let val1 = currentHand[i1];
+            let val2 = currentHand[i2];
+            let res = 0;
+
+            if (op === '+') res = val1 + val2;
+            else if (op === '-') res = val1 - val2;
+            else if (op === '*') res = val1 * val2;
+            else if (op === '/') {
+                if (val2 === 0 || val1 % val2 !== 0) {
+                    sfxError();
+                    createFloatingText("División Inexacta", '#ff0055');
+                    clearSelection();
+                    renderHand();
+                    return;
+                }
+                res = val1 / val2;
+            }
+
+            sfxMerge();
+            
+            // Guardar estado para Undo
+            historyStates.push([...currentHand]);
+
+            // Remover viejos y añadir nuevo
+            let newHand = [];
+            for(let i=0; i<currentHand.length; i++) {
+                if (i !== i1 && i !== i2) newHand.push(currentHand[i]);
+            }
+            newHand.push(res);
+            currentHand = newHand;
+
+            clearSelection();
+            renderHand();
+
+            checkCombat();
+        }
+
+        function undoMove() {
+            if (!isGameActive || historyStates.length === 0) { sfxError(); return; }
+            sfxSelect();
+            currentHand = historyStates.pop();
+            clearSelection();
+            renderHand();
+        }
+
+        function resetHand() {
+            if (!isGameActive || historyStates.length === 0) { sfxError(); return; }
+            sfxSelect();
+            currentHand = [...initialHand];
+            historyStates = [];
+            clearSelection();
+            renderHand();
+        }
+
+        // LÓGICA DE COMBATE
+        function checkCombat() {
+            // Revisa si hay una carta que iguala el objetivo
+            if (currentHand.includes(targetNumber)) {
+                isGameActive = false; // Pausa para animación
+                sfxShoot();
+                shootLaser();
+                
+                // Daño brutal al enemigo
+                enemyHp -= 100; 
+                updateHpBars();
+
+                setTimeout(() => {
+                    score++;
+                    document.getElementById('score-display').innerText = score;
+                    if (score >= maxScore) {
+                        sfxVictory();
+                        document.getElementById('m-title').style.color = "var(--cyber-cyan)";
+                        showModal("¡ACCESO CONCEDIDO! 🔓", `Hackeo completo. El sistema ha sido vulnerado con éxito.`, backToMenu);
+                    } else {
+                        nextEnemy();
+                    }
+                }, 1000);
+            } else if (currentHand.length === 1 && currentHand[0] !== targetNumber) {
+                // Te quedaste con una sola carta y no es el objetivo
+                sfxError();
+                createFloatingText("Secuencia Errónea", '#ff0055');
+                setTimeout(() => resetHand(), 800);
+            }
+        }
+
+        function takeDamage() {
+            sfxDamage();
+            playerHp -= 25;
+            updateHpBars();
+            document.getElementById('enemy-zone').classList.remove('damage-shake');
+            document.body.classList.remove('damage-shake');
+            void document.body.offsetWidth;
+            document.body.classList.add('damage-shake');
+
+            createFloatingText("¡ATAQUE ENEMIGO!", '#ff0055');
+
+            if (playerHp <= 0) {
+                isGameActive = false;
+                document.getElementById('m-title').style.color = "var(--cyber-pink)";
+                showModal("¡CONEXIÓN CORTADA! 💥", `Tus defensas colapsaron. El firewall te ha expulsado.`, backToMenu);
+            } else {
+                timeLeft = turnTimeMax; // Reset enemy timer
+            }
+        }
+
+        function updateHpBars() {
+            document.getElementById('player-hp-display').innerText = Math.max(0, playerHp);
+            document.getElementById('enemy-hp-fill').style.width = Math.max(0, enemyHp) + '%';
+        }
+
+        // EFECTOS VISUALES EN CANVAS (LASERS Y PARTICULAS)
+        let particles = [];
+        let lasers = [];
+
+        class Particle {
+            constructor(x,y,c) { this.x=x; this.y=y; this.c=c; this.life=1; this.vx=(Math.random()-0.5)*15; this.vy=(Math.random()-0.5)*15; this.size=Math.random()*8+4;}
+            update() { this.x+=this.vx; this.y+=this.vy; this.life-=0.05; this.size*=0.9;}
+            draw(ctx) { ctx.globalAlpha=Math.max(0,this.life); ctx.fillStyle=this.c; ctx.fillRect(this.x, this.y, this.size, this.size); ctx.globalAlpha=1;}
+        }
+
+        class FloatingText {
+            constructor(txt, c) { this.x=fxCanvas.width/2; this.y=fxCanvas.height/2; this.txt=txt; this.c=c; this.life=1; this.vy=-2; }
+            update() { this.y+=this.vy; this.life-=0.02; }
+            draw(ctx) { ctx.globalAlpha=Math.max(0,this.life); ctx.fillStyle=this.c; ctx.font="bold 30px 'Share Tech Mono'"; ctx.textAlign="center"; ctx.shadowBlur=10; ctx.shadowColor=this.c; ctx.fillText(this.txt,this.x,this.y); ctx.shadowBlur=0; ctx.globalAlpha=1; }
+        }
+
+        function createBurst(x,y,c) { for(let i=0; i<20; i++) particles.push(new Particle(x,y,c)); }
+        function createFloatingText(txt,c) { particles.push(new FloatingText(txt,c)); }
+
+        function shootLaser() {
+            // Desde abajo centro hacia arriba centro (enemigo)
+            lasers.push({ x1: fxCanvas.width/2, y1: fxCanvas.height, x2: fxCanvas.width/2, y2: fxCanvas.height * 0.25, life: 1.0 });
+            createBurst(fxCanvas.width/2, fxCanvas.height * 0.25, '#00f3ff');
+        }
+
+        function gameLoop(ts) {
+            animFrameId = requestAnimationFrame(gameLoop);
+            if (!isGameActive) return;
+
+            let dt = (ts - lastTime) / 1000;
+            lastTime = ts;
+
+            // Timer del Enemigo
+            timeLeft -= dt;
+            if (timeLeft <= 0) {
+                takeDamage();
+            }
+            // Update UI timer bar
+            let timerPercent = Math.max(0, (timeLeft / turnTimeMax) * 100);
+            document.getElementById('attack-timer-bar').style.width = timerPercent + '%';
+            if (timerPercent < 25) document.getElementById('attack-timer-bar').style.background = 'var(--cyber-pink)';
+            else document.getElementById('attack-timer-bar').style.background = 'var(--cyber-yellow)';
+
+            ctx.clearRect(0, 0, fxCanvas.width, fxCanvas.height);
+
+            // Dibujar Lasers
+            for(let i = lasers.length - 1; i >= 0; i--) {
+                let l = lasers[i];
+                ctx.strokeStyle = `rgba(0, 243, 255, ${l.life})`;
+                ctx.lineWidth = 15 * l.life;
+                ctx.beginPath(); ctx.moveTo(l.x1, l.y1); ctx.lineTo(l.x2, l.y2); ctx.stroke();
+                
+                ctx.strokeStyle = `rgba(255, 255, 255, ${l.life})`;
+                ctx.lineWidth = 5 * l.life;
+                ctx.stroke();
+
+                l.life -= 0.1;
+                if(l.life <= 0) lasers.splice(i, 1);
+            }
+
+            // Dibujar Partículas
+            for(let i=particles.length-1; i>=0; i--) { 
+                particles[i].update(); 
+                particles[i].draw(ctx); 
+                if(particles[i].life<=0) particles.splice(i,1); 
+            }
+        }
+
+        let modalCallback = null;
+        function showModal(title, msg, callback = null) {
+            document.getElementById('m-title').innerText = title;
+            document.getElementById('m-msg').innerText = msg;
+            document.getElementById('modal').classList.add('active');
+            modalCallback = callback;
+        }
+
+        function closeModal() {
+            sfxClick();
+            document.getElementById('modal').classList.remove('active');
+            if (modalCallback) { modalCallback(); modalCallback = null; }
+        }
+    </script>
+</body>
+</html>
