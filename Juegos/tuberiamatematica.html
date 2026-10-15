@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Math Flow: Red Cuántica 🔀</title>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root { 
+            --bg-color: #050a15;
+            --tile-bg: #0d1326;
+            --tile-border: #1e3a8a;
+            --pipe-cyan: #00f3ff;
+            --neon-green: #39ff14;
+            --neon-yellow: #f1c40f;
+            --neon-red: #ff0055;
+            --text-gray: #9ca3af;
+        }
+
+        body, html { 
+            font-family: 'Share Tech Mono', monospace; 
+            display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+            margin: 0; padding: 0; width: 100vw; height: 100vh; 
+            touch-action: manipulation; color: #fff; background-color: var(--bg-color); 
+            overflow: hidden; box-sizing: border-box;
+            user-select: none;
+        }
+
+        .decorations { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
+        .scanlines {
+            position: fixed; inset: 0; z-index: 999; pointer-events: none;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+            background-size: 100% 4px; box-shadow: inset 0 0 100px rgba(0,0,0,0.9);
+        }
+
+        .sound-toggle { position: absolute; top: 15px; right: 15px; background: rgba(0,0,0,0.8); border: 2px solid var(--pipe-cyan); border-radius: 8px; width: 45px; height: 45px; font-size: 20px; display: flex; justify-content: center; align-items: center; cursor: pointer; z-index: 1000; box-shadow: 0 0 10px rgba(0,243,255,0.3); transition: all 0.2s; color: var(--pipe-cyan);}
+        .sound-toggle:active { transform: scale(0.9); }
+
+        /* HEADER */
+        .game-header { 
+            display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 800px; margin-top: 2vh; margin-bottom: 1vh; z-index: 10; 
+        }
+        
+        .back-menu-btn { 
+            background: transparent; border: 1px solid var(--text-gray); padding: 8px 20px; border-radius: 6px; font-size: 16px; color: var(--text-gray); cursor: pointer; font-family: 'Share Tech Mono', monospace; 
+            transition: all 0.2s;
+        }
+        .back-menu-btn:active { background: var(--text-gray); color: #000; }
+
+        .hud-group { display: flex; gap: 20px; align-items: center; }
+
+        .hud-box {
+            background: transparent; padding: 8px 20px; border-radius: 6px;
+            border: 1px solid var(--neon-green); font-size: 18px; color: #fff; display: flex; align-items: center; gap: 10px;
+        }
+        .hud-box span { color: var(--neon-green); font-weight: bold; font-size: 22px;}
+        
+        .target-box { border-color: var(--neon-yellow); }
+        .target-box span { color: var(--neon-yellow); }
+
+        /* INSTRUCCIONES */
+        .task-panel { 
+            text-align: center; background: transparent; padding: 15px 20px; 
+            border-radius: 10px; font-size: clamp(14px, 2.5vh, 18px); font-weight: 500; 
+            width: 100%; max-width: 800px; border: 1px solid var(--pipe-cyan); color: var(--text-gray);
+            box-sizing: border-box; margin-bottom: 4vh; z-index: 10; box-shadow: inset 0 0 20px rgba(0,243,255,0.05);
+        }
+        .task-panel b.in { color: var(--neon-green); }
+        .task-panel b.out { color: var(--neon-red); }
+
+        /* CONTENEDOR MAESTRO */
+        .grid-master-container {
+            flex: 1 1 auto; display: flex; align-items: center; justify-content: center; gap: 0px; 
+            width: 100%; max-width: 1000px; margin-bottom: 4vh; z-index: 10; min-height: 0;
+        }
+
+        /* COLUMNAS LATERALES (PUERTOS) */
+        .ports-col {
+            display: grid; grid-template-rows: repeat(3, 1fr); gap: 12px; height: 100%; width: 160px;
+        }
+        
+        .port-slot {
+            display: flex; align-items: center; justify-content: flex-end; width: 100%; height: 100%;
+        }
+        .port-slot.out { justify-content: flex-start; }
+
+        /* TEXTOS LATERALES (Energía Inicial / Final) */
+        .side-info {
+            display: flex; flex-direction: column; align-items: flex-end; justify-content: center;
+            font-size: 18px; color: var(--text-gray); padding: 0 15px; text-align: right; line-height: 1.2;
+        }
+        .side-info.out { align-items: flex-start; text-align: left; }
+        .side-info span { font-size: 32px; color: #fff; margin-top: 5px; font-weight: bold;}
+
+        /* CONECTORES VERDES (IN / OUT) */
+        .port-visual {
+            width: 35px; height: 60%; border: 3px solid var(--neon-green);
+            display: flex; align-items: center; justify-content: flex-end; position: relative;
+            background: rgba(57,255,20,0.05); border-radius: 10px 0 0 10px; border-right: none;
+            box-shadow: inset 0 0 15px rgba(57,255,20,0.2);
+        }
+        .port-visual.out {
+            border-color: var(--neon-yellow); border-radius: 0 10px 10px 0; border-left: none;
+            background: rgba(241,196,15,0.05); box-shadow: inset 0 0 15px rgba(241,196,15,0.2);
+            justify-content: flex-start;
+        }
+        
+        .port-pipe {
+            position: absolute; right: -4px; width: 25px; height: 16px; background: var(--neon-green); z-index: 20;
+            box-shadow: 0 0 10px var(--neon-green); border-radius: 2px;
+        }
+        .port-visual.out .port-pipe {
+            left: -4px; right: auto; background: var(--neon-yellow); box-shadow: 0 0 10px var(--neon-yellow);
+        }
+
+        /* GRILLA PRINCIPAL 3x3 */
+        .grid-container {
+            width: clamp(250px, 45vh, 450px);
+            height: clamp(250px, 45vh, 450px);
+            display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr);
+            gap: 12px; background: transparent; position: relative; z-index: 15;
+        }
+
+        .pipe-tile {
+            background: var(--tile-bg); border: 2px solid var(--tile-border); border-radius: 16px;
+            position: relative; cursor: pointer; transition: transform 0.15s ease, border-color 0.2s;
+            user-select: none; display: flex; justify-content: center; align-items: center;
+        }
+        .pipe-tile:active { transform: scale(0.92); }
+        .pipe-tile.connected .pipe-line, .pipe-tile.connected .pipe-center { background: var(--neon-green); box-shadow: 0 0 15px var(--neon-green); }
+        .pipe-tile.connected { border-color: var(--neon-green); box-shadow: 0 0 20px rgba(57,255,20,0.1); }
+        .pipe-tile.error { border-color: var(--neon-red); }
+
+        /* DIBUJO DE TUBERÍAS FÍSICAS GRUESAS */
+        .pipe-wrapper {
+            position: absolute; inset: 0; transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .pipe-center {
+            position: absolute; top: calc(50% - 8px); left: calc(50% - 8px);
+            width: 16px; height: 16px; background: var(--pipe-cyan); border-radius: 2px;
+            box-shadow: 0 0 10px var(--pipe-cyan); transition: all 0.2s;
+        }
+        .pipe-line {
+            position: absolute; background: var(--pipe-cyan); box-shadow: 0 0 10px var(--pipe-cyan); transition: all 0.2s;
+        }
+        .pipe-line.top { top: 0; left: calc(50% - 8px); width: 16px; height: 50%; }
+        .pipe-line.right { top: calc(50% - 8px); right: 0; width: 50%; height: 16px; }
+        .pipe-line.bottom { bottom: 0; left: calc(50% - 8px); width: 16px; height: 50%; }
+        .pipe-line.left { top: calc(50% - 8px); left: 0; width: 50%; height: 16px; }
+
+        /* OPERACIÓN MATEMÁTICA */
+        .pipe-math { 
+            position: absolute; bottom: 12px; 
+            font-family: 'Share Tech Mono', monospace; font-size: clamp(16px, 3vh, 22px); font-weight: bold; 
+            color: var(--neon-yellow); background: rgba(0,0,0,0.85); padding: 4px 10px; border-radius: 6px;
+            pointer-events: none; z-index: 2; border: 1px solid rgba(241,196,15,0.3);
+        }
+
+        .start-flow-btn {
+            background: var(--neon-green); border: none; color: #000; padding: 18px 50px;
+            font-size: 24px; font-weight: bold; font-family: 'Share Tech Mono', monospace; border-radius: 10px;
+            cursor: pointer; box-shadow: 0 0 30px rgba(57, 255, 20, 0.5); margin-bottom: 2vh; z-index: 10; flex: 0 0 auto;
+        }
+        .start-flow-btn:active { transform: scale(0.95); }
+
+        /* MODAL */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: flex; justify-content: center; align-items: center; z-index: 1000; visibility: hidden; opacity: 0; transition: all 0.3s; backdrop-filter: blur(4px);}
+        .modal-overlay.active { visibility: visible; opacity: 1; }
+        .modal-box { background: #050510; padding: 40px; border-radius: 12px; text-align: center; max-width: 85%; width: 500px; transform: scale(0.9); transition: transform 0.3s; border: 2px solid var(--pipe-cyan); box-shadow: 0 0 50px rgba(0,243,255,0.4);}
+        .modal-overlay.active .modal-box { transform: scale(1); }
+        .modal-title { font-family: 'Share Tech Mono', monospace; font-size: 36px; margin-top: 0; margin-bottom: 15px; color: var(--pipe-cyan); text-shadow: 0 0 15px var(--pipe-cyan);}
+        .modal-msg { font-size: 20px; margin-bottom: 30px; color: #ddd; white-space: pre-line; line-height: 1.5; font-family: 'Rajdhani', sans-serif; font-weight: 600;}
+        .modal-btn { background: transparent; border: 2px solid var(--pipe-cyan); color: var(--pipe-cyan); padding: 15px 35px; font-size: 20px; border-radius: 6px; text-transform: uppercase; font-family: 'Share Tech Mono', monospace; font-weight: bold; cursor:pointer; transition: all 0.2s;}
+        .modal-btn:hover { background: var(--pipe-cyan); color: #000; }
+
+        @media (max-width: 800px) {
+            .side-info { display: none; }
+            .ports-col { width: 40px; }
+        }
+    </style>
+</head>
+<body>
+
+    <audio id="bgm" loop><source src="../assets/musicaFondo/cancion1.mp3" type="audio/mpeg"></audio>
+    <button id="soundToggle" class="sound-toggle" aria-label="Activar sonido">🔇</button>
+
+    <div class="decorations"><div class="scanlines"></div></div>
+
+    <div id="game-screen">
+        <div class="game-header">
+            <button class="back-menu-btn" onclick="initLevel()">[ REINICIAR ]</button>
+            <div class="hud-group">
+                <div class="hud-box">INICIO: <span id="hdr-start">10</span></div>
+                <div class="hud-box target-box">OBJETIVO: <span id="hdr-target">22</span></div>
+            </div>
+        </div>
+
+        <div class="task-panel">
+            Rota los tubos para conectar <b class="in">IN (Izquierda)</b> con <b class="out">OUT (Derecha)</b> y lograr el valor exacto.
+        </div>
+
+        <div class="grid-master-container">
+            <!-- COLUMNA IZQUIERDA -->
+            <div class="ports-col" id="ports-in-col"></div>
+            <!-- GRILLA CENTRAL -->
+            <div class="grid-container" id="grid-container"></div>
+            <!-- COLUMNA DERECHA -->
+            <div class="ports-col out" id="ports-out-col"></div>
+        </div>
+
+        <button class="start-flow-btn" onclick="validateFlow()">⚡ INICIAR FLUJO</button>
+    </div>
+
+    <div class="modal-overlay" id="modal">
+        <div class="modal-box">
+            <h2 class="modal-title" id="m-title">Título</h2>
+            <p class="modal-msg" id="m-msg">Mensaje</p>
+            <button class="modal-btn" onclick="closeModal()">ACEPTAR</button>
+        </div>
+    </div>
+
+    <script>
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        let audioCtx; let isMuted = true;
+        const bgAudio = document.getElementById('bgm');
+        const soundToggle = document.getElementById('soundToggle');
+
+        soundToggle.addEventListener('click', () => {
+            if (!audioCtx) audioCtx = new AudioContext();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            isMuted = !isMuted;
+            if(isMuted) { bgAudio.pause(); soundToggle.innerText = '🔇'; } 
+            else { bgAudio.volume = 0.25; bgAudio.play().catch(e=>e); soundToggle.innerText = '🔊'; }
+        });
+
+        function playTone(freq, type, duration, vol = 0.1) {
+            if (!audioCtx || isMuted) return;
+            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+            osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gain.gain.setValueAtTime(vol, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+            osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + duration);
+        }
+
+        function sfxRotate() { playTone(600, 'square', 0.05, 0.05); }
+        function sfxSuccess() { playTone(523.25, 'triangle', 0.15, 0.15); setTimeout(()=>playTone(783.99, 'triangle', 0.2, 0.15), 100); setTimeout(()=>playTone(1046.50, 'triangle', 0.3, 0.15), 200); }
+        function sfxError() { playTone(180, 'sawtooth', 0.3, 0.3); }
+
+        let grid = [];
+        let gridsize = 3;
+        let startVal = 10;
+        let targetVal = 22;
+        
+        let startRow = 1;
+        let endRow = 1;
+
+        const pipeTypes = [
+            { id: 0, exits: [1, 0, 1, 0] }, // Recta vertical
+            { id: 1, exits: [0, 1, 1, 0] }, // Codo Abajo-Derecha
+            { id: 2, exits: [1, 1, 1, 0] }, // T-Junction
+            { id: 3, exits: [1, 1, 1, 1] }  // Cruce
+        ];
+
+        const mathOperations = [
+            { op: '+', val: 1 }, { op: '+', val: 2 }, { op: '+', val: 3 }, { op: '+', val: 5 },
+            { op: '-', val: 1 }, { op: '-', val: 2 }, 
+            { op: '×', val: 2 }, { op: '×', val: 3 }
+        ];
+
+        window.onload = () => { initLevel(); };
+
+        function findAllPaths(startR, startC, endR, endC) {
+            let paths = [];
+            let visited = Array(3).fill().map(() => Array(3).fill(false));
+            
+            function dfs(r, c, currentPath) {
+                visited[r][c] = true;
+                currentPath.push([r, c]);
+                
+                if (r === endR && c === endC) {
+                    paths.push([...currentPath]);
+                } else {
+                    let dirs = [[-1,0], [0,1], [1,0], [0,-1]];
+                    for(let d of dirs) {
+                        let nr = r + d[0], nc = c + d[1];
+                        if (nr >= 0 && nr < 3 && nc >= 0 && nc < 3 && !visited[nr][nc]) {
+                            dfs(nr, nc, currentPath);
+                        }
+                    }
+                }
+                currentPath.pop();
+                visited[r][c] = false;
+            }
+            dfs(startR, startC, []);
+            return paths;
+        }
+
+        function initLevel() {
+            startVal = Math.floor(Math.random() * 5 + 5); 
+            startRow = Math.floor(Math.random() * 3);
+            endRow = Math.floor(Math.random() * 3);
+
+            grid = [];
+            for (let r = 0; r < gridsize; r++) {
+                let row = [];
+                for (let c = 0; c < gridsize; c++) {
+                    let mathObj = mathOperations[Math.floor(Math.random() * mathOperations.length)];
+                    row.push({
+                        type: 0, rotation: 0,
+                        op: mathObj.op, val: mathObj.val,
+                        connected: false, error: false
+                    });
+                }
+                grid.push(row);
+            }
+
+            let allPaths = findAllPaths(startRow, 0, endRow, 2);
+            let pathA = allPaths[Math.floor(Math.random() * allPaths.length)];
+            let pathB = allPaths[(Math.floor(Math.random() * allPaths.length) + 1) % allPaths.length]; 
+
+            let reqExits = Array(3).fill().map(() => Array(3).fill().map(()=>[0,0,0,0]));
+
+            function applyPathToReq(p) {
+                for(let i=0; i<p.length; i++) {
+                    let r = p[i][0]; let c = p[i][1];
+                    let inDir = -1, outDir = -1;
+                    
+                    if (i === 0) inDir = 3; 
+                    else {
+                        let pr = p[i-1][0], pc = p[i-1][1];
+                        if (pr < r) inDir = 0; else if (pr > r) inDir = 2;
+                        else if (pc < c) inDir = 3; else if (pc > c) inDir = 1;
+                    }
+                    
+                    if (i === p.length - 1) outDir = 1; 
+                    else {
+                        let nr = p[i+1][0], nc = p[i+1][1];
+                        if (nr < r) outDir = 0; else if (nr > r) outDir = 2;
+                        else if (nc < c) outDir = 3; else if (nc > c) outDir = 1;
+                    }
+                    
+                    reqExits[r][c][inDir] = 1;
+                    reqExits[r][c][outDir] = 1;
+                }
+            }
+
+            applyPathToReq(pathA);
+            applyPathToReq(pathB);
+
+            for(let r=0; r<3; r++){
+                for(let c=0; c<3; c++){
+                    let req = reqExits[r][c];
+                    let count = req.reduce((a,b)=>a+b, 0);
+                    let typeToAssign = 0;
+                    
+                    if (count === 0) {
+                        typeToAssign = Math.floor(Math.random()*4); 
+                    } else {
+                        let possibleMatches = [];
+                        for(let pt=0; pt<4; pt++) {
+                            for(let rot=0; rot<4; rot++) {
+                                let exits = getRotatedExits(pt, rot);
+                                let covers = true;
+                                for(let d=0; d<4; d++) {
+                                    if (req[d] === 1 && exits[d] === 0) covers = false;
+                                }
+                                if (covers) {
+                                    let exitCount = exits.reduce((a,b)=>a+b,0);
+                                    if (exitCount === count || (exitCount > count && Math.random()<0.2)) {
+                                        possibleMatches.push(pt);
+                                    }
+                                }
+                            }
+                        }
+                        if(possibleMatches.length > 0) {
+                            typeToAssign = possibleMatches[Math.floor(Math.random()*possibleMatches.length)];
+                        } else {
+                            typeToAssign = 3; 
+                        }
+                    }
+                    grid[r][c].type = typeToAssign;
+                }
+            }
+
+            let attempts = 0;
+            let targetA, targetB;
+            do {
+                for(let r=0; r<3; r++) for(let c=0; c<3; c++){
+                    let mathObj = mathOperations[Math.floor(Math.random() * mathOperations.length)];
+                    grid[r][c].op = mathObj.op; grid[r][c].val = mathObj.val;
+                }
+                
+                targetA = startVal;
+                for(let i=0; i<pathA.length; i++) targetA = applyMath(targetA, grid[pathA[i][0]][pathA[i][1]].op, grid[pathA[i][0]][pathA[i][1]].val);
+                
+                targetB = startVal;
+                for(let i=0; i<pathB.length; i++) targetB = applyMath(targetB, grid[pathB[i][0]][pathB[i][1]].op, grid[pathB[i][0]][pathB[i][1]].val);
+                
+                attempts++;
+            } while(targetA === targetB && attempts < 100 && JSON.stringify(pathA) !== JSON.stringify(pathB));
+
+            targetVal = targetA; 
+
+            for (let r = 0; r < gridsize; r++) {
+                for (let c = 0; c < gridsize; c++) {
+                    grid[r][c].rotation = Math.floor(Math.random() * 4);
+                }
+            }
+
+            updateHUD();
+            renderPorts();
+            renderGrid();
+        }
+
+        function applyMath(val, op, num) {
+            if (op === '+') return val + num;
+            if (op === '-') return val - num;
+            if (op === '×') return val * num;
+            return val;
+        }
+
+        function updateHUD() {
+            document.getElementById('hdr-start').innerText = startVal;
+            document.getElementById('hdr-target').innerText = targetVal;
+        }
+
+        function renderPorts() {
+            let inCol = document.getElementById('ports-in-col');
+            let outCol = document.getElementById('ports-out-col');
+            inCol.innerHTML = ''; outCol.innerHTML = '';
+
+            for(let i=0; i<3; i++) {
+                if(i === startRow) {
+                    inCol.innerHTML += `
+                        <div class="port-slot">
+                            <div class="side-info">energía inicial<br><span>${startVal}</span></div>
+                            <div class="port-visual port-in"><div class="port-pipe"></div></div>
+                        </div>`;
+                } else {
+                    inCol.innerHTML += `<div class="port-slot"></div>`;
+                }
+
+                if(i === endRow) {
+                    outCol.innerHTML += `
+                        <div class="port-slot out">
+                            <div class="port-visual port-out out"><div class="port-pipe"></div></div>
+                            <div class="side-info out">energía final<br><span>${targetVal}</span></div>
+                        </div>`;
+                } else {
+                    outCol.innerHTML += `<div class="port-slot"></div>`;
+                }
+            }
+        }
+
+        function renderGrid() {
+            let container = document.getElementById('grid-container');
+            container.innerHTML = '';
+
+            for (let r = 0; r < gridsize; r++) {
+                for (let c = 0; c < gridsize; c++) {
+                    let tile = grid[r][c];
+                    let tileEl = document.createElement('div');
+                    tileEl.className = 'pipe-tile';
+                    if (tile.connected) tileEl.classList.add('connected');
+                    if (tile.error) tileEl.classList.add('error');
+                    
+                    tileEl.onclick = () => rotateTile(r, c);
+
+                    let cssRot = tile.rotation * 90;
+                    
+                    // Solo usamos las salidas BASE para generar el dibujo HTML. El CSS rotará la imagen visualmente completa.
+                    let bExits = pipeTypes[tile.type].exits; 
+                    
+                    let htmlLines = '';
+                    if(bExits[0]) htmlLines += `<div class="pipe-line top"></div>`;
+                    if(bExits[1]) htmlLines += `<div class="pipe-line right"></div>`;
+                    if(bExits[2]) htmlLines += `<div class="pipe-line bottom"></div>`;
+                    if(bExits[3]) htmlLines += `<div class="pipe-line left"></div>`;
+
+                    tileEl.innerHTML = `
+                        <div class="pipe-wrapper" style="transform: rotate(${cssRot}deg);">
+                            ${htmlLines}
+                            <div class="pipe-center"></div>
+                        </div>
+                        <div class="pipe-math">${tile.op}${tile.val}</div>
+                    `;
+                    container.appendChild(tileEl);
+                }
+            }
+        }
+
+        function rotateTile(r, c) {
+            sfxRotate();
+            grid[r][c].rotation = (grid[r][c].rotation + 1) % 4;
+            for(let i=0; i<3; i++) for(let j=0; j<3; j++) { grid[i][j].connected = false; grid[i][j].error = false; }
+            renderGrid();
+        }
+
+        function validateFlow() {
+            for(let r=0; r<gridsize; r++) for(let c=0; c<gridsize; c++) { grid[r][c].connected = false; grid[r][c].error = false; }
+
+            let flows = [{r: startRow, c: 0, val: startVal, enteringSide: 3, pathSet: new Set(['start'])}];
+            let reachedValues = [];
+            let anyError = false;
+
+            while(flows.length > 0) {
+                let currentFlow = flows.shift();
+                let r = currentFlow.r; let c = currentFlow.c;
+                let tile = grid[r][c];
+                let exits = getRotatedExits(tile.type, tile.rotation);
+                
+                if (exits[currentFlow.enteringSide] === 0) {
+                    tile.error = true; anyError = true; continue; 
+                }
+                
+                tile.connected = true;
+                let newVal = applyMath(currentFlow.val, tile.op, tile.val);
+                
+                for(let d=0; d<4; d++) {
+                    if (d !== currentFlow.enteringSide && exits[d] === 1) {
+                        if (c === 2 && d === 1) {
+                            if (r === endRow) reachedValues.push(newVal);
+                            else { tile.error = true; anyError = true; }
+                            continue;
+                        }
+                        
+                        let nr = r, nc = c;
+                        if (d===0) nr--; else if (d===1) nc++; else if (d===2) nr++; else if (d===3) nc--;
+                        
+                        if (nr>=0 && nr<3 && nc>=0 && nc<3) {
+                            let key = nr + ',' + nc;
+                            if (!currentFlow.pathSet.has(key)) {
+                                let newSet = new Set(currentFlow.pathSet);
+                                newSet.add(key);
+                                flows.push({r: nr, c: nc, val: newVal, enteringSide: (d+2)%4, pathSet: newSet});
+                            }
+                        } else {
+                            tile.error = true; anyError = true;
+                        }
+                    }
+                }
+            }
+
+            renderGrid();
+
+            if (reachedValues.includes(targetVal)) {
+                sfxSuccess();
+                document.getElementById('m-title').style.color = "var(--neon-green)";
+                document.getElementById('m-title').style.textShadow = "0 0 10px var(--neon-green)";
+                showModal("¡Circuito Optimizado! ⚡", `¡El flujo llegó a ${targetVal} exactos a través de las operaciones!\nGenerando nueva ruta...`, () => {
+                    document.getElementById('m-title').style.color = "var(--pipe-cyan)"; 
+                    document.getElementById('m-title').style.textShadow = "0 0 10px var(--pipe-cyan)";
+                    initLevel();
+                });
+            } else if (reachedValues.length > 0) {
+                sfxError();
+                document.getElementById('m-title').style.color = "var(--neon-yellow)";
+                document.getElementById('m-title').style.textShadow = "0 0 10px var(--neon-yellow)";
+                showModal("¡Desfase de Energía! ⚠️", `El circuito está conectado a OUT, pero el cálculo resultó en ${reachedValues[0]}.\n¡Necesitamos exactamente ${targetVal}!`, () => {
+                    document.getElementById('m-title').style.color = "var(--pipe-cyan)"; 
+                    document.getElementById('m-title').style.textShadow = "0 0 10px var(--pipe-cyan)";
+                });
+            } else {
+                sfxError();
+                document.getElementById('m-title').style.color = "var(--neon-red)";
+                document.getElementById('m-title').style.textShadow = "0 0 10px var(--neon-red)";
+                showModal("¡Fuga Cuántica! ❌", "La energía se filtró o no llegó al colector OUT. Cierra los tubos sueltos.", () => {
+                    document.getElementById('m-title').style.color = "var(--pipe-cyan)"; 
+                    document.getElementById('m-title').style.textShadow = "0 0 10px var(--pipe-cyan)";
+                });
+            }
+        }
+
+        function getRotatedExits(type, rot) {
+            let baseExits = [...pipeTypes[type].exits];
+            for (let i = 0; i < rot; i++) {
+                let last = baseExits.pop();
+                baseExits.unshift(last);
+            }
+            return baseExits;
+        }
+
+        let modalCallback = null;
+        function showModal(title, msg, callback = null) {
+            document.getElementById('m-title').innerText = title;
+            document.getElementById('m-msg').innerText = msg;
+            document.getElementById('modal').classList.add('active');
+            modalCallback = callback;
+        }
+
+        function closeModal() {
+            sfxRotate();
+            document.getElementById('modal').classList.remove('active');
+            if (modalCallback) { modalCallback(); modalCallback = null; }
+        }
+    </script>
+</body>
+</html>
