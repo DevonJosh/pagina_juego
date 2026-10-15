@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Línea de Fuego: Emancipación 📜</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root { 
+            --peru-red: #c0392b;
+            --peru-dark: #78281f;
+            --parchment: #fdfefe;
+            --parchment-border: #d4ac0d;
+            --gold: #f39c12;
+            --sky-night: #154360;
+        }
+
+        body, html { 
+            font-family: 'Fredoka', sans-serif; 
+            display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+            margin: 0; padding: 0; width: 100vw; height: 100vh; 
+            touch-action: manipulation; 
+            color: #2c3e50; background: linear-gradient(135deg, var(--sky-night) 0%, #1a252f 100%); 
+            overflow: hidden; box-sizing: border-box;
+            user-select: none;
+        }
+
+        .sound-toggle { position: absolute; top: 15px; right: 15px; background: rgba(255,255,255,0.9); border: 3px solid var(--gold); border-radius: 50%; width: 45px; height: 45px; font-size: 20px; display: flex; justify-content: center; align-items: center; cursor: pointer; z-index: 1000; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: all 0.2s;}
+        .sound-toggle:active { transform: translateY(4px); box-shadow: none; }
+
+        /* LOBBY */
+        #setup-screen {
+            position: absolute; inset: 0; z-index: 500; display: flex; flex-direction: column; justify-content: center; align-items: center;
+            background: rgba(0,0,0,0.75); backdrop-filter: blur(8px);
+        }
+
+        .history-card {
+            background: #f4ecd0; padding: 35px; border-radius: 15px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6); 
+            border: 6px solid var(--parchment-border); text-align: center; max-width: 90%; width: 500px; 
+            display: flex; flex-direction: column; gap: 15px; color: #2c3e50;
+        }
+
+        .history-card h1 { font-family: 'Cinzel', serif; font-size: clamp(26px, 4.5vh, 36px); color: var(--peru-dark); margin: 0; text-transform: uppercase; letter-spacing: 1px;}
+        
+        .setup-section { background: rgba(255,255,255,0.7); padding: 12px; border: 2px dashed #b7950b; display: flex; flex-direction: column; gap: 8px; align-items: center; border-radius: 10px;}
+        .setup-section h3 { margin: 0; color: #7d6608; font-size: 16px; text-transform: uppercase; font-family: 'Cinzel', serif; font-weight: 800;}
+        
+        .setup-row { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; width: 100%;}
+        
+        .setup-btn { background: #fff; border: 2px solid #d4ac0d; padding: 8px 14px; font-size: 16px; font-weight: bold; color: #7d6608; cursor: pointer; transition: all 0.1s; font-family: 'Fredoka', sans-serif; border-radius: 8px; box-shadow: 0 4px 0 #b7950b;}
+        .setup-btn.active.diff { background: var(--peru-red); border-color: #641e16; color: #fff; box-shadow: 0 4px 0 #641e16; transform: translateY(2px);}
+        .setup-btn:active:not(.active) { transform: translateY(2px); box-shadow: none; }
+
+        .time-input-group { display: flex; align-items: center; gap: 10px; background: #fff; padding: 6px 15px; border: 2px solid #d4ac0d; border-radius: 8px;}
+        .time-input-group label { color: #2c3e50; font-size: 18px; font-weight: bold;}
+        .time-input-group input { width: 60px; background: #fef9e7; border: 1px solid #d4ac0d; color: #2c3e50; text-align: center; font-family: 'Cinzel', serif; font-size: 18px; padding: 4px; outline: none; font-weight: bold; border-radius: 6px;}
+        
+        .start-btn {
+            background: linear-gradient(135deg, var(--peru-red), #922b21); border: none; box-shadow: 0 6px 0 #641e16, 0 10px 20px rgba(0,0,0,0.3); padding: 14px 30px; font-size: 22px; color: #fff; text-transform: uppercase; font-family: 'Cinzel', serif; font-weight: 800; cursor:pointer; margin-top: 5px; transition: all 0.1s; border-radius: 12px; letter-spacing: 1px;
+        }
+        .start-btn:active { transform: translateY(6px); box-shadow: 0 0 0 #641e16; }
+
+        /* ============================================================
+           PANTALLA DE JUEGO & HUD
+           ============================================================ */
+        #game-screen {
+            display: none; flex-direction: column; align-items: center; justify-content: flex-start;
+            width: 100vw; height: 100vh; padding: 1.5vh 2vw; box-sizing: border-box; overflow: hidden;
+        }
+
+        .game-header { flex: 0 0 auto; display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 900px; margin-bottom: 1vh; z-index: 10; }
+        
+        .back-menu-btn { background: #f4ecd0; border: 2px solid var(--parchment-border); padding: 6px 14px; font-size: 15px; font-weight: bold; color: #2c3e50; cursor: pointer; transition: all 0.1s; font-family: 'Fredoka', sans-serif; box-shadow: 0 4px 0 #b7950b; border-radius: 8px;}
+        .back-menu-btn:active { transform: translateY(4px); box-shadow: none;}
+
+        .hud-group { display: flex; gap: 12px; align-items: center; }
+        .lives-box, .score-box {
+            background: #f4ecd0; padding: 6px 16px; border-radius: 10px;
+            border: 2px solid var(--parchment-border); font-size: 18px; color: #2c3e50; font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2); font-family: 'Cinzel', serif;
+        }
+        .lives-box { border-color: var(--peru-red); color: var(--peru-red); }
+
+        /* ÁREA DE JUEGO (ANIMACIÓN DE PERSONAJES + TARJETAS) */
+        .game-split-container {
+            flex: 1 1 auto; width: 100%; max-width: 900px; display: flex; flex-direction: column; gap: 15px; align-items: center; justify-content: center; z-index: 5; margin-bottom: 1vh; min-height: 0;
+        }
+
+        /* ESCENARIO GRÁFICO (CANVAS DONDE EL PERSONAJE ACTÚA) */
+        .stage-wrapper {
+            width: 100%; height: 200px; background: rgba(0,0,0,0.4); border-radius: 15px; border: 3px solid var(--parchment-border);
+            position: relative; overflow: hidden; display: flex; justify-content: center; align-items: center;
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.6);
+        }
+        #gameCanvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+
+        .instruction-box {
+            background: #f4ecd0; padding: 12px 20px; border-radius: 12px; border: 3px solid var(--parchment-border);
+            text-align: center; font-size: clamp(15px, 2.3vh, 20px); font-weight: bold; color: #2c3e50; box-shadow: 0 6px 15px rgba(0,0,0,0.3); width: 100%; box-sizing: border-box;
+        }
+
+        .timeline-slot-container {
+            display: flex; gap: 12px; width: 100%; justify-content: center; flex-wrap: wrap;
+        }
+
+        .timeline-card {
+            background: #fff; border: 3px solid #d4ac0d; border-radius: 12px;
+            padding: 12px; width: 250px; min-height: 100px; display: flex; flex-direction: column;
+            justify-content: space-between; align-items: center; cursor: pointer;
+            box-shadow: 0 6px 0 #b7950b, 0 10px 15px rgba(0,0,0,0.2); transition: all 0.1s;
+            text-align: center; font-size: 14px; font-weight: 600;
+        }
+        .timeline-card:active { transform: translateY(4px); box-shadow: 0 2px 0 #b7950b; }
+        .timeline-card.correct { background: #d4efdf !important; border-color: #27ae60 !important; box-shadow: 0 2px 0 #27ae60 !important; }
+        .timeline-card.wrong { background: #fadbd8 !important; border-color: #c0392b !important; box-shadow: 0 2px 0 #c0392b !important; }
+
+        @keyframes damageShake { 
+            0%, 100% { transform: translate(0, 0); } 
+            20%, 60% { transform: translate(-10px, 0); } 
+            40%, 80% { transform: translate(10px, 0); } 
+        }
+        .damage-shake { animation: damageShake 0.4s ease-in-out; }
+
+        /* MODAL */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: flex; justify-content: center; align-items: center; z-index: 1000; visibility: hidden; opacity: 0; transition: all 0.3s; backdrop-filter: blur(5px);}
+        .modal-overlay.active { visibility: visible; opacity: 1; }
+        .modal-box { background: #f4ecd0; padding: 35px; border-radius: 15px; text-align: center; max-width: 85%; width: 450px; transform: scale(0.9); transition: transform 0.3s; border: 4px solid var(--parchment-border); box-shadow: 0 20px 50px rgba(0,0,0,0.6); color: #2c3e50;}
+        .modal-overlay.active .modal-box { transform: scale(1); }
+        .modal-title { font-family: 'Cinzel', serif; font-size: 34px; margin-top: 0; margin-bottom: 10px; color: var(--peru-dark); text-transform: uppercase; font-weight: 800;}
+        .modal-msg { font-size: 18px; margin-bottom: 25px; color: #555; white-space: pre-line; line-height: 1.4; font-weight: 600;}
+        .modal-btn { background: var(--peru-red); border: none; box-shadow: 0 6px 0 #641e16; color: #fff; padding: 12px 30px; font-size: 20px; border-radius: 8px; text-transform: uppercase; font-family: 'Cinzel', serif; font-weight: 800; cursor:pointer; transition: all 0.1s;}
+        .modal-btn:active { transform: translateY(6px); box-shadow: none;}
+    </style>
+</head>
+<body>
+
+    <audio id="bgm" loop><source src="../assets/musicaFondo/cancion1.mp3" type="audio/mpeg"></audio>
+    <button id="soundToggle" class="sound-toggle" aria-label="Activar sonido">🔇</button>
+
+    <!-- LOBBY -->
+    <div id="setup-screen">
+        <div class="history-card">
+            <h1>Línea de Fuego: Emancipación</h1>
+            <p style="margin:0; font-size:14px; color:#555;">¡Ayuda a los héroes patriotas a organizar la revolución cronológicamente!</p>
+            
+            <div class="setup-section">
+                <h3>Dificultad de Campaña</h3>
+                <div class="setup-row">
+                    <button id="setup-diff-1" class="setup-btn diff active" onclick="selectDiff(1)">Libertador (3 Eventos)</button>
+                    <button id="setup-diff-2" class="setup-btn diff" onclick="selectDiff(2)">Mariscal (4 Eventos)</button>
+                </div>
+            </div>
+
+            <div class="setup-section">
+                <h3>Vidas (Errores Permitidos)</h3>
+                <div class="time-input-group">
+                    <label>❤️</label>
+                    <input type="number" id="setup-lives" value="3" min="1" max="10">
+                </div>
+            </div>
+
+            <button class="start-btn" onclick="startGame()">¡Iniciar Crónica!</button>
+        </div>
+    </div>
+
+    <!-- JUEGO -->
+    <div id="game-screen">
+        <div class="game-header">
+            <button class="back-menu-btn" onclick="backToMenu()">Retirarse</button>
+            <div class="hud-group">
+                <div class="lives-box">❤️ <span id="lives-display">3</span></div>
+                <div class="score-box">Hitos: <span id="score-display">0</span>/5</div>
+            </div>
+        </div>
+
+        <div class="game-split-container">
+            <!-- ESCENARIO GRÁFICO CON PERSONAJES ANIMADOS -->
+            <div class="stage-wrapper" id="canvas-wrapper">
+                <canvas id="gameCanvas"></canvas>
+            </div>
+
+            <div class="instruction-box">
+                ¿Qué ocurrió <span id="target-order-text" style="color:var(--peru-red);">PRIMERO</span> en la historia de la independencia?
+            </div>
+            
+            <div class="timeline-slot-container" id="cards-container">
+                <!-- Tarjetas inyectadas por JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL -->
+    <div class="modal-overlay" id="modal">
+        <div class="modal-box">
+            <h2 class="modal-title" id="m-title">Título</h2>
+            <p class="modal-msg" id="m-msg">Mensaje</p>
+            <button class="modal-btn" onclick="closeModal()">Aceptar</button>
+        </div>
+    </div>
+
+    <script>
+        const eventsDB = [
+            { year: 1780, text: "Rebelión de Túpac Amaru II en el Cusco.", hero: "🪶", title: "Túpac Amaru II llama a la rebelión" },
+            { year: 1812, text: "Promulgación de la Constitución de Cádiz.", title: "Debates liberales en el Virreinato" },
+            { year: 1814, text: "Rebelión de los hermanos Angulo y Mateo Pumacahua.", hero: "⚔️", title: "Grita el Sur por la libertad" },
+            { year: 1820, text: "Desembarco de la Expedición de San Martín en Paracas.", hero: "⛵", title: "Llega la expedición libertadora" },
+            { year: 1821, text: "Proclamación de la Independencia del Perú en Lima.", hero: "🇵🇪", title: "¡El Perú es independiente!" },
+            { year: 1824, text: "Batallas decisivas de Junín y Ayacucho.", hero: "🐎", title: "Triunfo final en la pampa" }
+        ];
+
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        let audioCtx; let isMuted = true;
+        const bgAudio = document.getElementById('bgm');
+        const soundToggle = document.getElementById('soundToggle');
+
+        soundToggle.addEventListener('click', () => {
+            if (!audioCtx) audioCtx = new AudioContext();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            isMuted = !isMuted;
+            if(isMuted) { bgAudio.pause(); soundToggle.innerText = '🔇'; } 
+            else { bgAudio.volume = 0.25; bgAudio.play().catch(e=>e); soundToggle.innerText = '🔊'; }
+        });
+
+        function playTone(freq, type, duration, vol = 0.1) {
+            if (!audioCtx || isMuted) return;
+            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+            osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gain.gain.setValueAtTime(vol, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+            osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + duration);
+        }
+
+        function sfxClick() { playTone(600, 'square', 0.05, 0.05); }
+        function sfxCorrect() { playTone(523.25, 'triangle', 0.15, 0.15); setTimeout(()=>playTone(659.25, 'triangle', 0.2, 0.15), 100); }
+        function sfxWrong() { playTone(180, 'sawtooth', 0.3, 0.2); }
+        function sfxVictory() { let notes = [523.25, 659.25, 783.99, 1046.50]; notes.forEach((f, i) => setTimeout(() => playTone(f, 'square', 0.3, 0.1), i * 150)); }
+
+        let currentDifficulty = 3; 
+        let lives = 3;
+        let score = 0;
+        let activeEvents = [];
+        let targetYear = 0;
+        let animFrameId = null;
+
+        // PERSONAJE EN ESCENA
+        let character = {
+            x: 100, y: 130,
+            emoji: "🪶",
+            action: "idle", // 'idle', 'working', 'celebrating', 'hurt'
+            speech: "¡Organicemos la resistencia!",
+            timer: 0
+        };
+
+        const canvas = document.getElementById('gameCanvas'); const ctx = canvas.getContext('2d');
+        const canvasWrapper = document.getElementById('canvas-wrapper');
+
+        function resizeCanvas() { canvas.width = canvasWrapper.offsetWidth; canvas.height = canvasWrapper.offsetHeight; }
+        window.addEventListener('resize', resizeCanvas);
+
+        function selectDiff(level) {
+            sfxClick();
+            currentDifficulty = level === 1 ? 3 : 4;
+            document.querySelectorAll('.setup-btn.diff').forEach(b => b.classList.remove('active'));
+            document.getElementById('setup-diff-' + level).classList.add('active');
+        }
+
+        function startGame() {
+            if (!audioCtx && !isMuted) { audioCtx = new AudioContext(); bgAudio.play().catch(e=>e); }
+            sfxClick();
+            let valLives = parseInt(document.getElementById('setup-lives').value);
+            lives = (isNaN(valLives) || valLives < 1) ? 3 : valLives;
+
+            document.getElementById('setup-screen').style.display = 'none';
+            document.getElementById('game-screen').style.display = 'flex';
+            resizeCanvas();
+            score = 0;
+            nextRound();
+            cancelAnimationFrame(animFrameId);
+            animFrameId = requestAnimationFrame(gameLoop);
+        }
+
+        function backToMenu() {
+            sfxClick();
+            cancelAnimationFrame(animFrameId);
+            document.getElementById('game-screen').style.display = 'none';
+            document.getElementById('setup-screen').style.display = 'flex';
+        }
+
+        function nextRound() {
+            document.getElementById('lives-display').innerText = lives;
+            document.getElementById('score-display').innerText = score;
+
+            let shuffled = [...eventsDB].sort(() => Math.random() - 0.5);
+            activeEvents = shuffled.slice(0, currentDifficulty);
+            activeEvents.sort((a, b) => a.year - b.year);
+            targetYear = activeEvents[0].year;
+
+            // Actualizar personaje en escena según el evento objetivo
+            character.emoji = activeEvents[0].hero || "📜";
+            character.speech = `Buscando fecha para: "${activeEvents[0].title}"`;
+            character.action = "idle";
+
+            let displayEvents = [...activeEvents].sort(() => Math.random() - 0.5);
+
+            let container = document.getElementById('cards-container');
+            container.innerHTML = '';
+
+            displayEvents.forEach(ev => {
+                let card = document.createElement('div');
+                card.className = 'timeline-card';
+                card.innerHTML = `<span>📅 ${ev.year} (Siglo XIX)</span><p>${ev.text}</p><small style="color:#d4ac0d; font-weight:bold;">Toca si ocurrió primero</small>`;
+                card.onclick = () => selectEvent(ev, card);
+                container.appendChild(card);
+            });
+        }
+
+        function selectEvent(ev, cardEl) {
+            document.querySelectorAll('.timeline-card').forEach(c => c.style.pointerEvents = 'none');
+
+            if (ev.year === targetYear) {
+                sfxCorrect();
+                cardEl.classList.add('correct');
+                score++;
+                
+                character.action = "celebrating";
+                character.speech = "¡Excelente maniobra patriota! ⚡";
+
+                setTimeout(() => {
+                    if (score >= 5) {
+                        sfxVictory();
+                        showModal("¡Victoria Crítica! 🏅", "¡Completaste con éxito la cronología y sellaste la independencia!", () => backToMenu());
+                    } else {
+                        nextRound();
+                    }
+                }, 900);
+            } else {
+                sfxWrong();
+                cardEl.classList.add('wrong');
+                lives--;
+                document.getElementById('lives-display').innerText = lives;
+
+                character.action = "hurt";
+                character.speech = "¡Alerta realista! Ese no era el orden 🛡️";
+                canvasWrapper.classList.add('damage-shake');
+                setTimeout(() => canvasWrapper.classList.remove('damage-shake'), 400);
+
+                if (lives <= 0) {
+                    showModal("¡Revolución Reprimida! ⚔️", "Te quedaste sin vidas. Las fuerzas virreinales detuvieron la conspiración.", () => backToMenu());
+                } else {
+                    setTimeout(() => nextRound(), 900);
+                }
+            }
+        }
+
+        // BUCLE GRÁFICO DEL ESCENARIO (ANIMACIÓN DE PERSONAJES)
+        function gameLoop(ts) {
+            animFrameId = requestAnimationFrame(gameLoop);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Fondo de la tertulia / plaza virreinal
+            ctx.fillStyle = "#1a252f";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Suelo adoquinado
+            ctx.fillStyle = "#2c3e50";
+            ctx.fillRect(0, canvas.height - 35, canvas.width, 35);
+            ctx.strokeStyle = "#34495e"; ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.moveTo(0, canvas.height - 35); ctx.lineTo(canvas.width, canvas.height - 35); ctx.stroke();
+
+            // Animación de movimiento del personaje
+            if (character.action === "celebrating") {
+                character.y = 130 + Math.sin(ts * 0.02) * 15; // Salto alegre
+            } else if (character.action === "hurt") {
+                character.x = 100 + (Math.random() - 0.5) * 8; // Tiritar por daño
+            } else {
+                character.y = 130 + Math.sin(ts * 0.008) * 4; // Respiración normal (idle)
+                character.x = 100;
+            }
+
+            // DIBUJAR PERSONAJE EN ESCENA
+            ctx.save();
+            ctx.translate(character.x, character.y);
+            
+            // Sombra
+            ctx.fillStyle = "rgba(0,0,0,0.4)";
+            ctx.beginPath(); ctx.ellipse(0, 35, 18, 6, 0, 0, Math.PI*2); ctx.fill();
+
+            // Emoji / Avatar animado
+            ctx.font = "45px Arial";
+            ctx.textAlign = "center"; ctx.textBaseline = "bottom";
+            ctx.fillText(character.emoji, 0, 15);
+
+            // Bocadillo de diálogo estilo historieta
+            ctx.font = "bold 14px 'Fredoka'";
+            let textW = ctx.measureText(character.speech).width + 20;
+            ctx.fillStyle = "#fff";
+            ctx.strokeStyle = "#d4ac0d"; ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.roundRect(25, -25, textW, 30, 8); ctx.fill(); ctx.stroke();
+
+            ctx.fillStyle = "#2c3e50";
+            ctx.textAlign = "left"; ctx.textBaseline = "middle";
+            ctx.fillText(character.speech, 35, -10);
+
+            ctx.restore();
+        }
+
+        let modalCallback = null;
+        function showModal(title, msg, callback = null) {
+            document.getElementById('m-title').innerText = title;
+            document.getElementById('m-msg').innerText = msg;
+            document.getElementById('modal').classList.add('active');
+            modalCallback = callback;
+        }
+
+        function closeModal() {
+            sfxClick();
+            document.getElementById('modal').classList.remove('active');
+            if (modalCallback) { modalCallback(); modalCallback = null; }
+        }
+    </script>
+</body>
+</html>

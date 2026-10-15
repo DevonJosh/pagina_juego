@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Ascenso al Misti: Expedición Characata 🌋</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Nunito:wght@800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        :root { 
+            --sillar-light: #ffffff;
+            --sillar-border: #d0d3d4;
+            --sky-top: #154360;
+            --sky-bottom: #3498db;
+            --aqp-red: #b03a2e;
+            --aqp-gold: #f39c12;
+        }
+
+        body, html { 
+            font-family: 'Fredoka', sans-serif; 
+            display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+            margin: 0; padding: 0; width: 100vw; height: 100vh; 
+            touch-action: manipulation; 
+            color: #333; background: linear-gradient(135deg, var(--sky-top) 0%, var(--sky-bottom) 100%); 
+            overflow: hidden; box-sizing: border-box;
+            user-select: none;
+        }
+
+        .decorations { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
+        .sun { position: absolute; top: 5%; right: 5%; font-size: 80px; filter: drop-shadow(0 0 30px rgba(243, 156, 18, 0.9)); animation: pulseSun 5s infinite alternate; }
+        @keyframes pulseSun { 0% { transform: scale(1); } 100% { transform: scale(1.1); } }
+
+        .sound-toggle { position: absolute; top: 15px; right: 15px; background: rgba(255,255,255,0.9); border: 3px solid var(--sillar-border); border-radius: 50%; width: 45px; height: 45px; font-size: 20px; display: flex; justify-content: center; align-items: center; cursor: pointer; z-index: 1000; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: all 0.2s;}
+        .sound-toggle:active { transform: translateY(4px); box-shadow: none; }
+
+        /* LOBBY */
+        #setup-screen {
+            position: absolute; inset: 0; z-index: 500; display: flex; flex-direction: column; justify-content: center; align-items: center;
+            background: rgba(10, 20, 30, 0.8); backdrop-filter: blur(10px);
+        }
+
+        .sillar-card {
+            background: var(--sillar-light); padding: 35px; border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6); 
+            border: 6px solid #95a5a6; text-align: center; max-width: 90%; width: 500px; 
+            display: flex; flex-direction: column; gap: 15px; color: #2c3e50;
+        }
+
+        .sillar-card h1 { font-family: 'Nunito', sans-serif; font-size: clamp(28px, 5vh, 38px); color: var(--aqp-red); margin: 0; text-transform: uppercase; text-shadow: 1px 1px 0px #f9e79f;}
+        
+        .setup-section { background: #f2f4f4; padding: 12px; border: 2px dashed #bdc3c7; display: flex; flex-direction: column; gap: 8px; align-items: center; border-radius: 12px;}
+        .setup-section h3 { margin: 0; color: #34495e; font-size: 16px; text-transform: uppercase; font-weight: 800;}
+        
+        .setup-row { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; width: 100%;}
+        
+        .setup-btn { background: #fff; border: 2px solid #bdc3c7; padding: 8px 14px; font-size: 16px; font-weight: bold; color: #7f8c8d; cursor: pointer; transition: all 0.1s; font-family: 'Fredoka', sans-serif; border-radius: 10px; box-shadow: 0 4px 0 #bdc3c7;}
+        .setup-btn.active.diff { background: var(--aqp-red); border-color: #641e16; color: #fff; box-shadow: 0 4px 0 #641e16; transform: translateY(2px);}
+        .setup-btn:active:not(.active) { transform: translateY(2px); box-shadow: none; }
+
+        .time-input-group { display: flex; align-items: center; gap: 10px; background: #fff; padding: 6px 15px; border: 2px solid #bdc3c7; border-radius: 10px;}
+        .time-input-group label { color: #2c3e50; font-size: 18px; font-weight: bold;}
+        .time-input-group input { width: 60px; background: #ecf0f1; border: 1px solid #bdc3c7; color: #2c3e50; text-align: center; font-family: 'Nunito', sans-serif; font-size: 18px; padding: 4px; outline: none; font-weight: bold; border-radius: 6px;}
+        
+        .start-btn {
+            background: var(--aqp-gold); border: none; box-shadow: 0 8px 0 #b7950b, 0 15px 25px rgba(0,0,0,0.3); padding: 14px 30px; font-size: 26px; color: #111; text-transform: uppercase; font-weight: 900; font-family: 'Nunito', sans-serif; cursor:pointer; margin-top: 5px; transition: all 0.1s; border-radius: 15px;
+        }
+        .start-btn:active { transform: translateY(6px); box-shadow: 0 0 0 #b7950b; }
+
+        /* ============================================================
+           PANTALLA DE JUEGO & HUD
+           ============================================================ */
+        #game-screen {
+            display: none; flex-direction: column; align-items: center; justify-content: flex-start;
+            width: 100vw; height: 100vh; padding: 1.5vh 2vw; box-sizing: border-box; overflow: hidden;
+        }
+
+        .game-header { flex: 0 0 auto; display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 1100px; margin-bottom: 1.5vh; z-index: 10; }
+        
+        .back-menu-btn { background: rgba(255,255,255,0.9); border: 2px solid var(--sillar-border); padding: 8px 16px; font-size: 15px; font-weight: bold; color: #2c3e50; cursor: pointer; transition: all 0.1s; font-family: 'Fredoka', sans-serif; box-shadow: 0 4px 0 rgba(0,0,0,0.2); border-radius: 10px;}
+        .back-menu-btn:active { transform: translateY(4px); box-shadow: none;}
+
+        .hud-group { display: flex; gap: 12px; align-items: center; }
+        .lives-box, .score-box {
+            background: rgba(255,255,255,0.95); padding: 8px 18px; border-radius: 12px;
+            border: 2px solid var(--sillar-border); font-size: 18px; color: #2c3e50; font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .lives-box { border-color: var(--aqp-red); color: var(--aqp-red); }
+
+        /* CONTENEDOR SPLIT */
+        .game-split-container {
+            flex: 1 1 auto; width: 100%; max-width: 1100px; display: flex; gap: 25px; align-items: stretch; justify-content: center; z-index: 5; margin-bottom: 1vh; min-height: 0;
+        }
+
+        /* COLUMNA IZQUIERDA */
+        .left-panel {
+            flex: 1.1; display: flex; flex-direction: column; gap: 18px; justify-content: center; align-items: center; max-width: 480px;
+        }
+
+        .prompt-box { 
+            text-align: center; background: rgba(253, 254, 254, 0.95); padding: 20px; 
+            border-radius: 18px; font-size: clamp(18px, 2.8vh, 24px); font-weight: 800; color: #2c3e50;
+            width: 100%; border: 4px solid var(--sillar-border); 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.25); box-sizing: border-box; 
+            font-family: 'Nunito', sans-serif; backdrop-filter: blur(5px);
+        }
+
+        .options-container {
+            display: flex; flex-direction: column; gap: 14px; width: 100%;
+        }
+
+        .option-btn {
+            background: #fdfefe; border: 3px solid #bdc3c7; border-radius: 16px;
+            padding: 15px 22px; font-size: clamp(16px, 2.3vh, 20px); font-weight: 700; color: #2c3e50;
+            cursor: pointer; box-shadow: 0 6px 0 #bdc3c7; transition: all 0.1s; font-family: 'Fredoka', sans-serif;
+            text-align: center; display: flex; align-items: center; justify-content: center; gap: 12px;
+        }
+        .option-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #bdc3c7; background: #eaeded; }
+        .option-btn.correct { background: #2ecc71 !important; border-color: #27ae60 !important; color: #fff !important; box-shadow: 0 2px 0 #27ae60 !important; transform: translateY(4px); }
+        .option-btn.wrong { background: #e74c3c !important; border-color: #c0392b !important; color: #fff !important; box-shadow: 0 2px 0 #c0392b !important; transform: translateY(4px); }
+
+        /* COLUMNA DERECHA */
+        .right-panel {
+            flex: 1.3; position: relative; background: rgba(5, 10, 20, 0.4); border-radius: 20px; border: 3px solid rgba(255,255,255,0.35);
+            box-shadow: inset 0 0 50px rgba(0,0,0,0.5), 0 15px 35px rgba(0,0,0,0.3);
+            overflow: hidden; display: flex; justify-content: center; align-items: center; backdrop-filter: blur(4px);
+        }
+        
+        #gameCanvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+
+        @keyframes earthquake { 
+            0%, 100% { transform: translate(0, 0); } 
+            10%, 30%, 50%, 70%, 90% { transform: translate(-12px, 8px); } 
+            20%, 40%, 60%, 80% { transform: translate(12px, -8px); } 
+        }
+        .damage-shake { animation: earthquake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
+
+        /* MODAL */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: flex; justify-content: center; align-items: center; z-index: 1000; visibility: hidden; opacity: 0; transition: all 0.3s; backdrop-filter: blur(5px);}
+        .modal-overlay.active { visibility: visible; opacity: 1; }
+        .modal-box { background: var(--sillar-light); padding: 35px; border-radius: 20px; text-align: center; max-width: 85%; width: 450px; transform: scale(0.9); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); border: 5px solid var(--sillar-border); box-shadow: 0 20px 50px rgba(0,0,0,0.6); color: #2c3e50;}
+        .modal-overlay.active .modal-box { transform: scale(1); }
+        .modal-title { font-size: 38px; margin-top: 0; margin-bottom: 10px; color: var(--aqp-red); text-transform: uppercase; font-family: 'Nunito', sans-serif; font-weight: 900;}
+        .modal-msg { font-size: 20px; margin-bottom: 25px; color: #555; white-space: pre-line; line-height: 1.4; font-weight: 600;}
+        .modal-btn { background: var(--aqp-gold); border: none; box-shadow: 0 6px 0 #b7950b; color: #111; padding: 12px 30px; font-size: 22px; border-radius: 12px; text-transform: uppercase; font-weight: 900; font-family: 'Nunito', sans-serif; cursor:pointer; transition: all 0.1s;}
+        .modal-btn:active { transform: translateY(6px); box-shadow: none;}
+
+        @media (max-width: 800px) {
+            .game-split-container { flex-direction: column-reverse; align-items: center; }
+            .left-panel { max-width: 100%; width: 100%; }
+            .right-panel { width: 100%; height: 280px; flex: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <audio id="bgm" loop><source src="../assets/musicaFondo/cancion1.mp3" type="audio/mpeg"></audio>
+    <div class="decorations">
+        <div class="sun">☀️</div>
+    </div>
+    <button id="soundToggle" class="sound-toggle" aria-label="Activar sonido">🔇</button>
+
+    <!-- LOBBY -->
+    <div id="setup-screen">
+        <div class="sillar-card">
+            <h1>ASCENSO AL MISTI</h1>
+            <p style="margin:0; font-size:15px; color:#666;">Guía al explorador paso a paso hacia la cumbre de Arequipa</p>
+            
+            <div class="setup-section">
+                <h3>Temática de Expedición</h3>
+                <div class="setup-row">
+                    <button id="setup-dict-historia" class="setup-btn diff active" onclick="selectDict('historia')">Historia</button>
+                    <button id="setup-dict-gastro" class="setup-btn diff" onclick="selectDict('gastro')">Gastronomía</button>
+                    <button id="setup-dict-cultura" class="setup-btn diff" onclick="selectDict('cultura')">Geografía</button>
+                    <button id="setup-dict-mix" class="setup-btn diff" onclick="selectDict('mix')">Ruta Mixta</button>
+                </div>
+            </div>
+
+            <div class="setup-section">
+                <h3>Resistencia Física (Vidas)</h3>
+                <div class="setup-row">
+                    <div class="time-input-group">
+                        <label>❤️</label>
+                        <input type="number" id="setup-lives" value="3" min="0" max="99">
+                    </div>
+                </div>
+            </div>
+
+            <button class="start-btn" onclick="startGame()">¡INICIAR EXPEDICIÓN!</button>
+        </div>
+    </div>
+
+    <!-- JUEGO -->
+    <div id="game-screen">
+        <div class="game-header">
+            <button class="back-menu-btn" onclick="backToMenu()">ABANDONAR</button>
+            <div class="hud-group">
+                <div class="lives-box">❤️ <span id="lives-display">3</span></div>
+                <div class="score-box">⛰️ <span id="score-display">2335</span> msnm</div>
+            </div>
+        </div>
+
+        <!-- CONTENEDOR PRINCIPAL SPLIT -->
+        <div class="game-split-container">
+            <div class="left-panel">
+                <div class="prompt-box">
+                    <span id="question-display">Cargando pregunta...</span>
+                </div>
+                <div class="options-container" id="options-container"></div>
+            </div>
+
+            <div class="right-panel" id="canvas-wrapper">
+                <canvas id="gameCanvas"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL -->
+    <div class="modal-overlay" id="modal">
+        <div class="modal-box">
+            <h2 class="modal-title" id="m-title">Título</h2>
+            <p class="modal-msg" id="m-msg">Mensaje</p>
+            <button class="modal-btn" onclick="closeModal()">ACEPTAR</button>
+        </div>
+    </div>
+
+    <script>
+        const triviaDB = {
+            'historia': [
+                { q: "¿Fundador español de Arequipa en 1540?", a: "Garcí Manuel de Carbajal", fakes: ["Francisco Pizarro", "Simón Bolívar"] },
+                { q: "Prócer y poeta arequipeño fusilado en 1815", a: "Mariano Melgar", fakes: ["Mario Vargas Llosa", "César Vallejo"] },
+                { q: "Apodo histórico de la ciudad", a: "El León del Sur", fakes: ["La Incontrastable", "El Ombligo del Mundo"] },
+                { q: "¿En qué año se fundó Arequipa?", a: "1540", fakes: ["1532", "1821"] }
+            ],
+            'gastro': [
+                { q: "Plato tradicional de domingo por la mañana", a: "Adobo", fakes: ["Rocoto Relleno", "Pachamanca"] },
+                { q: "Postre tradicional que irónicamente NO lleva queso", a: "Queso Helado", fakes: ["Arroz Zambito", "Mazamorra Morada"] },
+                { q: "Hierba principal usada en la Ocopa", a: "Huacatay", fakes: ["Culantro", "Orégano"] },
+                { q: "Bebida fermentada tradicional arequipeña", a: "Chicha de Güiñapo", fakes: ["Pisco Sour", "Chicha de Jora"] }
+            ],
+            'cultura': [
+                { q: "Material volcánico de construcción", a: "Sillar", fakes: ["Adobe", "Ladrillo"] },
+                { q: "Volcanes tutelares: Misti, Pichu Pichu y...", a: "Chachani", fakes: ["Sabancaya", "Coropuna"] },
+                { q: "Famoso monasterio colonial en la ciudad", a: "Santa Catalina", fakes: ["Santa Teresa", "San Francisco"] },
+                { q: "¿Qué cañón profundo se ubica en Arequipa?", a: "Cañón del Colca", fakes: ["Cañón del Pato", "Cañón de Cotahuasi"] }
+            ]
+        };
+
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        let audioCtx; let isMuted = true;
+        const bgAudio = document.getElementById('bgm');
+        const soundToggle = document.getElementById('soundToggle');
+
+        soundToggle.addEventListener('click', () => {
+            if (!audioCtx) audioCtx = new AudioContext();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            isMuted = !isMuted;
+            if(isMuted) { bgAudio.pause(); soundToggle.innerText = '🔇'; } 
+            else { bgAudio.volume = 0.25; bgAudio.play().catch(e=>e); soundToggle.innerText = '🔊'; }
+        });
+
+        function playTone(freq, type, duration, vol = 0.1) {
+            if (!audioCtx || isMuted) return;
+            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+            osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gain.gain.setValueAtTime(vol, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+            osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + duration);
+        }
+
+        function sfxClick() { playTone(600, 'square', 0.05, 0.05); }
+        function sfxStep() { playTone(350, 'triangle', 0.08, 0.1); } 
+        function sfxSlip() { playTone(150, 'sawtooth', 0.3, 0.2); } 
+        function sfxSummit() { let notes = [523.25, 659.25, 783.99, 1046.50]; notes.forEach((f, i) => setTimeout(() => playTone(f, 'square', 0.3, 0.1), i * 150)); } 
+
+        let currentDict = 'historia';
+        let isGameActive = false;
+        let altitud = 2335; 
+        const altitudBase = 2335;
+        const altitudMeta = 5822; 
+        let lives = 3; let infiniteLives = false;
+        let animFrameId = null; 
+
+        let currentQuestion = null;
+        let particles = [];
+        let recentQuestions = []; // HISTORIAL PARA EVITAR PREGUNTAS REPETIDAS SEGUIDAS
+
+        let mistiImg = new Image();
+        mistiImg.src = '../assets/misti.png';
+        let imgLoaded = false;
+        mistiImg.onload = () => { imgLoaded = true; };
+
+        let climber = {
+            x: 0, y: 0,
+            targetX: 0, targetY: 0,
+            isWalking: false
+        };
+
+        const canvas = document.getElementById('gameCanvas'); const ctx = canvas.getContext('2d');
+        const canvasWrapper = document.getElementById('canvas-wrapper');
+
+        function resizeCanvas() { 
+            canvas.width = canvasWrapper.offsetWidth; 
+            canvas.height = canvasWrapper.offsetHeight;
+            updateClimberPositionImmediate();
+        }
+        window.addEventListener('resize', resizeCanvas);
+
+        function selectDict(dict) { sfxClick(); currentDict = dict; document.querySelectorAll('#setup-dict-historia, #setup-dict-gastro, #setup-dict-cultura, #setup-dict-mix').forEach(btn => btn.classList.remove('active')); document.getElementById('setup-dict-' + dict).classList.add('active'); }
+
+        function startGame() {
+            if (!audioCtx && !isMuted) { audioCtx = new AudioContext(); bgAudio.play().catch(e=>e); }
+            sfxClick();
+            
+            let valLives = parseInt(document.getElementById('setup-lives').value);
+            let initialLives = (isNaN(valLives) || valLives < 0) ? 3 : valLives;
+            infiniteLives = (initialLives === 0);
+            lives = initialLives;
+            
+            document.getElementById('setup-screen').style.display = 'none'; 
+            document.getElementById('game-screen').style.display = 'flex';
+            
+            resizeCanvas(); resetGame();
+        }
+
+        function backToMenu() { 
+            sfxClick(); isGameActive = false; cancelAnimationFrame(animFrameId);
+            document.getElementById('game-screen').style.display = 'none'; document.getElementById('setup-screen').style.display = 'flex'; 
+            document.body.classList.remove('damage-shake');
+        }
+
+        function getVolcanoCoordinates(ratio) {
+            let imgW = canvas.width * 0.95;
+            let imgH = imgW * (mistiImg.height / mistiImg.width || 0.75);
+            let imgX = (canvas.width - imgW) / 2;
+            let imgY = (canvas.height - imgH) / 2;
+
+            let peakX = imgX + imgW * 0.5;
+            let peakY = imgY + imgH * 0.18;
+            let baseY = imgY + imgH * 0.9;
+            let baseX = imgX + imgW * 0.5;
+
+            let currentX = baseX + (peakX - baseX) * ratio;
+            let currentY = baseY - (baseY - peakY) * ratio;
+            return { x: currentX, y: currentY };
+        }
+
+        function updateClimberPositionImmediate() {
+            let ratio = (altitud - altitudBase) / (altitudMeta - altitudBase);
+            let pos = getVolcanoCoordinates(ratio);
+            climber.x = pos.x; climber.y = pos.y;
+            climber.targetX = pos.x; climber.targetY = pos.y;
+        }
+
+        function moveClimberTo(newAltitud) {
+            let oldRatio = (altitud - altitudBase) / (altitudMeta - altitudBase);
+            altitud = newAltitud;
+            let newRatio = (altitud - altitudBase) / (altitudMeta - altitudBase);
+            newRatio = Math.max(0, Math.min(1, newRatio));
+            
+            let startPos = getVolcanoCoordinates(oldRatio);
+            let endPos = getVolcanoCoordinates(newRatio);
+
+            climber.x = startPos.x; climber.y = startPos.y;
+            climber.targetX = endPos.x; climber.targetY = endPos.y;
+            climber.isWalking = true;
+        }
+
+        function updateMountainHUD() {
+            document.getElementById('score-display').innerText = altitud;
+        }
+
+        function generateBifurcation() {
+            let pool = [];
+            if (currentDict === 'mix') {
+                pool = [...triviaDB.historia, ...triviaDB.gastro, ...triviaDB.cultura];
+            } else {
+                pool = triviaDB[currentDict];
+            }
+            
+            // FILTRAR PREGUNTAS RECIENTES PARA EVITAR DUPLICADOS SEGUIDOS
+            let availablePool = pool.filter(q => !recentQuestions.includes(q.q));
+            if (availablePool.length === 0) {
+                recentQuestions = []; // Reiniciar si se acaban
+                availablePool = pool;
+            }
+
+            currentQuestion = availablePool[Math.floor(Math.random() * availablePool.length)];
+            
+            // Guardar en historial (mantener máximo las últimas 2 preguntas)
+            recentQuestions.push(currentQuestion.q);
+            if (recentQuestions.length > 2) recentQuestions.shift();
+
+            document.getElementById('question-display').innerText = currentQuestion.q;
+
+            let answers = [
+                { text: currentQuestion.a, isCorrect: true },
+                { text: currentQuestion.fakes[0], isCorrect: false },
+                { text: currentQuestion.fakes[1], isCorrect: false }
+            ];
+            answers.sort(() => Math.random() - 0.5); 
+
+            let container = document.getElementById('options-container');
+            container.innerHTML = '';
+
+            answers.forEach(ans => {
+                let btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.innerHTML = `🚩 ${ans.text}`;
+                btn.onclick = () => handleAnswer(ans.isCorrect, btn);
+                container.appendChild(btn);
+            });
+        }
+
+        function handleAnswer(isCorrect, btnEl) {
+            if (!isGameActive || climber.isWalking) return;
+
+            document.querySelectorAll('.option-btn').forEach(b => b.style.pointerEvents = 'none');
+
+            if (isCorrect) {
+                sfxStep();
+                btnEl.classList.add('correct');
+                createFloatingText(canvas.width/2, canvas.height/2, "¡Correcto! Sube", '#27ae60');
+                
+                let nextAlt = Math.min(altitudMeta, altitud + 350);
+                moveClimberTo(nextAlt);
+
+                setTimeout(() => {
+                    updateMountainHUD();
+                    if (altitud >= altitudMeta) {
+                        endGame(true);
+                    } else {
+                        isGameActive = true;
+                        generateBifurcation();
+                    }
+                }, 900);
+
+            } else {
+                sfxSlip();
+                btnEl.classList.add('wrong');
+                document.body.classList.remove('damage-shake'); void document.body.offsetWidth; document.body.classList.add('damage-shake');
+                createFloatingText(canvas.width/2, canvas.height/2, "¡Resbalón! Baja", '#c0392b');
+                
+                let prevAlt = Math.max(altitudBase, altitud - 200);
+                moveClimberTo(prevAlt);
+
+                setTimeout(() => {
+                    updateMountainHUD();
+                    loseLife();
+                    if(lives > 0 || infiniteLives) {
+                        isGameActive = true;
+                        generateBifurcation();
+                    }
+                }, 900);
+            }
+        }
+
+        function loseLife() {
+            if (!infiniteLives) {
+                lives--; document.getElementById('lives-display').innerText = lives.toString();
+                if (lives <= 0) setTimeout(() => endGame(false), 800);
+            }
+        }
+
+        class FloatText {
+            constructor(x,y,txt,c) { this.x=x; this.y=y; this.txt=txt; this.c=c; this.life=1; this.vy=-2; }
+            update() { this.y+=this.vy; this.life-=0.02; }
+            draw(ctx) { ctx.globalAlpha=Math.max(0,this.life); ctx.fillStyle=this.c; ctx.font="bold 22px 'Fredoka'"; ctx.textAlign="center"; ctx.shadowBlur=6; ctx.shadowColor="#fff"; ctx.fillText(this.txt,this.x,this.y); ctx.shadowBlur=0; ctx.globalAlpha=1; }
+        }
+        function createFloatingText(x,y,txt,c) { particles.push(new FloatText(x,y,txt,c)); }
+
+        // BUCLE PRINCIPAL
+        function gameLoop(ts) {
+            animFrameId = requestAnimationFrame(gameLoop);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            let imgW = canvas.width * 0.95;
+            let imgH = imgW * (mistiImg.height / mistiImg.width || 0.75);
+            let imgX = (canvas.width - imgW) / 2;
+            let imgY = (canvas.height - imgH) / 2;
+
+            if (imgLoaded) {
+                ctx.drawImage(mistiImg, imgX, imgY, imgW, imgH);
+            } else {
+                ctx.fillStyle = "#7f8c8d";
+                ctx.beginPath(); ctx.moveTo(canvas.width/2 - 180, canvas.height); ctx.lineTo(canvas.width/2, canvas.height * 0.2); ctx.lineTo(canvas.width/2 + 200, canvas.height); ctx.fill();
+            }
+
+            if (climber.isWalking) {
+                climber.x = climber.x + (climber.targetX - climber.x) * 0.1;
+                climber.y = climber.y + (climber.targetY - climber.y) * 0.1;
+                if (Math.hypot(climber.targetX - climber.x, climber.targetY - climber.y) < 2) {
+                    climber.isWalking = false;
+                }
+            }
+
+            ctx.save();
+            ctx.translate(climber.x, climber.y);
+            let bounce = climber.isWalking ? Math.sin(ts * 0.03) * 6 : 0;
+            ctx.font = "28px Arial";
+            ctx.textAlign = "center"; ctx.textBaseline = "bottom";
+            ctx.shadowBlur = 10; ctx.shadowColor = "rgba(0,0,0,0.6)";
+            ctx.fillText("🧗‍♂️", 0, bounce);
+            ctx.restore();
+
+            for(let i=particles.length-1; i>=0; i--) { particles[i].update(); particles[i].draw(ctx); if(particles[i].life<=0) particles.splice(i,1); }
+        }
+
+        function endGame(isWin) {
+            isGameActive = false;
+            
+            if (isWin) { 
+                sfxSummit();
+                document.getElementById('m-title').style.color = "var(--aqp-red)"; 
+                showModal("¡CUMBRE DEL MISTI! 🌋", `¡Llegaste con éxito a los 5,822 msnm!\nEl explorador plantó la bandera en la cima de Arequipa.`, backToMenu); 
+            } else { 
+                document.getElementById('m-title').style.color = "#e74c3c"; 
+                showModal("¡EXPEDICIÓN FALLIDA! 🧗‍♂️", `Te quedaste sin resistencia en la falda del volcán.\n¡Vuelve a intentarlo, characato!`, backToMenu); 
+            }
+        }
+
+        let modalCallback = null;
+        function showModal(title, msg, callback = null) { document.getElementById('m-title').innerText = title; document.getElementById('m-msg').innerText = msg; document.getElementById('modal').classList.add('active'); modalCallback = callback; }
+        function closeModal() { sfxClick(); document.getElementById('modal').classList.remove('active'); if(modalCallback) { modalCallback(); modalCallback = null; } }
+
+        function resetGame() { 
+            altitud = altitudBase; 
+            updateMountainHUD();
+            updateClimberPositionImmediate();
+            recentQuestions = [];
+            
+            let valLives = parseInt(document.getElementById('setup-lives').value);
+            let initialLives = (isNaN(valLives) || valLives < 0) ? 3 : valLives;
+            infiniteLives = (initialLives === 0);
+            lives = initialLives;
+            document.getElementById('lives-display').innerText = infiniteLives ? "∞" : lives;
+            
+            particles = [];
+            isGameActive = true; 
+            generateBifurcation();
+            
+            cancelAnimationFrame(animFrameId);
+            animFrameId = requestAnimationFrame(gameLoop); 
+        }
+    </script>
+</body>
+</html>

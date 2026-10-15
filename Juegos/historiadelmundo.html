@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Ruta Global: Mercaderes 🐫</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root { 
+            --silk-gold: #d4ac0d;
+            --silk-red: #922b21;
+            --silk-bg: #111827;
+            --silk-panel: #1f2937;
+            --parchment: #fdfefe;
+        }
+
+        body, html { 
+            font-family: 'Fredoka', sans-serif; 
+            display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+            margin: 0; padding: 0; width: 100vw; height: 100vh; 
+            touch-action: manipulation; 
+            color: #f3f4f6; background-color: var(--silk-bg); 
+            overflow: hidden; box-sizing: border-box;
+            user-select: none;
+        }
+
+        .sound-toggle { position: absolute; top: 15px; right: 15px; background: rgba(255,255,255,0.9); border: 3px solid var(--silk-gold); border-radius: 50%; width: 45px; height: 45px; font-size: 20px; display: flex; justify-content: center; align-items: center; cursor: pointer; z-index: 1000; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: all 0.2s; color: #111;}
+        .sound-toggle:active { transform: translateY(4px); box-shadow: none; }
+
+        /* LOBBY */
+        #setup-screen {
+            position: absolute; inset: 0; z-index: 500; display: flex; flex-direction: column; justify-content: center; align-items: center;
+            background: rgba(0,0,0,0.8); backdrop-filter: blur(8px);
+        }
+
+        .world-card {
+            background: #273746; padding: 35px; border-radius: 15px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6); 
+            border: 6px solid var(--silk-gold); text-align: center; max-width: 90%; width: 500px; 
+            display: flex; flex-direction: column; gap: 15px; color: #f3f4f6;
+        }
+
+        .world-card h1 { font-family: 'Cinzel', serif; font-size: clamp(24px, 4.5vh, 34px); color: var(--silk-gold); margin: 0; text-transform: uppercase; letter-spacing: 1px;}
+        
+        .setup-section { background: rgba(0,0,0,0.3); padding: 12px; border: 2px dashed var(--silk-gold); display: flex; flex-direction: column; gap: 8px; align-items: center; border-radius: 10px;}
+        .setup-section h3 { margin: 0; color: #f9e79f; font-size: 16px; text-transform: uppercase; font-family: 'Cinzel', serif; font-weight: 800;}
+        
+        .setup-row { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; width: 100%;}
+        
+        .setup-btn { background: #34495e; border: 2px solid var(--silk-gold); padding: 8px 14px; font-size: 16px; font-weight: bold; color: #f3f4f6; cursor: pointer; transition: all 0.1s; font-family: 'Fredoka', sans-serif; border-radius: 8px; box-shadow: 0 4px 0 #1b4f72;}
+        .setup-btn.active.diff { background: var(--silk-red); border-color: #641e16; color: #fff; box-shadow: 0 4px 0 #641e16; transform: translateY(2px);}
+        .setup-btn:active:not(.active) { transform: translateY(2px); box-shadow: none; }
+
+        .start-btn {
+            background: linear-gradient(135deg, var(--silk-gold), #b7950b); border: none; box-shadow: 0 6px 0 #7d6608, 0 10px 20px rgba(0,0,0,0.3); padding: 14px 30px; font-size: 22px; color: #111; text-transform: uppercase; font-family: 'Cinzel', serif; font-weight: 800; cursor:pointer; margin-top: 5px; transition: all 0.1s; border-radius: 12px; letter-spacing: 1px;
+        }
+        .start-btn:active { transform: translateY(6px); box-shadow: 0 0 0 #7d6608; }
+
+        /* ============================================================
+           PANTALLA DE JUEGO & HUD
+           ============================================================ */
+        #game-screen {
+            display: none; flex-direction: column; align-items: center; justify-content: flex-start;
+            width: 100vw; height: 100vh; padding: 1.5vh 2vw; box-sizing: border-box; overflow: hidden;
+        }
+
+        .game-header { flex: 0 0 auto; display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 900px; margin-bottom: 1vh; z-index: 10; }
+        
+        .back-menu-btn { background: var(--silk-panel); border: 2px solid var(--silk-gold); padding: 6px 14px; font-size: 15px; font-weight: bold; color: #fff; cursor: pointer; transition: all 0.1s; font-family: 'Cinzel', serif; box-shadow: 0 4px 0 #1b4f72; border-radius: 8px;}
+        .back-menu-btn:active { transform: translateY(4px); box-shadow: none;}
+
+        .hud-group { display: flex; gap: 10px; align-items: center; }
+        .hud-box {
+            background: var(--silk-panel); padding: 6px 14px; border-radius: 10px;
+            border: 2px solid var(--silk-gold); font-size: clamp(14px, 2.2vh, 18px); color: #f3f4f6; font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3); font-family: 'Cinzel', serif;
+        }
+
+        /* ÁREA DE JUEGO (MAPA GLOBAL + INTERACCIÓN) */
+        .game-split-container {
+            flex: 1 1 auto; width: 100%; max-width: 900px; display: flex; flex-direction: column; gap: 12px; align-items: center; justify-content: center; z-index: 5; margin-bottom: 1vh; min-height: 0;
+        }
+
+        .map-wrapper {
+            width: 100%; height: 220px; background: #17202a; border-radius: 15px; border: 3px solid var(--silk-gold);
+            position: relative; overflow: hidden; display: flex; justify-content: center; align-items: center;
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.8);
+        }
+        #gameCanvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+
+        .mission-box {
+            background: var(--silk-panel); padding: 15px 20px; border-radius: 12px; border: 3px solid var(--silk-gold);
+            text-align: center; font-size: clamp(15px, 2.3vh, 20px); font-weight: bold; color: #f3f4f6; box-shadow: 0 6px 15px rgba(0,0,0,0.4); width: 100%; box-sizing: border-box;
+        }
+
+        .market-options {
+            display: flex; gap: 12px; width: 100%; justify-content: center; flex-wrap: wrap;
+        }
+
+        .market-btn {
+            background: #2e4053; border: 3px solid var(--silk-gold); border-radius: 12px;
+            padding: 12px 18px; font-size: clamp(14px, 2vh, 18px); font-weight: 700; color: #f3f4f6;
+            cursor: pointer; box-shadow: 0 6px 0 #1b4f72; transition: all 0.1s; font-family: 'Fredoka', sans-serif;
+            text-align: center; flex: 1; min-width: 220px; max-width: 280px;
+        }
+        .market-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #1b4f72; background: #34495e; }
+
+        @keyframes damageShake { 
+            0%, 100% { transform: translate(0, 0); } 
+            20%, 60% { transform: translate(-10px, 0); } 
+            40%, 80% { transform: translate(10px, 0); } 
+        }
+        .damage-shake { animation: damageShake 0.4s ease-in-out; }
+
+        /* MODAL */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: flex; justify-content: center; align-items: center; z-index: 1000; visibility: hidden; opacity: 0; transition: all 0.3s; backdrop-filter: blur(5px);}
+        .modal-overlay.active { visibility: visible; opacity: 1; }
+        .modal-box { background: var(--silk-panel); padding: 35px; border-radius: 15px; text-align: center; max-width: 85%; width: 450px; transform: scale(0.9); transition: transform 0.3s; border: 4px solid var(--silk-gold); box-shadow: 0 20px 50px rgba(0,0,0,0.8); color: #f3f4f6;}
+        .modal-overlay.active .modal-box { transform: scale(1); }
+        .modal-title { font-family: 'Cinzel', serif; font-size: 32px; margin-top: 0; margin-bottom: 10px; color: var(--silk-gold); text-transform: uppercase; font-weight: 800;}
+        .modal-msg { font-size: 18px; margin-bottom: 25px; color: #d5d8dc; white-space: pre-line; line-height: 1.4; font-weight: 600;}
+        .modal-btn { background: var(--silk-red); border: none; box-shadow: 0 6px 0 #641e16; color: #fff; padding: 12px 30px; font-size: 20px; border-radius: 8px; text-transform: uppercase; font-family: 'Cinzel', serif; font-weight: 800; cursor:pointer; transition: all 0.1s;}
+        .modal-btn:active { transform: translateY(6px); box-shadow: none;}
+    </style>
+</head>
+<body>
+
+    <audio id="bgm" loop><source src="../assets/musicaFondo/cancion1.mp3" type="audio/mpeg"></audio>
+    <button id="soundToggle" class="sound-toggle" aria-label="Activar sonido">🔇</button>
+
+    <!-- LOBBY -->
+    <div id="setup-screen">
+        <div class="world-card">
+            <h1>Ruta Global: Mercaderes</h1>
+            <p style="margin:0; font-size:14px; color:#d5d8dc;">Intercambia seda, especias y descubrimientos científicos entre Oriente y Occidente.</p>
+            
+            <div class="setup-section">
+                <h3>Objetivo de Campaña</h3>
+                <div class="setup-row">
+                    <button id="setup-diff-1" class="setup-btn diff active" onclick="selectGoal(5)">Corto (5 Contratos)</button>
+                    <button id="setup-diff-2" class="setup-btn diff" onclick="selectGoal(10)">Largo (10 Contratos)</button>
+                </div>
+            </div>
+
+            <button class="start-btn" onclick="startGame()">¡Zarpar Caravana!</button>
+        </div>
+    </div>
+
+    <!-- JUEGO -->
+    <div id="game-screen">
+        <div class="game-header">
+            <button class="back-menu-btn" onclick="backToMenu()">Abandonar</button>
+            <div class="hud-group">
+                <div class="hud-box">🪙 Oro: <span id="gold-display">100</span></div>
+                <div class="hud-box">💡 Sabiduría: <span id="knowledge-display">0</span></div>
+                <div class="hud-box">📦 Contratos: <span id="progress-display">0</span>/<span id="goal-display">5</span></div>
+            </div>
+        </div>
+
+        <div class="game-split-container">
+            <div class="map-wrapper" id="canvas-wrapper">
+                <canvas id="gameCanvas"></canvas>
+            </div>
+
+            <div class="mission-box" id="mission-text">
+                Cargando misión comercial...
+            </div>
+            
+            <div class="market-options" id="market-options">
+                <!-- Opciones de decisión inyectadas por JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL -->
+    <div class="modal-overlay" id="modal">
+        <div class="modal-box">
+            <h2 class="modal-title" id="m-title">Título</h2>
+            <p class="modal-msg" id="m-msg">Mensaje</p>
+            <button class="modal-btn" onclick="closeModal()">Continuar</button>
+        </div>
+    </div>
+
+    <script>
+        const tradeScenarios = [
+            {
+                title: "Mercado de Chang'an (China)",
+                desc: "Un mercader persa te ofrece rollos de seda pura y porcelana fina a buen precio, pero exige pago adelantado.",
+                choices: [
+                    { text: "Comprar cargamento de seda (-40 🪙, +50 💡)", gold: -40, knowledge: 50, feedback: "¡Gran acierto! La seda china es muy cotizada en Constantinopla." },
+                    { text: "Rechazar trato y buscar especias en la India (-10 🪙, +20 💡)", gold: -10, knowledge: 20, feedback: "Decisión conservadora, pero segura para el viaje." }
+                ]
+            },
+            {
+                title: "Califato de Bagdad (Mundo Islámico)",
+                desc: "La 'Casa de la Sabiduría' busca textos de astronomía y matemáticas griegas traducidos al árabe. Tienes oportunidad de invertir.",
+                choices: [
+                    { text: "Financiar traductores y científicos (-30 🪙, +70 💡)", gold: -30, knowledge: 70, feedback: "¡Excelente! Contribuiste al renacimiento científico islámico." },
+                    { text: "Vender alfombras persas en su lugar (+50 🪙, +10 💡)", gold: 50, knowledge: 10, feedback: "Obtuviste ganancias rápidas de oro puro." }
+                ]
+            },
+            {
+                title: "Paso por el Imperio Mongol (Pax Mongolica)",
+                desc: "Tropas mongolas resguardan las rutas comerciales. Exigen un tributo o un obsequio tecnológico a cambio de salvoconducto.",
+                choices: [
+                    { text: "Entregar secretos de la Pólvora oriental (-20 🪙, +90 💡)", gold: -20, knowledge: 90, feedback: "Los mongoles quedaron fascinados y abrieron paso libre a tu caravana." },
+                    { text: "Pagar un fuerte peaje en oro (-60 🪙, +0 💡)", gold: -60, knowledge: 0, feedback: "Protegiste tus secretos, pero tu bolsa de oro sufrió pérdidas." }
+                ]
+            },
+            {
+                title: "Llegada a Venecia (Europa Medieval)",
+                desc: "Llegas con tus bienes orientales a los puertos italianos. Los nobles europeos compiten por adquirir tus productos exóticos.",
+                choices: [
+                    { text: "Vender todo al mejor postre (+120 🪙, +30 💡)", gold: 120, knowledge: 30, feedback: "¡Negocio redondo! Regresas a casa con una fortuna en monedas." },
+                    { text: "Intercambiar especias por libros de imprenta temprana (+40 🪙, +80 💡)", gold: 40, knowledge: 80, feedback: "Priorizaste el intercambio cultural e intelectual." }
+                ]
+            }
+        ];
+
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        let audioCtx; let isMuted = true;
+        const bgAudio = document.getElementById('bgm');
+        const soundToggle = document.getElementById('soundToggle');
+
+        soundToggle.addEventListener('click', () => {
+            if (!audioCtx) audioCtx = new AudioContext();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            isMuted = !isMuted;
+            if(isMuted) { bgAudio.pause(); soundToggle.innerText = '🔇'; } 
+            else { bgAudio.volume = 0.25; bgAudio.play().catch(e=>e); soundToggle.innerText = '🔊'; }
+        });
+
+        function playTone(freq, type, duration, vol = 0.1) {
+            if (!audioCtx || isMuted) return;
+            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+            osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gain.gain.setValueAtTime(vol, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+            osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + duration);
+        }
+
+        function sfxClick() { playTone(600, 'square', 0.05, 0.05); }
+        function sfxCoin() { playTone(880, 'sine', 0.1, 0.1); setTimeout(()=>playTone(1174.66, 'sine', 0.15, 0.1), 80); }
+        function sfxError() { playTone(180, 'sawtooth', 0.3, 0.2); }
+        function sfxVictory() { let notes = [523.25, 659.25, 783.99, 1046.50]; notes.forEach((f, i) => setTimeout(() => playTone(f, 'square', 0.3, 0.1), i * 150)); }
+
+        let gold = 100;
+        let knowledge = 0;
+        let progress = 0;
+        let goal = 5;
+        let currentScenario = null;
+        let animFrameId = null;
+
+        // POSICIÓN DE LA CARAVANA EN EL MAPA
+        let caravan = { x: 50, y: 110, targetX: 50 };
+
+        const canvas = document.getElementById('gameCanvas'); const ctx = canvas.getContext('2d');
+        const canvasWrapper = document.getElementById('canvas-wrapper');
+
+        function resizeCanvas() { canvas.width = canvasWrapper.offsetWidth; canvas.height = canvasWrapper.offsetHeight; }
+        window.addEventListener('resize', resizeCanvas);
+
+        function selectGoal(g) {
+            sfxClick();
+            goal = g;
+            document.querySelectorAll('.setup-btn.diff').forEach(b => b.classList.remove('active'));
+            document.getElementById('setup-diff-' + (g === 5 ? 1 : 2)).classList.add('active');
+            document.getElementById('goal-display').innerText = goal;
+        }
+
+        function startGame() {
+            if (!audioCtx && !isMuted) { audioCtx = new AudioContext(); bgAudio.play().catch(e=>e); }
+            sfxClick();
+            document.getElementById('setup-screen').style.display = 'none';
+            document.getElementById('game-screen').style.display = 'flex';
+            resizeCanvas();
+            gold = 100; knowledge = 0; progress = 0;
+            updateHUD();
+            nextScenario();
+            cancelAnimationFrame(animFrameId);
+            animFrameId = requestAnimationFrame(gameLoop);
+        }
+
+        function backToMenu() {
+            sfxClick();
+            cancelAnimationFrame(animFrameId);
+            document.getElementById('game-screen').style.display = 'none';
+            document.getElementById('setup-screen').style.display = 'flex';
+        }
+
+        function updateHUD() {
+            document.getElementById('gold-display').innerText = gold;
+            document.getElementById('knowledge-display').innerText = knowledge;
+            document.getElementById('progress-display').innerText = progress;
+        }
+
+        function nextScenario() {
+            if (progress >= goal || gold <= 0) {
+                if (gold <= 0) {
+                    sfxError();
+                    showModal("¡Bancarrota en la Ruta! 💸", "Tu caravana se quedó sin fondos para sobornar guardianes y comprar provisiones.", () => backToMenu());
+                } else {
+                    sfxVictory();
+                    showModal("¡Gran Emperador del Comercio! 🐫📜", `¡Completaste con éxito ${goal} contratos internacionales y enriqueciste la historia global!`, () => backToMenu());
+                }
+                return;
+            }
+
+            currentScenario = tradeScenarios[Math.floor(Math.random() * tradeScenarios.length)];
+            document.getElementById('mission-text').innerHTML = `<b>${currentScenario.title}</b><br><span style="font-size:15px; font-weight:normal;">${currentScenario.desc}</span>`;
+
+            let container = document.getElementById('market-options');
+            container.innerHTML = '';
+
+            currentScenario.choices.forEach(ch => {
+                let btn = document.createElement('button');
+                btn.className = 'market-btn';
+                btn.innerText = ch.text;
+                btn.onclick = () => makeChoice(ch);
+                container.appendChild(btn);
+            });
+
+            // Mover caravana en el mapa
+            caravan.targetX = 80 + Math.random() * (canvas.width - 160);
+        }
+
+        function makeChoice(choice) {
+            sfxCoin();
+            gold += choice.gold;
+            knowledge += choice.knowledge;
+            progress++;
+            updateHUD();
+
+            showModal("Reporte de Caravana 📜", choice.feedback, () => {
+                nextScenario();
+            });
+        }
+
+        // BUCLE GRÁFICO (MAPA DE LA RUTA DE SEDA)
+        function gameLoop(ts) {
+            animFrameId = requestAnimationFrame(gameLoop);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // DIBUJAR MAPA / RUTA DE SEDA ESTILIZADA
+            ctx.strokeStyle = "#d4ac0d"; ctx.lineWidth = 4; ctx.setLineDash([8, 8]);
+            ctx.beginPath();
+            ctx.moveTo(40, canvas.height / 2);
+            ctx.bezierCurveTo(canvas.width * 0.3, 40, canvas.width * 0.7, canvas.height - 40, canvas.width - 40, canvas.height / 2);
+            ctx.stroke();
+            ctx.setLineDash([]); // reset
+
+            // Ciudades clave en el mapa
+            let cities = [
+                { x: 50, name: "Chang'an (China)" },
+                { x: canvas.width * 0.35, name: "Bagdad (Islam)" },
+                { x: canvas.width * 0.7, name: "Constantinopla" },
+                { x: canvas.width - 50, name: "Venecia (Europa)" }
+            ];
+
+            cities.forEach(c => {
+                ctx.fillStyle = "#f39c12";
+                ctx.beginPath(); ctx.arc(c.x, canvas.height / 2, 8, 0, Math.PI*2); ctx.fill();
+                ctx.fillStyle = "#d5d8dc";
+                ctx.font = "12px 'Fredoka'"; ctx.textAlign = "center";
+                ctx.fillText(c.name, c.x, (canvas.height / 2) + 25);
+            });
+
+            // Mover caravana suavemente
+            caravan.x += (caravan.targetX - caravan.x) * 0.08;
+
+            // DIBUJAR CARAVANA (CAMLLO / MERCADER)
+            ctx.save();
+            ctx.translate(caravan.x, (canvas.height / 2) - 10 + Math.sin(ts * 0.01) * 3);
+            ctx.font = "28px Arial";
+            ctx.textAlign = "center"; ctx.textBaseline = "bottom";
+            ctx.fillText("🐫", 0, 0);
+            ctx.restore();
+        }
+
+        let modalCallback = null;
+        function showModal(title, msg, callback = null) {
+            document.getElementById('m-title').innerText = title;
+            document.getElementById('m-msg').innerText = msg;
+            document.getElementById('modal').classList.add('active');
+            modalCallback = callback;
+        }
+
+        function closeModal() {
+            sfxClick();
+            document.getElementById('modal').classList.remove('active');
+            if (modalCallback) { modalCallback(); modalCallback = null; }
+        }
+    </script>
+</body>
+</html>

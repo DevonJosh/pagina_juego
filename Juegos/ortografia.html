@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Control de Calidad 📦</title>
+    <link href="https://fonts.googleapis.com/css2?family=Teko:wght@500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    
+    <style>
+        :root { 
+            --factory-bg: #111418;
+            --factory-wall: #1e242b;
+            --steel: #5f6a73;
+            --steel-light: #9ea8b3;
+            --cardboard-dark: #8c4912;
+            --cardboard: #c06c22;
+            --cardboard-light: #e08e43;
+            --hazard-yellow: #f39c12;
+            --alert-red: #e74c3c;
+            --ok-green: #2ecc71;
+            --laser-cyan: #00f3ff;
+        }
+
+        body, html { 
+            font-family: 'Teko', sans-serif; 
+            display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+            margin: 0; padding: 0; width: 100vw; height: 100vh; 
+            touch-action: none; 
+            color: #ecf0f1; background-color: var(--factory-bg); 
+            overflow: hidden; box-sizing: border-box;
+            user-select: none;
+        }
+
+        /* EFECTOS ATMOSFÉRICOS Y CÁMARA DE SEGURIDAD */
+        .decorations { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; background: radial-gradient(circle at center, var(--factory-wall) 0%, var(--factory-bg) 100%); }
+        
+        .columns {
+            position: absolute; inset: 0;
+            background-image: linear-gradient(90deg, rgba(255,255,255,0.02) 2%, transparent 2%, transparent 98%, rgba(0,0,0,0.4) 98%);
+            background-size: 25% 100%;
+        }
+        
+        .hazard-tape {
+            position: absolute; top: 0; left: 0; right: 0; height: 20px;
+            background: repeating-linear-gradient( 45deg, var(--hazard-yellow), var(--hazard-yellow) 15px, #111 15px, #111 30px );
+            box-shadow: 0 5px 15px rgba(0,0,0,0.8);
+            border-bottom: 2px solid #000;
+        }
+
+        .scanlines {
+            position: fixed; inset: 0; z-index: 999; pointer-events: none;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+            background-size: 100% 4px; box-shadow: inset 0 0 120px rgba(0,0,0,0.85);
+        }
+
+        .sound-toggle { position: absolute; top: 30px; right: 15px; background: rgba(30, 36, 43, 0.9); border: 2px solid var(--steel); border-radius: 8px; width: 45px; height: 45px; font-size: 20px; display: flex; justify-content: center; align-items: center; cursor: pointer; z-index: 1000; box-shadow: 0 4px 10px rgba(0,0,0,0.5); transition: all 0.1s; color: var(--steel-light);}
+        .sound-toggle:active { transform: translateY(4px); box-shadow: none; }
+
+        /* ============================================================
+           LOBBY DE CONFIGURACIÓN (CLIPBOARD INDUSTRIAL)
+           ============================================================ */
+        #setup-screen {
+            position: absolute; inset: 0; z-index: 500; display: flex; flex-direction: column; justify-content: center; align-items: center;
+            background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);
+        }
+
+        .clipboard {
+            background: #e8e4d9; padding: 35px 30px 30px 30px; border-radius: 8px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8), inset 0 0 50px rgba(139, 115, 85, 0.2); 
+            border: 1px solid #bba386; text-align: center; max-width: 90%; width: 450px; 
+            display: flex; flex-direction: column; gap: 15px; color: #2c3e50; position: relative;
+        }
+
+        .clipboard::before {
+            content: ''; position: absolute; top: -20px; left: 50%; transform: translateX(-50%);
+            width: 100px; height: 35px; background: linear-gradient(to bottom, #d5d8dc, #839192); 
+            border-radius: 5px; border: 2px solid #333; box-shadow: 0 8px 15px rgba(0,0,0,0.4);
+        }
+
+        .clipboard h1 { font-size: 45px; color: #111; margin: 15px 0 0 0; text-transform: uppercase; letter-spacing: 2px; border-bottom: 4px solid #333; padding-bottom: 10px;}
+        
+        .setup-section { background: rgba(255,255,255,0.6); padding: 12px; border: 2px dashed #aaa; display: flex; flex-direction: column; gap: 8px; align-items: center; border-radius: 5px;}
+        .setup-section h3 { margin: 0; color: #444; font-size: 24px; text-transform: uppercase; font-weight: 700;}
+        
+        .setup-row { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; width: 100%;}
+        
+        .setup-btn { background: #fdfdfd; border: 2px solid #888; padding: 6px 12px; font-size: 20px; font-weight: bold; color: #555; cursor: pointer; transition: all 0.1s; font-family: 'Teko', sans-serif; border-radius: 4px; box-shadow: 0 4px 0 #ccc;}
+        .setup-btn.active.diff { background: #2c3e50; border-color: #111; color: #fff; box-shadow: inset 0 4px 8px rgba(0,0,0,0.5), 0 0 0 transparent; transform: translateY(4px);}
+        .setup-btn:active:not(.active) { transform: translateY(4px); box-shadow: 0 0 0 transparent; }
+
+        .time-input-group { display: flex; align-items: center; gap: 10px; background: #fff; padding: 6px 15px; border: 2px solid #888; border-radius: 4px;}
+        .time-input-group label { color: #2c3e50; font-size: 22px; font-weight: bold;}
+        .time-input-group input { width: 60px; background: #eee; border: 1px solid #ccc; color: #2c3e50; text-align: center; font-family: 'Share Tech Mono', monospace; font-size: 18px; padding: 4px; outline: none; font-weight: bold;}
+        
+        .start-btn {
+            background: linear-gradient(to bottom, var(--ok-green), #1e8449); border: 2px solid #145a32; box-shadow: 0 8px 0 #145a32, 0 15px 20px rgba(0,0,0,0.3); padding: 12px 30px; font-size: 30px; color: #fff; text-transform: uppercase; font-family: 'Teko', sans-serif; cursor:pointer; margin-top: 10px; transition: all 0.1s; letter-spacing: 2px; border-radius: 8px; text-shadow: 2px 2px 0 rgba(0,0,0,0.3);
+        }
+        .start-btn:active { transform: translateY(8px); box-shadow: 0 0 0 #145a32; }
+
+        /* ============================================================
+           PANTALLA DE JUEGO
+           ============================================================ */
+        #game-screen {
+            display: none; flex-direction: column; align-items: center; justify-content: flex-start;
+            width: 100vw; height: 100vh; padding: 3vh 1vw 1vh 1vw; box-sizing: border-box; overflow: hidden;
+        }
+
+        .game-header { flex: 0 0 auto; display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 900px; margin-bottom: 1.5vh; z-index: 10; }
+        
+        .back-menu-btn { background: #34495e; border: 2px solid #111; padding: 4px 15px; font-size: 24px; color: #fff; cursor: pointer; transition: all 0.1s; font-family: 'Teko', sans-serif; box-shadow: 0 6px 0 #111; border-radius: 6px; letter-spacing: 1px;}
+        .back-menu-btn:active { transform: translateY(6px); box-shadow: none;}
+
+        .hud-group { display: flex; gap: 12px; align-items: center; }
+
+        .score-box, .lives-box, .timer-container {
+            background: rgba(10, 15, 20, 0.9); padding: 4px 15px; border-radius: 6px;
+            border: 2px solid #444; box-shadow: 0 6px 15px rgba(0,0,0,0.5);
+            font-size: clamp(20px, 3vh, 26px); display: flex; align-items: center; gap: 8px; color: #fff; font-weight: bold; font-family: 'Teko', sans-serif; letter-spacing: 1px;
+        }
+        .score-box span, .lives-box span, .timer-container span span { font-family: 'Share Tech Mono', monospace; font-size: 90%; color: var(--laser-cyan); text-shadow: 0 0 5px var(--laser-cyan);}
+        
+        .lives-box { border-color: var(--alert-red); color: var(--alert-red); }
+        .lives-box span { color: var(--alert-red); text-shadow: 0 0 5px var(--alert-red);}
+        
+        .timer-container.warning { border-color: var(--hazard-yellow); color: var(--hazard-yellow); animation: pulseTimer 0.5s infinite alternate;}
+        .timer-container.warning span span { color: var(--hazard-yellow); text-shadow: 0 0 5px var(--hazard-yellow);}
+        @keyframes pulseTimer { 0% { transform: scale(1); } 100% { transform: scale(1.05); box-shadow: 0 0 20px rgba(243, 156, 18, 0.5); } }
+
+        /* INSTRUCCIÓN DEL OBJETIVO (PANEL LED) */
+        .prompt-box { 
+            text-align: center; background: #0a0a0a; padding: 12px 20px; 
+            border-radius: 8px; font-size: clamp(20px, 3vh, 28px); font-weight: bold; color: #7f8c8d;
+            width: 100%; max-width: 900px; border: 3px solid #333; box-shadow: 0 10px 30px rgba(0,0,0,0.8), inset 0 0 20px rgba(0,0,0,0.9); box-sizing: border-box; margin-bottom: 1.5vh; z-index: 10;
+            text-transform: uppercase;
+        }
+        .highlight-text { color: var(--alert-red); font-size: 115%; letter-spacing: 2px; text-shadow: 0 0 10px rgba(231, 76, 60, 0.6); display: block; margin-top: 5px;}
+
+        /* ÁREA DE JUEGO (CANVAS) */
+        .game-area-wrapper {
+            flex: 1 1 auto; width: 100%; max-width: 900px; position: relative;
+            background: #1a1a1a; border-radius: 8px; border: 6px solid #222;
+            box-shadow: inset 0 20px 50px rgba(0,0,0,0.9), 0 15px 30px rgba(0,0,0,0.5);
+            overflow: hidden; margin-bottom: 1vh; display: flex; justify-content: center; align-items: center;
+        }
+        
+        #gameCanvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: crosshair; }
+
+        @keyframes damageShake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-15px) rotate(-1deg); } 40%, 80% { transform: translateX(15px) rotate(1deg); } }
+        .damage-shake { animation: damageShake 0.4s cubic-bezier(.36,.07,.19,.97) both; border-color: var(--alert-red) !important; box-shadow: inset 0 0 80px rgba(231, 76, 60, 0.3) !important;}
+
+        /* MODAL */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: flex; justify-content: center; align-items: center; z-index: 1000; visibility: hidden; opacity: 0; transition: all 0.3s; backdrop-filter: blur(3px);}
+        .modal-overlay.active { visibility: visible; opacity: 1; }
+        .modal-box { background: #1e242b; padding: 40px; border-radius: 10px; text-align: center; max-width: 85%; width: 450px; transform: scale(0.9); transition: transform 0.3s; border: 2px solid var(--steel); box-shadow: 0 20px 60px rgba(0,0,0,0.8); color: #fff;}
+        .modal-overlay.active .modal-box { transform: scale(1); }
+        .modal-title { font-size: 45px; margin-top: 0; margin-bottom: 10px; color: var(--hazard-yellow); text-transform: uppercase; text-shadow: 0 4px 0 #000;}
+        .modal-msg { font-size: 26px; margin-bottom: 30px; color: #bdc3c7; white-space: pre-line; line-height: 1.2; font-family: 'Teko', sans-serif;}
+        .modal-btn { background: var(--hazard-yellow); border: none; box-shadow: 0 6px 0 #b9770e; color: #111; padding: 12px 35px; font-size: 28px; border-radius: 6px; text-transform: uppercase; font-family: 'Teko', sans-serif; cursor:pointer; transition: all 0.1s; font-weight: bold;}
+        .modal-btn:active { transform: translateY(6px); box-shadow: none;}
+    </style>
+</head>
+<body>
+
+    <audio id="bgm" loop><source src="../assets/musicaFondo/cancion1.mp3" type="audio/mpeg"></audio>
+    <div class="scanlines"></div>
+    <div class="decorations">
+        <div class="columns"></div>
+        <div class="hazard-tape"></div>
+    </div>
+    <button id="soundToggle" class="sound-toggle" aria-label="Activar sonido">🔇</button>
+
+    <!-- LOBBY -->
+    <div id="setup-screen">
+        <div class="clipboard">
+            <h1>CONTROL DE LÍNEA</h1>
+            
+            <div class="setup-section">
+                <h3>Criterio de Descarte</h3>
+                <div class="setup-row">
+                    <button id="setup-dict-orto" class="setup-btn diff active" onclick="selectDict('orto')">Errores en Etiqueta</button>
+                    <button id="setup-dict-info" class="setup-btn diff" onclick="selectDict('info')">Hardware Infectado</button>
+                    <button id="setup-dict-eco" class="setup-btn diff" onclick="selectDict('eco')">Material Contaminante</button>
+                </div>
+            </div>
+
+            <div class="setup-section">
+                <h3>Velocidad de Cinta</h3>
+                <div class="setup-row">
+                    <button id="setup-diff-1" class="setup-btn diff active" onclick="selectDiff(1)">Turno Mañana (Lento)</button>
+                    <button id="setup-diff-2" class="setup-btn diff" onclick="selectDiff(2)">Turno Tarde (Normal)</button>
+                    <button id="setup-diff-3" class="setup-btn diff" onclick="selectDiff(3)">Turno Noche (Rápido)</button>
+                </div>
+            </div>
+
+            <div class="setup-row" style="gap: 15px;">
+                <div class="setup-section" style="flex:1;">
+                    <h3>Faltas Permitidas</h3>
+                    <div class="time-input-group">
+                        <label>⚠️</label>
+                        <input type="number" id="setup-lives" value="5" min="0" max="99">
+                    </div>
+                </div>
+
+                <div class="setup-section" style="flex:1;">
+                    <h3>Duración de Turno</h3>
+                    <div class="time-input-group">
+                        <label>SEG</label>
+                        <input type="number" id="setup-time" value="0" min="0" max="999">
+                    </div>
+                </div>
+            </div>
+
+            <button class="start-btn" onclick="startGame()">ARRANCAR MOTORES</button>
+        </div>
+    </div>
+
+    <!-- JUEGO -->
+    <div id="game-screen">
+        <div class="game-header">
+            <button class="back-menu-btn" onclick="backToMenu()">PARO DE EMERGENCIA</button>
+            <div class="hud-group">
+                <div class="lives-box">FALTAS: <span id="lives-display">5</span></div>
+                <div class="score-box">EMPACADOS: <span id="score-display">0</span></div>
+                <div id="timer-display" class="timer-container" style="display: none;">
+                    <span>RELOJ: <span id="time-left">00:00</span></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="prompt-box">
+            TOCA LAS CAJAS PARA DESCARTAR: <br> <span class="highlight-text" id="rule-display">...</span>
+        </div>
+
+        <div class="game-area-wrapper" id="canvas-wrapper">
+            <canvas id="gameCanvas"></canvas>
+        </div>
+    </div>
+
+    <!-- MODAL -->
+    <div class="modal-overlay" id="modal">
+        <div class="modal-box">
+            <h2 class="modal-title" id="m-title">Título</h2>
+            <p class="modal-msg" id="m-msg">Mensaje</p>
+            <button class="modal-btn" onclick="closeModal()">ENTENDIDO</button>
+        </div>
+    </div>
+
+    <script>
+        // BASE DE DATOS Y REGLAS DE LA FÁBRICA
+        const dictionaries = {
+            'orto': {
+                rule: "ETIQUETAS CON MALA ORTOGRAFÍA",
+                safe: ['ABSORBER', 'DECISIÓN', 'EXCEPCIÓN', 'SINTAXIS', 'HECHO', 'ECHAR', 'HABER', 'A VER', 'VALLA', 'VAYA', 'HACER', 'HASTA', 'IBA', 'CONSECUENCIA'],
+                threat: ['ABSORVER', 'DESICIÓN', 'EXCEPSIÓN', 'SINTAXIZ', 'HECHAR', 'ABER', 'HAVER', 'BAYA', 'BALLA', 'HASER', 'ASTA', 'IVA (de ir)', 'HIBA', 'CONSECUENSIA']
+            },
+            'info': {
+                rule: "PIEZAS CON MALWARE",
+                safe: ['ALGORITMO', 'SERVIDOR', 'FIREWALL', 'HARDWARE', 'SOFTWARE', 'MEMORIA RAM', 'PROCESADOR', 'TARJETA RED', 'FUENTE DE PODER', 'DISIPADOR'],
+                threat: ['TROYANO', 'GUSANO', 'RANSOMWARE', 'SPYWARE', 'ADWARE', 'BOTNET', 'ROOTKIT', 'PHISHING', 'MALWARE', 'KEYLOGGER']
+            },
+            'eco': {
+                rule: "PRODUCTOS CONTAMINANTES",
+                safe: ['RECICLADO', 'COMPOST', 'BIODEGRADABLE', 'ENERGÍA SOLAR', 'REUTILIZABLE', 'ECO-FRIENDLY', 'MADERA CERTIFICADA', 'BAMBÚ'],
+                threat: ['PLÁSTICO 1 SOLO USO', 'BATERÍA DE LITIO', 'AEROSOL CFC', 'TEFLÓN TÓXICO', 'PVC', 'MICROPLÁSTICOS', 'AMONIACO', 'ASBESTO']
+            }
+        };
+
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        let audioCtx; let isMuted = true;
+        const bgAudio = document.getElementById('bgm');
+        const soundToggle = document.getElementById('soundToggle');
+
+        soundToggle.addEventListener('click', () => {
+            if (!audioCtx) audioCtx = new AudioContext();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            isMuted = !isMuted;
+            if(isMuted) { bgAudio.pause(); soundToggle.innerText = '🔇'; } 
+            else { bgAudio.volume = 0.25; bgAudio.play().catch(e=>e); soundToggle.innerText = '🔊'; }
+        });
+
+        function playTone(freq, type, duration, vol = 0.1) {
+            if (!audioCtx || isMuted) return;
+            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+            osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gain.gain.setValueAtTime(vol, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+            osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + duration);
+        }
+
+        function sfxClick() { playTone(600, 'square', 0.05, 0.05); }
+        // Sonido de pistón neumático (PUNCH)
+        function sfxReject() { playTone(100, 'square', 0.1, 0.2); setTimeout(()=>playTone(50, 'sawtooth', 0.15, 0.2), 50); } 
+        function sfxError() { playTone(200, 'sawtooth', 0.3, 0.2); setTimeout(() => playTone(150, 'sawtooth', 0.4, 0.2), 100); } 
+        function sfxShip() { playTone(880, 'sine', 0.1, 0.05); setTimeout(() => playTone(1100, 'sine', 0.2, 0.05), 100); } 
+
+        let currentDifficulty = 1; let currentDict = 'orto'; let initialTimeLimit = 0; 
+        let timerInterval = null; let timeLeft = 0; let isGameActive = false;
+        let score = 0; let lives = 5; let infiniteLives = false;
+        let animFrameId = null; 
+        let beltOffset = 0; 
+
+        let packets = [];
+        let particles = [];
+        let smokeParticles = []; // Humo de fondo
+        let stamps = []; 
+
+        let spawnRate = 2000;
+        let lastSpawnTime = 0;
+        let baseSpeed = 1.2;
+
+        const canvas = document.getElementById('gameCanvas'); const ctx = canvas.getContext('2d');
+        const canvasWrapper = document.getElementById('canvas-wrapper');
+
+        function resizeCanvas() { canvas.width = canvasWrapper.offsetWidth; canvas.height = canvasWrapper.offsetHeight; }
+        window.addEventListener('resize', resizeCanvas);
+
+        function selectDiff(level) { sfxClick(); currentDifficulty = level; document.querySelectorAll('#setup-diff-1, #setup-diff-2, #setup-diff-3').forEach(btn => btn.classList.remove('active')); document.getElementById('setup-diff-' + level).classList.add('active'); }
+        function selectDict(dict) { sfxClick(); currentDict = dict; document.querySelectorAll('#setup-dict-info, #setup-dict-orto, #setup-dict-eco').forEach(btn => btn.classList.remove('active')); document.getElementById('setup-dict-' + dict).classList.add('active'); }
+        function formatTime(s) { let m = Math.floor(s/60); let sec = s%60; return (m<10?"0"+m:m)+":"+(sec<10?"0"+sec:sec); }
+
+        function startGame() {
+            if (!audioCtx && !isMuted) { audioCtx = new AudioContext(); bgAudio.play().catch(e=>e); }
+            sfxClick();
+            
+            let valTime = parseInt(document.getElementById('setup-time').value); 
+            initialTimeLimit = (isNaN(valTime) || valTime < 0) ? 0 : valTime;
+            
+            let valLives = parseInt(document.getElementById('setup-lives').value);
+            let initialLives = (isNaN(valLives) || valLives < 0) ? 5 : valLives;
+            infiniteLives = (initialLives === 0);
+            lives = initialLives;
+            
+            document.getElementById('setup-screen').style.display = 'none'; 
+            document.getElementById('game-screen').style.display = 'flex';
+            
+            document.getElementById('rule-display').innerText = dictionaries[currentDict].rule;
+
+            resizeCanvas(); resetGame();
+        }
+
+        function backToMenu() { 
+            sfxClick(); clearInterval(timerInterval); isGameActive = false; cancelAnimationFrame(animFrameId);
+            document.getElementById('game-screen').style.display = 'none'; document.getElementById('setup-screen').style.display = 'flex'; 
+        }
+
+        function setupTimer() {
+            clearInterval(timerInterval); let display = document.getElementById('timer-display'); let timeSpan = document.getElementById('time-left');
+            display.classList.remove('warning');
+            if (initialTimeLimit > 0) {
+                timeLeft = initialTimeLimit; display.style.display = 'flex'; timeSpan.innerText = formatTime(timeLeft);
+                timerInterval = setInterval(() => {
+                    if (!isGameActive) return;
+                    timeLeft--; timeSpan.innerText = formatTime(timeLeft);
+
+                    let progress = 1 - (timeLeft / initialTimeLimit);
+                    baseSpeed = (currentDifficulty * 1.2) + (progress * 1.5);
+                    spawnRate = Math.max(600, (2000 / currentDifficulty) - (progress * 800));
+
+                    if (timeLeft === 10) { display.classList.add('warning'); playTone(300, 'sawtooth', 0.2, 0.15); }
+                    if (timeLeft <= 0) { clearInterval(timerInterval); endGame(true); }
+                }, 1000);
+            } else { 
+                display.style.display = 'none'; 
+                baseSpeed = currentDifficulty * 1.2;
+                spawnRate = 2000 / currentDifficulty;
+            }
+        }
+
+        // MOTOR DE CAJAS
+        function spawnPacket() {
+            let data = dictionaries[currentDict];
+            let isThreat = Math.random() < 0.6;
+            let wordList = isThreat ? data.threat : data.safe;
+            let word = wordList[Math.floor(Math.random() * wordList.length)];
+            
+            ctx.font = "bold 16px 'Share Tech Mono'";
+            let wWidth = ctx.measureText(word).width + 40; // Más padding para la etiqueta
+            wWidth = Math.max(wWidth, 140);
+            let wHeight = 70; // Más gorditas para que luzcan 3D
+            
+            packets.push({
+                word: word,
+                isThreat: isThreat,
+                x: Math.random() * (canvas.width - wWidth - 40) + 20,
+                y: -100,
+                w: wWidth,
+                h: wHeight,
+                speed: (Math.random() * 0.5 + 1.0) * baseSpeed,
+                state: 'falling',
+                vx: 0,
+                vy: 0,
+                rot: 0 // Rotación al ser golpeada
+            });
+        }
+
+        function handleTap(e) {
+            if (!isGameActive) return;
+            if (e.cancelable) e.preventDefault();
+
+            let rect = canvas.getBoundingClientRect();
+            let clickX = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+            let clickY = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+
+            for (let i = packets.length - 1; i >= 0; i--) {
+                let p = packets[i];
+                if (p.state !== 'falling') continue;
+
+                if (clickX >= p.x - 10 && clickX <= p.x + p.w + 10 &&
+                    clickY >= p.y - 10 && clickY <= p.y + p.h + 10) {
+                    
+                    if (p.isThreat) {
+                        sfxReject();
+                        p.state = 'rejected';
+                        // Pistón Neumático: Golpe violento a la derecha
+                        p.vx = 30; 
+                        p.vy = -5;
+                        p.rot = (Math.random() - 0.5) * 0.2;
+                        createBurst(p.x, p.y + p.h/2, '#f39c12'); // Chispas
+                        createBurst(p.x, p.y + p.h/2, '#c06c22'); // Cartón
+                        
+                        // Efecto Flash rojo en pantalla para dar impacto
+                        canvasWrapper.style.boxShadow = "inset 0 0 100px rgba(231, 76, 60, 0.8)";
+                        setTimeout(() => canvasWrapper.style.boxShadow = "inset 0 20px 50px rgba(0,0,0,0.9)", 100);
+
+                    } else {
+                        sfxError();
+                        createFloatingText(p.x + p.w/2, p.y, "ERROR: PRODUCTO OK", '#e74c3c');
+                        p.state = 'rejected';
+                        p.vx = -15; // Golpe penalizado (más débil, a la izquierda)
+                        p.vy = 5;
+                        p.rot = -0.1;
+                        loseLife();
+                    }
+                    return; 
+                }
+            }
+        }
+
+        canvas.addEventListener('mousedown', handleTap, {passive: false});
+        canvas.addEventListener('touchstart', handleTap, {passive: false});
+
+        function loseLife() {
+            canvasWrapper.classList.remove('damage-shake'); void canvasWrapper.offsetWidth; canvasWrapper.classList.add('damage-shake');
+            if (!infiniteLives) {
+                lives--; document.getElementById('lives-display').innerText = lives.toString();
+                if (lives <= 0) setTimeout(() => endGame(false), 500);
+            }
+        }
+
+        // EFECTOS VISUALES 
+        class Particle {
+            constructor(x,y,c, isSmoke=false) { 
+                this.x=x; this.y=y; this.c=c; this.life=1; this.isSmoke = isSmoke;
+                if(isSmoke) {
+                    this.vx = (Math.random()-0.5)*2; this.vy = -Math.random()*3 - 1; this.size = Math.random()*20 + 10;
+                } else {
+                    this.vx=(Math.random()-0.5)*15; this.vy=(Math.random()-0.5)*15; this.size=Math.random()*6+3;
+                }
+            }
+            update() { 
+                this.x+=this.vx; this.y+=this.vy; 
+                if(this.isSmoke) { this.life-=0.01; this.size+=0.2; }
+                else { this.life-=0.05; this.size*=0.9; }
+            }
+            draw(ctx) { 
+                ctx.globalAlpha=Math.max(0,this.life * (this.isSmoke ? 0.3 : 1.0)); 
+                ctx.fillStyle=this.c; 
+                if(this.isSmoke) { ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI*2); ctx.fill(); }
+                else { ctx.fillRect(this.x, this.y, this.size, this.size); }
+                ctx.globalAlpha=1;
+            }
+        }
+        
+        class FloatText {
+            constructor(x,y,txt,c) { this.x=x; this.y=y; this.txt=txt; this.c=c; this.life=1; this.vy=-2; }
+            update() { this.y+=this.vy; this.life-=0.02; }
+            draw(ctx) { ctx.globalAlpha=Math.max(0,this.life); ctx.fillStyle=this.c; ctx.font="bold 24px 'Teko'"; ctx.textAlign="center"; ctx.shadowBlur=5; ctx.shadowColor="#000"; ctx.fillText(this.txt,this.x,this.y); ctx.shadowBlur=0; ctx.globalAlpha=1; }
+        }
+
+        function createBurst(x,y,c) { for(let i=0; i<15; i++) { particles.push(new Particle(x,y,c, false)); } }
+        function createFloatingText(x,y,txt,c) { particles.push(new FloatText(x,y,txt,c)); }
+
+        // BUCLE PRINCIPAL
+        function gameLoop(ts) {
+            animFrameId = requestAnimationFrame(gameLoop);
+            if (!isGameActive) return; 
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Generador de Humo de fondo
+            if (Math.random() < 0.1) smokeParticles.push(new Particle(Math.random()*canvas.width, canvas.height, '#fff', true));
+
+            if (ts - lastSpawnTime > spawnRate) {
+                spawnPacket();
+                lastSpawnTime = ts;
+            }
+
+            // DIBUJAR CINTA TRANSPORTADORA (Metálica y con profundidad)
+            beltOffset = (beltOffset + baseSpeed * 2) % 60;
+            
+            // Base de la cinta
+            let beltGrad = ctx.createLinearGradient(0, 0, canvas.width, 0);
+            beltGrad.addColorStop(0, "#111"); beltGrad.addColorStop(0.1, "#222"); beltGrad.addColorStop(0.9, "#222"); beltGrad.addColorStop(1, "#111");
+            ctx.fillStyle = beltGrad;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Segmentos metálicos
+            ctx.strokeStyle = "#111"; ctx.lineWidth = 6;
+            for(let y = beltOffset - 60; y < canvas.height; y += 60) {
+                ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+                // Reflejo metálico superior
+                ctx.strokeStyle = "rgba(255,255,255,0.05)"; ctx.lineWidth = 2;
+                ctx.beginPath(); ctx.moveTo(0, y+3); ctx.lineTo(canvas.width, y+3); ctx.stroke();
+            }
+
+            // Carriles laterales (Rieles amarillos)
+            ctx.fillStyle = "var(--hazard-yellow)";
+            ctx.fillRect(0, 0, 15, canvas.height);
+            ctx.fillRect(canvas.width - 15, 0, 15, canvas.height);
+            ctx.fillStyle = "rgba(0,0,0,0.5)";
+            ctx.fillRect(10, 0, 5, canvas.height);
+            ctx.fillRect(canvas.width - 15, 0, 5, canvas.height);
+
+            // Humo de fondo
+            for(let i=smokeParticles.length-1; i>=0; i--) { smokeParticles[i].update(); smokeParticles[i].draw(ctx); if(smokeParticles[i].life<=0) smokeParticles.splice(i,1); }
+
+            // LÁSER DE ESCANEO LOGÍSTICO
+            let scanY = (ts * 0.1) % canvas.height;
+            ctx.fillStyle = "rgba(0, 243, 255, 0.2)";
+            ctx.fillRect(0, scanY - 20, canvas.width, 40);
+            ctx.strokeStyle = "var(--laser-cyan)"; ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.moveTo(0, scanY); ctx.lineTo(canvas.width, scanY); ctx.stroke();
+
+            // DIBUJAR CAMIÓN DE ENVÍOS AL FONDO
+            ctx.fillStyle = "#111";
+            ctx.fillRect(0, canvas.height - 90, canvas.width, 90);
+            
+            // Trampa de carga (boca negra)
+            ctx.fillStyle = "#000";
+            ctx.fillRect(20, canvas.height - 80, canvas.width - 40, 80);
+            
+            // Banda de advertencia
+            ctx.fillStyle = "var(--hazard-yellow)";
+            ctx.fillRect(20, canvas.height - 90, canvas.width - 40, 10);
+            
+            ctx.fillStyle = "#fff";
+            ctx.font = "bold 26px 'Share Tech Mono'"; ctx.textAlign = "center";
+            ctx.fillText("[ ZONA DE EMPAQUE ]", canvas.width/2, canvas.height - 35);
+
+            // ACTUALIZAR Y DIBUJAR CAJAS
+            for(let i = packets.length - 1; i >= 0; i--) {
+                let p = packets[i];
+                
+                if (p.state === 'falling') {
+                    p.y += p.speed;
+
+                    // Colisión con la zona de empaque
+                    if (p.y + p.h >= canvas.height - 80) {
+                        if (p.isThreat) {
+                            createFloatingText(p.x + p.w/2, canvas.height - 100, "¡RECHAZO EN DESTINO!", '#e74c3c');
+                            sfxError();
+                            loseLife();
+                        } else {
+                            createFloatingText(p.x + p.w/2, canvas.height - 100, "+EMPACADO", '#2ecc71');
+                            sfxShip();
+                            score += 1;
+                            document.getElementById('score-display').innerText = score;
+                        }
+                        packets.splice(i, 1);
+                        continue;
+                    }
+                } else if (p.state === 'rejected') {
+                    // Físicas del golpe neumático
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vy += 0.5; // Gravedad
+                    
+                    if (p.x > canvas.width || p.x + p.w < 0 || p.y > canvas.height) {
+                        packets.splice(i, 1);
+                        continue;
+                    }
+                }
+
+                ctx.save();
+                // Si está cayendo, rotación 0. Si está rechazada, rota por el impacto.
+                if(p.state === 'rejected') {
+                    ctx.translate(p.x + p.w/2, p.y + p.h/2);
+                    ctx.rotate(p.rot);
+                    ctx.translate(-p.x - p.w/2, -p.y - p.h/2);
+                }
+
+                // Sombra (pseudo 3D)
+                ctx.fillStyle = "rgba(0,0,0,0.6)";
+                ctx.fillRect(p.x + 8, p.y + 8, p.w, p.h);
+
+                // Cara Frontal de la caja
+                ctx.fillStyle = "var(--cardboard)";
+                ctx.fillRect(p.x, p.y, p.w, p.h);
+                
+                // Cara Superior (Efecto 3D falso)
+                ctx.fillStyle = "var(--cardboard-light)";
+                ctx.beginPath();
+                ctx.moveTo(p.x, p.y); ctx.lineTo(p.x + 10, p.y - 10);
+                ctx.lineTo(p.x + p.w + 10, p.y - 10); ctx.lineTo(p.x + p.w, p.y);
+                ctx.fill();
+                
+                // Cara Lateral Derecha (Efecto 3D falso)
+                ctx.fillStyle = "var(--cardboard-dark)";
+                ctx.beginPath();
+                ctx.moveTo(p.x + p.w, p.y); ctx.lineTo(p.x + p.w + 10, p.y - 10);
+                ctx.lineTo(p.x + p.w + 10, p.y + p.h - 10); ctx.lineTo(p.x + p.w, p.y + p.h);
+                ctx.fill();
+
+                // Bordes marcados
+                ctx.strokeStyle = "#5a2e0b"; ctx.lineWidth = 2;
+                ctx.strokeRect(p.x, p.y, p.w, p.h);
+
+                // Cinta adhesiva vertical central
+                ctx.fillStyle = "rgba(255,255,255,0.2)";
+                ctx.fillRect(p.x + p.w/2 - 15, p.y, 30, p.h);
+                
+                // Líneas de pliegue de la caja
+                ctx.strokeStyle = "rgba(0,0,0,0.2)"; ctx.lineWidth = 1;
+                ctx.beginPath(); ctx.moveTo(p.x + p.w/2, p.y); ctx.lineTo(p.x + p.w/2, p.y + p.h); ctx.stroke();
+
+                // Etiqueta blanca de envío
+                let labelW = p.w - 30; let labelH = 35;
+                ctx.fillStyle = "#fdfdfd";
+                ctx.fillRect(p.x + 15, p.y + p.h/2 - labelH/2, labelW, labelH);
+                ctx.strokeStyle = "#333"; ctx.lineWidth = 1;
+                ctx.strokeRect(p.x + 15, p.y + p.h/2 - labelH/2, labelW, labelH);
+                
+                // Código de barras falso (líneas pequeñas arriba del texto)
+                ctx.fillStyle = "#111";
+                for(let b=0; b<10; b++) {
+                    let bw = Math.random() * 3 + 1;
+                    ctx.fillRect(p.x + 20 + (b*6), p.y + p.h/2 - labelH/2 + 2, bw, 8);
+                }
+
+                // Texto de la etiqueta
+                ctx.fillStyle = "#111";
+                ctx.font = "bold 15px 'Share Tech Mono'";
+                ctx.textAlign = "center"; ctx.textBaseline = "middle";
+                ctx.fillText(p.word, p.x + p.w/2, p.y + p.h/2 + 5);
+                
+                ctx.restore();
+            }
+
+            for(let i=particles.length-1; i>=0; i--) { particles[i].update(); particles[i].draw(ctx); if(particles[i].life<=0) particles.splice(i,1); }
+        }
+
+        function endGame(isWin) {
+            isGameActive = false; clearInterval(timerInterval);
+            if (isWin) { 
+                document.getElementById('m-title').style.color = "var(--ok-green)"; 
+                showModal("TURNO TERMINADO", `¡Excelente trabajo en la línea!\nCajas Empacadas: ${score}`, backToMenu); 
+            } else { 
+                document.getElementById('m-title').style.color = "var(--alert-red)"; 
+                showModal("DESPIDO INMINENTE", `Demasiados errores en tu turno.\nCajas Empacadas: ${score}`, backToMenu); 
+            }
+        }
+
+        let modalCallback = null;
+        function showModal(title, msg, callback = null) { document.getElementById('m-title').innerText = title; document.getElementById('m-msg').innerText = msg; document.getElementById('modal').classList.add('active'); modalCallback = callback; }
+        function closeModal() { sfxClick(); document.getElementById('modal').classList.remove('active'); if(modalCallback) { modalCallback(); modalCallback = null; } }
+
+        function resetGame() { 
+            score = 0; document.getElementById('score-display').innerText = score; 
+            
+            let valLives = parseInt(document.getElementById('setup-lives').value);
+            let initialLives = (isNaN(valLives) || valLives < 0) ? 5 : valLives;
+            infiniteLives = (initialLives === 0);
+            lives = initialLives;
+            document.getElementById('lives-display').innerText = infiniteLives ? "∞" : lives;
+            
+            packets = []; particles = []; stamps = []; smokeParticles = [];
+            
+            baseSpeed = currentDifficulty * 1.2;
+            spawnRate = 2000 / currentDifficulty;
+
+            setupTimer(); isGameActive = true; lastSpawnTime = performance.now();
+            
+            cancelAnimationFrame(animFrameId);
+            animFrameId = requestAnimationFrame(gameLoop); 
+        }
+    </script>
+</body>
+</html>

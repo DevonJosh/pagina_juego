@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Defensor Algebraico 🚀</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Nunito:wght@700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --space-bg-1: #1a0b2e;
+            --space-bg-2: #4b1d52;
+            --arc-cyan: #00e5ff;
+            --arc-pink: #ff007f;
+            --arc-yellow: #ffea00;
+            --arc-green: #00e676;
+            --arc-purple: #d500f9;
+        }
+
+        body, html {
+            font-family: 'Fredoka', sans-serif;
+            display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+            margin: 0; padding: 0; width: 100vw; height: 100vh;
+            touch-action: manipulation; color: #fff; background: var(--space-bg-1);
+            overflow: hidden; box-sizing: border-box;
+        }
+
+        /* FONDO ARCADE ESPACIAL */
+        .decorations { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; background: linear-gradient(180deg, var(--space-bg-1) 0%, var(--space-bg-2) 100%); }
+        
+        #stars-container { position: absolute; inset: 0; }
+        .star { position: absolute; background: white; border-radius: 50%; animation: starFall linear infinite; }
+        @keyframes starFall { 
+            0% { transform: translateY(-10vh); opacity: 0; } 
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(110vh); opacity: 0; } 
+        }
+
+        /* BOTÓN DE SONIDO FLOTANTE */
+        .sound-toggle { position: absolute; top: 15px; left: 15px; background: rgba(255, 255, 255, 0.9); border: 4px solid var(--arc-cyan); border-radius: 50%; width: 45px; height: 45px; font-size: 20px; display: flex; justify-content: center; align-items: center; cursor: pointer; z-index: 1000; box-shadow: 0 4px 0 #0096a6; transition: all 0.1s; color: #333;}
+        .sound-toggle:active { transform: translateY(4px); box-shadow: none; }
+
+        /* ============================================================
+           PANTALLA DE CONFIGURACIÓN PREVIA (LOBBY)
+           ============================================================ */
+        #setup-screen {
+            position: absolute; inset: 0; z-index: 500;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
+        }
+
+        .setup-card {
+            background: rgba(255, 255, 255, 0.95); padding: 40px; border-radius: 30px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5); border: 8px solid var(--arc-purple);
+            text-align: center; max-width: 90%; width: 550px;
+            display: flex; flex-direction: column; gap: 20px; color: #333;
+        }
+
+        .setup-card h1 { font-size: 36px; color: var(--arc-purple); margin: 0; text-shadow: 2px 2px 0px #f3e5f5;}
+        
+        .setup-section {
+            background: #f3e5f5; padding: 15px; border-radius: 20px; border: 3px dashed var(--arc-purple);
+            display: flex; flex-direction: column; gap: 12px; align-items: center;
+        }
+        .setup-section h3 { margin: 0; color: #6a1b9a; font-size: 18px; text-transform: uppercase;}
+        
+        .setup-row { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; width: 100%;}
+        
+        .setup-btn { background: #fff; border: 3px solid #bdc3c7; padding: 10px 20px; border-radius: 15px; font-size: 15px; font-weight: bold; color: #7f8c8d; cursor: pointer; transition: all 0.1s; font-family: 'Fredoka', sans-serif;}
+        .setup-btn.active.diff { background: var(--arc-yellow); border-color: #f39c12; color: #d35400; box-shadow: 0 5px 0 #f39c12; transform: translateY(-3px); }
+        .setup-btn:active { transform: translateY(2px); box-shadow: none !important;}
+
+        .time-input-group { display: flex; align-items: center; gap: 10px; background: #fff; padding: 8px 15px; border-radius: 15px; border: 3px solid var(--arc-cyan);}
+        .time-input-group label { color: #00838f; font-weight: bold; font-size: 18px; }
+        .time-input-group input { width: 70px; background: #e0f7fa; color: #006064; border: 2px solid var(--arc-cyan); border-radius: 10px; text-align: center; font-weight: bold; font-family: 'Fredoka', sans-serif; font-size: 18px; padding: 5px; outline: none;}
+        
+        .start-btn {
+            background: var(--arc-green); border: none; box-shadow: 0 8px 0 #00b359; padding: 15px 40px; font-size: 26px; color: white; border-radius: 20px; text-transform: uppercase; font-weight: bold; font-family: 'Fredoka', sans-serif; cursor:pointer; margin-top: 10px; transition: all 0.1s; letter-spacing: 1px; text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        }
+        .start-btn:active { transform: translateY(8px); box-shadow: 0 0 0 #00b359; }
+
+        /* ============================================================
+           PANTALLA DE JUEGO (GAME SCREEN)
+           ============================================================ */
+        #game-screen {
+            display: none; flex-direction: column; align-items: center; justify-content: flex-start;
+            width: 100vw; height: 100vh; padding: 1vh 2vw; box-sizing: border-box; overflow: hidden;
+        }
+
+        .game-header {
+            flex: 0 0 auto; display: flex; justify-content: space-between; align-items: center; 
+            width: 100%; max-width: 1000px; margin-bottom: 1vh; z-index: 10;
+        }
+        
+        .back-menu-btn { background: #fff; border: 3px solid #bdc3c7; padding: 8px 16px; border-radius: 15px; font-size: clamp(12px, 2vh, 16px); font-weight: bold; color: #2c3e50; cursor: pointer; transition: all 0.1s; font-family: 'Fredoka', sans-serif; box-shadow: 0 4px 0 #bdc3c7;}
+        .back-menu-btn:active { transform: translateY(4px); box-shadow: none;}
+
+        h1 { color: var(--arc-yellow); margin: 0; text-align: center; font-size: clamp(20px, 3.5vh, 32px); text-shadow: 2px 2px 0px #f39c12; z-index: 10; letter-spacing: 1px;}
+        
+        .hud-group { display: flex; gap: 12px; align-items: center; }
+
+        .score-box, .lives-box {
+            background: #fff; padding: 6px 15px; border-radius: 15px;
+            border: 3px solid var(--arc-purple); box-shadow: 0 4px 0 #9c27b0;
+            font-weight: bold; color: #6a1b9a; font-size: clamp(14px, 2.5vh, 20px); display: flex; align-items: center; gap: 5px;
+        }
+        
+        .timer-container {
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            background: #fff; border: 3px solid var(--arc-cyan); color: #00838f; padding: 6px 15px;
+            border-radius: 15px; font-size: clamp(16px, 2.5vh, 22px); font-weight: 900; box-shadow: 0 4px 0 #0096a6;
+        }
+        .timer-container.warning { border-color: var(--arc-pink); color: #c2185b; box-shadow: 0 4px 0 #c2185b; animation: pulseTimer 0.5s infinite alternate; }
+        @keyframes pulseTimer { 0% { transform: scale(1); } 100% { transform: scale(1.05); } }
+
+        /* ÁREA DE JUEGO (CANVAS) */
+        .game-area-wrapper {
+            flex: 1 1 auto; width: 100%; max-width: 900px; position: relative;
+            background: rgba(0, 0, 0, 0.4); border-radius: 20px; border: 4px solid var(--arc-cyan);
+            box-shadow: inset 0 0 50px rgba(0,0,0,0.5), 0 0 20px rgba(0, 229, 255, 0.2);
+            overflow: hidden; margin-bottom: 1.5vh; display: flex; justify-content: center; align-items: center;
+        }
+        
+        #gameCanvas {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        }
+
+        /* EFECTO SHAKE PARA DAÑO */
+        @keyframes damageShake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-10px) rotate(-1deg); }
+            40%, 80% { transform: translateX(10px) rotate(1deg); }
+        }
+        .damage-shake { animation: damageShake 0.4s cubic-bezier(.36,.07,.19,.97) both; border-color: var(--arc-pink) !important; box-shadow: 0 0 30px rgba(255, 0, 127, 0.6) !important;}
+
+        /* PANEL DE CONTROLES (OPERACIONES) */
+        .controls-panel {
+            flex: 0 0 auto; width: 100%; max-width: 900px;
+            background: rgba(255, 255, 255, 0.95); padding: 1.5vh; border-radius: 20px;
+            border: 4px solid var(--arc-yellow); box-sizing: border-box; box-shadow: 0 8px 0 #f39c12;
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5vh;
+            margin-bottom: 1.5vh;
+        }
+
+        /* BOTONES DE MAQUINITA ARCADE */
+        .op-btn {
+            background: var(--arc-cyan);
+            border: none; border-radius: 15px;
+            color: #fff; font-family: 'Fredoka', sans-serif; font-size: clamp(22px, 4vh, 35px); font-weight: 900;
+            padding: 1.5vh 0; cursor: pointer; transition: all 0.1s;
+            box-shadow: 0 8px 0 #0096a6, 0 10px 15px rgba(0,0,0,0.2);
+            text-shadow: 2px 2px 0 rgba(0,0,0,0.2);
+            display: flex; justify-content: center; align-items: center;
+        }
+        /* Variedad de colores para los botones */
+        .op-btn:nth-child(1), .op-btn:nth-child(8) { background: var(--arc-pink); box-shadow: 0 8px 0 #c2185b, 0 10px 15px rgba(0,0,0,0.2); }
+        .op-btn:nth-child(2), .op-btn:nth-child(7) { background: var(--arc-green); box-shadow: 0 8px 0 #00b359, 0 10px 15px rgba(0,0,0,0.2); }
+        .op-btn:nth-child(3), .op-btn:nth-child(6) { background: var(--arc-purple); box-shadow: 0 8px 0 #8e24aa, 0 10px 15px rgba(0,0,0,0.2); }
+        
+        .op-btn:active { transform: translateY(8px); box-shadow: 0 0px 0 transparent !important; }
+        .op-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* MODAL DE VICTORIA/DERROTA */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: flex; justify-content: center; align-items: center; z-index: 1000; visibility: hidden; opacity: 0; transition: all 0.3s; backdrop-filter: blur(5px);}
+        .modal-overlay.active { visibility: visible; opacity: 1; }
+        .modal-box { background: #fff; padding: 40px; border-radius: 30px; text-align: center; max-width: 85%; width: 450px; transform: scale(0.7); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 20px 50px rgba(0,0,0,0.5); border: 8px solid var(--arc-cyan);}
+        .modal-overlay.active .modal-box { transform: scale(1); }
+        .modal-title { font-size: 32px; margin-top: 0; margin-bottom: 15px; color: var(--arc-cyan); text-shadow: 2px 2px 0 #0096a6;}
+        .modal-msg { font-size: 20px; margin-bottom: 25px; color: #555; white-space: pre-line; line-height: 1.4; font-weight: 600;}
+        .modal-btn { background: var(--arc-green); border: none; box-shadow: 0 6px 0 #00b359; padding: 15px 35px; font-size: 20px; color: white; border-radius: 15px; text-transform: uppercase; font-weight: bold; font-family: 'Fredoka', sans-serif; cursor:pointer;}
+        .modal-btn:active { transform: translateY(6px); box-shadow: none; }
+    </style>
+</head>
+<body>
+
+    <audio id="bgm" loop>
+        <source src="../assets/musicaFondo/cancion1.mp3" type="audio/mpeg">
+    </audio>
+
+    <button id="soundToggle" class="sound-toggle" aria-label="Activar o desactivar sonido" title="Sonido">🔇</button>
+
+    <div class="decorations">
+        <div id="stars-container"></div>
+    </div>
+
+    <!-- ============================================================
+         PANTALLA DE CONFIGURACIÓN (LOBBY)
+         ============================================================ -->
+    <div id="setup-screen">
+        <div class="setup-card">
+            <h1>Defensor Algebraico 🚀</h1>
+            
+            <div class="setup-section">
+                <h3>Dificultad (Solo Sumas y Restas)</h3>
+                <div class="setup-row">
+                    <button id="setup-diff-1" class="setup-btn diff active" onclick="selectDiff(1)">⭐ Básico (1 Paso)</button>
+                    <button id="setup-diff-2" class="setup-btn diff" onclick="selectDiff(2)">⭐⭐ Intermedio (Núm. Altos)</button>
+                    <button id="setup-diff-3" class="setup-btn diff" onclick="selectDiff(3)">⭐⭐⭐ Avanzado (2 Pasos)</button>
+                </div>
+            </div>
+
+            <div class="setup-section">
+                <h3>Tiempo de Supervivencia</h3>
+                <div class="time-input-group">
+                    <label>⏳ Segundos:</label>
+                    <input type="number" id="setup-time" value="120" min="30" max="999">
+                </div>
+            </div>
+
+            <button class="start-btn" onclick="startGame()">¡A Defender!</button>
+        </div>
+    </div>
+
+    <!-- ============================================================
+         PANTALLA DEL JUEGO
+         ============================================================ -->
+    <div id="game-screen">
+        
+        <div class="game-header">
+            <button class="back-menu-btn" onclick="backToMenu()">⚙️ Abortar</button>
+            <h1>Despeje Espacial</h1>
+            <div class="hud-group">
+                <div class="lives-box">❤️ <span id="lives-display">3</span></div>
+                <div class="score-box">⭐ <span id="score-display">0</span></div>
+                <div id="timer-display" class="timer-container">
+                    <span>⏳ <span id="time-left">02:00</span></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="game-area-wrapper" id="canvas-wrapper">
+            <canvas id="gameCanvas"></canvas>
+        </div>
+
+        <div class="controls-panel" id="controls-panel">
+            <!-- Botones inyectados dinámicamente -->
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal">
+        <div class="modal-box">
+            <h2 class="modal-title" id="m-title">Título</h2>
+            <p class="modal-msg" id="m-msg">Mensaje</p>
+            <button class="modal-btn" onclick="closeModal()">¡Entendido!</button>
+        </div>
+    </div>
+
+    <script>
+        // GENERADOR DE ESTRELLAS
+        const starsContainer = document.getElementById('stars-container');
+        for(let i=0; i<40; i++) {
+            let star = document.createElement('div');
+            star.className = 'star';
+            let size = Math.random() * 3 + 1;
+            star.style.width = size + 'px';
+            star.style.height = size + 'px';
+            star.style.left = Math.random() * 100 + 'vw';
+            star.style.animationDuration = (Math.random() * 3 + 2) + 's';
+            star.style.animationDelay = (Math.random() * 5) + 's';
+            starsContainer.appendChild(star);
+        }
+
+        // MOTOR DE SONIDO (WEB AUDIO API + BGM)
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        let audioCtx; let isMuted = true;
+        
+        const bgAudio = document.getElementById('bgm');
+        const soundToggle = document.getElementById('soundToggle');
+
+        soundToggle.addEventListener('click', () => {
+            if (!audioCtx) audioCtx = new AudioContext();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            
+            isMuted = !isMuted;
+            if(isMuted) {
+                bgAudio.pause();
+                soundToggle.innerText = '🔇';
+            } else {
+                bgAudio.volume = 0.25; 
+                bgAudio.play().catch(e => console.log('Interacción requerida'));
+                soundToggle.innerText = '🔊';
+            }
+        });
+
+        function playTone(freq, type, duration, vol = 0.1) {
+            if (!audioCtx || isMuted) return;
+            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+            osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gain.gain.setValueAtTime(vol, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+            osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + duration);
+        }
+
+        function sfxShoot() { playTone(800, 'square', 0.1, 0.1); setTimeout(() => playTone(1200, 'square', 0.1, 0.1), 50); }
+        function sfxExplosion() { playTone(150, 'sawtooth', 0.2, 0.2); setTimeout(()=>playTone(100, 'sawtooth', 0.3, 0.2), 100); }
+        function sfxDamage() { playTone(100, 'sawtooth', 0.5, 0.4); setTimeout(()=>playTone(80, 'sawtooth', 0.6, 0.4), 200); }
+        function sfxWrong() { playTone(250, 'sine', 0.15, 0.2); }
+        function sfxVictory() { let notes = [523.25, 659.25, 783.99, 1046.50]; notes.forEach((freq, i) => { setTimeout(() => playTone(freq, 'square', 0.3, 0.1), i * 150); }); }
+
+        // ESTADO DEL JUEGO
+        let currentDifficulty = 1;
+        let initialTimeLimit = 120; 
+        let timerInterval = null;
+        let timeLeft = 0; 
+        let isGameActive = false;
+        let score = 0;
+        let lives = 3;
+
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const canvasWrapper = document.getElementById('canvas-wrapper');
+        const controlsPanel = document.getElementById('controls-panel');
+
+        const enemySprites = ['👽', '👾', '🛸', '☄️', '👻', '🐙'];
+
+        let enemies = [];
+        let particles = [];
+        let lasers = [];
+        let buttonPool = new Array(8).fill("?");
+        let spawnRate = 2500; // ms
+        let lastSpawnTime = 0;
+        let baseSpeed = 1.0;
+
+        function resizeCanvas() {
+            canvas.width = canvasWrapper.offsetWidth;
+            canvas.height = canvasWrapper.offsetHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+
+        // LOBBY Y CONFIGURACIÓN
+        function selectDiff(level) {
+            playTone(600, 'sine', 0.08, 0.1);
+            currentDifficulty = level;
+            document.querySelectorAll('.setup-btn.diff').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('setup-diff-' + level).classList.add('active');
+        }
+
+        function formatTime(seconds) {
+            let m = Math.floor(seconds / 60); let s = seconds % 60;
+            return (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s);
+        }
+
+        function startGame() {
+            if (!audioCtx && !isMuted) {
+                audioCtx = new AudioContext();
+                bgAudio.play().catch(e => console.log('Interacción requerida'));
+            }
+            playTone(600, 'sine', 0.08, 0.1);
+            
+            let val = parseInt(document.getElementById('setup-time').value);
+            initialTimeLimit = (isNaN(val) || val < 30) ? 30 : val; // Min 30s survival
+
+            document.getElementById('setup-screen').style.display = 'none';
+            document.getElementById('game-screen').style.display = 'flex';
+            
+            resizeCanvas();
+            resetGame();
+        }
+
+        function backToMenu() {
+            playTone(600, 'sine', 0.08, 0.1);
+            clearInterval(timerInterval); isGameActive = false;
+            document.getElementById('game-screen').style.display = 'none';
+            document.getElementById('setup-screen').style.display = 'flex';
+        }
+
+        function setupTimer() {
+            clearInterval(timerInterval); isGameActive = true; 
+            
+            let display = document.getElementById('timer-display');
+            let timeSpan = document.getElementById('time-left');
+
+            display.classList.remove('warning');
+            timeLeft = initialTimeLimit;
+            timeSpan.innerText = formatTime(timeLeft);
+            
+            timerInterval = setInterval(() => {
+                if (!isGameActive) return;
+                
+                timeLeft--;
+                timeSpan.innerText = formatTime(timeLeft);
+                
+                // Aumentar dificultad con el tiempo (más rápido y caen más)
+                baseSpeed = 1.0 + ((initialTimeLimit - timeLeft) / initialTimeLimit) * 1.5;
+                spawnRate = Math.max(800, 2500 - ((initialTimeLimit - timeLeft) / initialTimeLimit) * 1700);
+
+                if (timeLeft === 10) { display.classList.add('warning'); playTone(300, 'sawtooth', 0.2, 0.15); }
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    endGame(true); // Gana por supervivencia
+                }
+            }, 1000);
+        }
+
+        // MOTOR MATEMÁTICO (SOLO SUMAS Y RESTAS)
+        function getRandomInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+
+        function generateEquation() {
+            let a, b, c, ans, text, req, step2 = null;
+
+            if (currentDifficulty === 1) {
+                // 1 Paso, números pequeños
+                let isPlus = Math.random() > 0.5;
+                a = getRandomInt(1, 10);
+                ans = getRandomInt(1, 15);
+                if (isPlus) {
+                    b = ans + a;
+                    text = `x + ${a} = ${b}`;
+                    req = `-${a}`;
+                } else {
+                    b = ans - a;
+                    text = `x - ${a} = ${b}`;
+                    req = `+${a}`;
+                }
+            } else if (currentDifficulty === 2) {
+                // 1 Paso, números grandes
+                let isPlus = Math.random() > 0.5;
+                a = getRandomInt(11, 30);
+                ans = getRandomInt(10, 40);
+                if (isPlus) {
+                    b = ans + a;
+                    text = `x + ${a} = ${b}`;
+                    req = `-${a}`;
+                } else {
+                    b = ans - a;
+                    text = `x - ${a} = ${b}`;
+                    req = `+${a}`;
+                }
+            } else if (currentDifficulty === 3) {
+                // 2 Pasos con sumas y restas: x +/- a +/- c = finalB
+                a = getRandomInt(1, 15);
+                c = getRandomInt(1, 15);
+                ans = getRandomInt(1, 20);
+                
+                let isPlusA = Math.random() > 0.5;
+                let isPlusC = Math.random() > 0.5;
+                
+                let valAfterA = isPlusA ? ans + a : ans - a;
+                let finalB = isPlusC ? valAfterA + c : valAfterA - c;
+
+                text = `x ${isPlusA ? '+' : '-'} ${a} ${isPlusC ? '+' : '-'} ${c} = ${finalB}`;
+                req = isPlusC ? `-${c}` : `+${c}`;
+                
+                step2 = {
+                    text: `x ${isPlusA ? '+' : '-'} ${a} = ${valAfterA}`,
+                    req: isPlusA ? `-${a}` : `+${a}`
+                };
+            }
+
+            return { text, req, step2 };
+        }
+
+        function spawnEnemy() {
+            let eq = generateEquation();
+            let enemy = {
+                id: Date.now() + Math.random(),
+                x: getRandomInt(60, canvas.width - 60),
+                y: -40,
+                speed: (Math.random() * 0.5 + 0.5) * baseSpeed,
+                text: eq.text,
+                req: eq.req,
+                step2: eq.step2,
+                color: `hsl(${Math.random()*360}, 80%, 60%)`,
+                sprite: enemySprites[Math.floor(Math.random() * enemySprites.length)],
+                radius: 30
+            };
+            enemies.push(enemy);
+            updateButtonsPool();
+        }
+
+        // SISTEMA DE BOTONES INTELIGENTE (SOLO + Y -)
+        function generateFakeOp() {
+            const ops = ['+', '-'];
+            const op = ops[getRandomInt(0, 1)];
+            let num;
+            if (currentDifficulty === 1) num = getRandomInt(1, 15);
+            else if (currentDifficulty === 2) num = getRandomInt(5, 35);
+            else num = getRandomInt(1, 25);
+            return `${op}${num}`;
+        }
+
+        function updateButtonsPool() {
+            let requiredOps = new Set(enemies.map(e => e.req));
+            
+            // Si una operación requerida no está en los botones, la insertamos
+            requiredOps.forEach(req => {
+                if (!buttonPool.includes(req)) {
+                    // Buscar un botón que no sea requerido por ningún enemigo actual
+                    let replaceableIndices = [];
+                    for(let i=0; i<8; i++) {
+                        if (!requiredOps.has(buttonPool[i])) replaceableIndices.push(i);
+                    }
+                    if (replaceableIndices.length > 0) {
+                        let idx = replaceableIndices[Math.floor(Math.random() * replaceableIndices.length)];
+                        buttonPool[idx] = req;
+                    }
+                }
+            });
+
+            // Llenar vacíos o falsos
+            for(let i=0; i<8; i++) {
+                if (buttonPool[i] === "?" || (!requiredOps.has(buttonPool[i]) && Math.random() < 0.1)) {
+                    buttonPool[i] = generateFakeOp();
+                }
+            }
+
+            renderButtons();
+        }
+
+        function renderButtons() {
+            controlsPanel.innerHTML = '';
+            buttonPool.forEach(op => {
+                let btn = document.createElement('button');
+                btn.className = 'op-btn';
+                btn.innerText = op;
+                btn.onclick = () => handleShoot(op);
+                controlsPanel.appendChild(btn);
+            });
+        }
+
+        // MECÁNICAS DE DISPARO Y COLISIONES
+        function handleShoot(opClicked) {
+            if(!isGameActive) return;
+
+            // Buscar el enemigo más bajo que requiera esta operación
+            let target = null;
+            let maxHitY = -999;
+            let targetIndex = -1;
+
+            enemies.forEach((e, idx) => {
+                if (e.req === opClicked && e.y > maxHitY) {
+                    maxHitY = e.y;
+                    target = e;
+                    targetIndex = idx;
+                }
+            });
+
+            if (target) {
+                // Disparo correcto
+                sfxShoot();
+                lasers.push({ x1: canvas.width/2, y1: canvas.height - 30, x2: target.x, y2: target.y, life: 1.0, color: target.color });
+                
+                if (target.step2) {
+                    // Resolver paso 1
+                    target.text = target.step2.text;
+                    target.req = target.step2.req;
+                    target.step2 = null;
+                    createExplosion(target.x, target.y, target.color, 10);
+                } else {
+                    // Destruir por completo
+                    createExplosion(target.x, target.y, target.color, 30);
+                    enemies.splice(targetIndex, 1);
+                    score += 10;
+                    document.getElementById('score-display').innerText = score;
+                    sfxExplosion();
+                }
+                updateButtonsPool();
+            } else {
+                // Disparo fallido (Penalización visual)
+                sfxWrong();
+                canvasWrapper.classList.remove('damage-shake');
+                void canvasWrapper.offsetWidth;
+                canvasWrapper.classList.add('damage-shake');
+            }
+        }
+
+        function loseLife() {
+            lives--;
+            sfxDamage();
+            document.getElementById('lives-display').innerText = lives.toString();
+            canvasWrapper.classList.remove('damage-shake');
+            void canvasWrapper.offsetWidth;
+            canvasWrapper.classList.add('damage-shake');
+
+            if (lives <= 0) {
+                endGame(false); // Pierde
+            }
+        }
+
+        // EFECTOS VISUALES
+        class Particle {
+            constructor(x, y, color) {
+                this.x = x; this.y = y;
+                this.vx = (Math.random() - 0.5) * 12;
+                this.vy = (Math.random() - 0.5) * 12;
+                this.life = 1.0;
+                this.color = color;
+                this.size = Math.random() * 6 + 3;
+            }
+            update() { this.x += this.vx; this.y += this.vy; this.life -= 0.03; this.size *= 0.95;}
+            draw(ctx) {
+                ctx.globalAlpha = Math.max(0, this.life); ctx.fillStyle = this.color;
+                ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI*2); ctx.fill();
+                ctx.globalAlpha = 1.0;
+            }
+        }
+
+        function createExplosion(x, y, color, amount) {
+            for(let i=0; i<amount; i++) particles.push(new Particle(x, y, color));
+        }
+
+        // BUCLE DE JUEGO (CANVAS)
+        function gameLoop(timestamp) {
+            if (!isGameActive) return;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Spawner
+            if (timestamp - lastSpawnTime > spawnRate) {
+                spawnEnemy();
+                lastSpawnTime = timestamp;
+            }
+
+            // Dibujar Base Defensora (Nave)
+            ctx.font = "45px Arial";
+            ctx.textAlign = "center"; ctx.textBaseline = "middle";
+            ctx.filter = "drop-shadow(0 0 10px #00e5ff)";
+            ctx.fillText("🚀", canvas.width/2, canvas.height - 35);
+            ctx.filter = "none";
+            
+            // Suelo defensivo (Escudo)
+            let shieldGrad = ctx.createLinearGradient(0, canvas.height - 70, 0, canvas.height);
+            shieldGrad.addColorStop(0, "rgba(0, 229, 255, 0.3)");
+            shieldGrad.addColorStop(1, "rgba(0, 229, 255, 0.0)");
+            ctx.fillStyle = shieldGrad;
+            ctx.fillRect(0, canvas.height - 70, canvas.width, 70);
+            
+            ctx.strokeStyle = "var(--arc-cyan)"; ctx.lineWidth = 3;
+            ctx.beginPath(); ctx.moveTo(0, canvas.height - 70); ctx.lineTo(canvas.width, canvas.height - 70); ctx.stroke();
+
+            // Lasers
+            for(let i = lasers.length - 1; i >= 0; i--) {
+                let l = lasers[i];
+                ctx.strokeStyle = l.color;
+                ctx.lineWidth = 6 * l.life;
+                ctx.beginPath(); ctx.moveTo(l.x1, l.y1); ctx.lineTo(l.x2, l.y2); ctx.stroke();
+                
+                // Laser core
+                ctx.strokeStyle = `rgba(255, 255, 255, ${l.life})`;
+                ctx.lineWidth = 3 * l.life;
+                ctx.beginPath(); ctx.moveTo(l.x1, l.y1); ctx.lineTo(l.x2, l.y2); ctx.stroke();
+
+                l.life -= 0.1;
+                if(l.life <= 0) lasers.splice(i, 1);
+            }
+
+            // Enemigos
+            for(let i = enemies.length - 1; i >= 0; i--) {
+                let e = enemies[i];
+                e.y += e.speed;
+
+                // Colisión con base
+                if (e.y + e.radius >= canvas.height - 70) {
+                    createExplosion(e.x, e.y, e.color, 25);
+                    enemies.splice(i, 1);
+                    loseLife();
+                    updateButtonsPool();
+                    continue;
+                }
+
+                // Dibujar Enemigo (Nave Alien)
+                ctx.save(); ctx.translate(e.x, e.y);
+                
+                ctx.font = "40px Arial";
+                ctx.filter = `drop-shadow(0 0 10px ${e.color})`;
+                ctx.fillText(e.sprite, 0, 0);
+                ctx.filter = "none";
+
+                // Caja de ecuación
+                ctx.font = "bold 18px Nunito";
+                let textWidth = ctx.measureText(e.text).width + 24;
+                ctx.fillStyle = "rgba(255,255,255,0.95)";
+                ctx.strokeStyle = e.color; ctx.lineWidth = 3;
+                
+                ctx.beginPath(); ctx.roundRect(-textWidth/2, -50, textWidth, 28, 8); 
+                ctx.fill(); ctx.stroke();
+                
+                ctx.fillStyle = "#333";
+                ctx.fillText(e.text, 0, -36);
+
+                ctx.restore();
+            }
+
+            // Partículas
+            for(let i = particles.length - 1; i >= 0; i--) {
+                particles[i].update(); particles[i].draw(ctx);
+                if(particles[i].life <= 0) particles.splice(i, 1);
+            }
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        // FIN DEL JUEGO
+        function endGame(isWin) {
+            isGameActive = false;
+            clearInterval(timerInterval);
+
+            if (isWin) {
+                sfxVictory();
+                document.getElementById('m-title').style.color = "var(--arc-green)";
+                showModal("¡Misión Cumplida! 🎉", `Sobreviviste el ataque espacial.\nPuntuación Final: ${score}`, backToMenu);
+            } else {
+                playTone(150, 'sawtooth', 0.8, 0.4);
+                document.getElementById('m-title').style.color = "var(--arc-pink)";
+                showModal("¡SISTEMA COMPROMETIDO! 💥", `Los alienígenas destruyeron la base.\nPuntuación Final: ${score}`, backToMenu);
+            }
+        }
+
+        let modalCallback = null;
+        function showModal(title, msg, callback = null) { 
+            document.getElementById('m-title').innerText = title; 
+            document.getElementById('m-msg').innerText = msg; 
+            document.getElementById('modal').classList.add('active'); 
+            modalCallback = callback;
+        }
+        function closeModal() { 
+            playTone(600, 'sine', 0.08, 0.1); document.getElementById('modal').classList.remove('active'); 
+            if(modalCallback) { modalCallback(); modalCallback = null; }
+        }
+
+        function resetGame() { 
+            score = 0; lives = 3;
+            document.getElementById('score-display').innerText = score;
+            document.getElementById('lives-display').innerText = lives.toString();
+            
+            enemies = []; particles = []; lasers = [];
+            buttonPool = new Array(8).fill("?");
+            
+            for(let i=0; i<8; i++) buttonPool[i] = generateFakeOp();
+            renderButtons();
+
+            setupTimer();
+            lastSpawnTime = performance.now();
+            requestAnimationFrame(gameLoop);
+        }
+
+    </script>
+</body>
+</html>

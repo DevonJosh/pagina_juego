@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Vector Core: Optimización 📊</title>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root { 
+            --bg-color: #03030c;
+            --grid-line: rgba(0, 243, 255, 0.1);
+            --axis-color: rgba(0, 243, 255, 0.4);
+            --neon-cyan: #00f3ff;
+            --neon-pink: #ff0055;
+            --neon-yellow: #f1c40f;
+            --neon-green: #39ff14;
+        }
+
+        body, html { 
+            font-family: 'Rajdhani', sans-serif; 
+            display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+            margin: 0; padding: 0; width: 100vw; height: 100vh; 
+            touch-action: none; color: #fff; background-color: var(--bg-color); 
+            overflow: hidden; box-sizing: border-box;
+            user-select: none;
+        }
+
+        .decorations { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; background: radial-gradient(circle at center, #0a0a20 0%, #000 100%); }
+        
+        .scanlines {
+            position: fixed; inset: 0; z-index: 999; pointer-events: none;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+            background-size: 100% 4px; box-shadow: inset 0 0 100px rgba(0,0,0,0.9);
+        }
+
+        .sound-toggle { position: absolute; top: 15px; right: 15px; background: rgba(0,0,0,0.8); border: 2px solid var(--neon-cyan); border-radius: 8px; width: 45px; height: 45px; font-size: 20px; display: flex; justify-content: center; align-items: center; cursor: pointer; z-index: 1000; box-shadow: 0 0 10px rgba(0,243,255,0.3); transition: all 0.2s; color: var(--neon-cyan);}
+        .sound-toggle:active { transform: scale(0.9); }
+
+        /* LOBBY */
+        #setup-screen {
+            position: absolute; inset: 0; z-index: 500; display: flex; flex-direction: column; justify-content: center; align-items: center;
+            background: rgba(3, 3, 12, 0.85); backdrop-filter: blur(8px);
+        }
+
+        .setup-card {
+            background: rgba(10, 15, 30, 0.95); padding: 35px; border-radius: 15px;
+            box-shadow: 0 0 40px rgba(0,243,255,0.2); border: 2px solid var(--neon-cyan);
+            text-align: center; max-width: 90%; width: 500px; display: flex; flex-direction: column; gap: 15px;
+        }
+
+        .setup-card h1 { font-family: 'Share Tech Mono', monospace; font-size: 34px; color: var(--neon-cyan); margin: 0; text-shadow: 0 0 10px var(--neon-cyan);}
+        
+        .setup-section { background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; gap: 8px; align-items: center; }
+        .setup-section h3 { margin: 0; color: #888; font-size: 14px; text-transform: uppercase; letter-spacing: 2px; font-family: 'Share Tech Mono', monospace;}
+        
+        .setup-row { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; width: 100%;}
+        
+        .setup-btn { background: rgba(0,0,0,0.5); border: 2px solid #444; padding: 8px 15px; border-radius: 5px; font-size: 16px; font-weight: bold; color: #aaa; cursor: pointer; transition: all 0.2s; font-family: 'Rajdhani', sans-serif;}
+        .setup-btn.active.diff { background: rgba(0,243,255,0.2); border-color: var(--neon-cyan); color: #fff; box-shadow: 0 0 15px rgba(0,243,255,0.5); text-shadow: 0 0 5px var(--neon-cyan);}
+
+        .start-btn {
+            background: var(--neon-cyan); border: none; box-shadow: 0 0 20px rgba(0,243,255,0.4); padding: 15px 40px; font-size: 22px; color: #000; border-radius: 5px; text-transform: uppercase; font-weight: bold; font-family: 'Share Tech Mono', monospace; cursor:pointer; margin-top: 5px; transition: all 0.1s; letter-spacing: 2px;
+        }
+        .start-btn:active { transform: scale(0.95); }
+
+        /* PANTALLA DE JUEGO */
+        #game-screen {
+            display: none; flex-direction: column; align-items: center; justify-content: flex-start;
+            width: 100vw; height: 100vh; padding: 1.5vh 2vw; box-sizing: border-box; overflow: hidden;
+        }
+
+        .game-header { flex: 0 0 auto; display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 900px; margin-bottom: 1vh; z-index: 10; }
+        
+        .back-menu-btn { background: transparent; border: 1px solid #fff; padding: 6px 12px; border-radius: 5px; font-size: 14px; color: #fff; cursor: pointer; font-family: 'Share Tech Mono', monospace; }
+        .back-menu-btn:hover { background: rgba(255,255,255,0.1); }
+
+        .hud-group { display: flex; gap: 15px; align-items: center; font-family: 'Share Tech Mono', monospace; }
+
+        .hud-box {
+            background: rgba(0,0,0,0.8); padding: 6px 15px; border-radius: 5px;
+            border: 1px solid var(--neon-cyan); box-shadow: 0 0 10px rgba(0,243,255,0.2);
+            font-size: 16px; color: #fff; display: flex; align-items: center; gap: 8px;
+        }
+        .lives-box { border-color: var(--neon-pink); color: var(--neon-pink); }
+
+        /* PANEL DE TAREA MATEMÁTICA */
+        .task-panel { 
+            text-align: center; background: rgba(10, 15, 30, 0.9); padding: 12px 20px; 
+            border-radius: 8px; font-size: clamp(16px, 2.5vh, 22px); font-weight: 500; 
+            width: 100%; max-width: 900px; border: 1px solid var(--neon-cyan); box-shadow: 0 0 20px rgba(0,243,255,0.2); 
+            box-sizing: border-box; margin-bottom: 1vh; z-index: 10; font-family: 'Share Tech Mono', monospace;
+        }
+        .highlight-eq { color: var(--neon-yellow); font-size: 110%; text-shadow: 0 0 10px rgba(241,196,15,0.5); }
+
+        /* ÁREA DE JUEGO (CANVAS PLANO CARTESIANO INTERACTIVO) */
+        .game-area-wrapper {
+            flex: 1 1 auto; width: 100%; max-width: 900px; position: relative;
+            background: rgba(0, 0, 0, 0.5); border-radius: 10px; border: 2px solid rgba(0, 243, 255, 0.3);
+            box-shadow: inset 0 0 50px rgba(0,0,0,0.8);
+            overflow: hidden; margin-bottom: 1vh; display: flex; justify-content: center; align-items: center;
+        }
+        
+        #gameCanvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: crosshair; touch-action: none; }
+
+        /* CONTROLES DE PARÁMETROS (SLIDERS / BOTONES DE TASA DE CAMBIO) */
+        .controls-panel {
+            flex: 0 0 auto; width: 100%; max-width: 900px;
+            background: rgba(10, 15, 30, 0.9); padding: 12px 20px; border-radius: 8px;
+            border: 1px solid var(--neon-cyan); box-sizing: border-box;
+            display: flex; justify-content: space-around; align-items: center; gap: 15px; margin-bottom: 1vh;
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        .control-group { display: flex; align-items: center; gap: 10px; font-size: 18px; }
+        .control-btn {
+            background: rgba(0, 243, 255, 0.1); border: 1px solid var(--neon-cyan); color: var(--neon-cyan);
+            width: 40px; height: 40px; border-radius: 5px; font-size: 20px; font-weight: bold; cursor: pointer;
+            display: flex; justify-content: center; align-items: center; transition: all 0.1s;
+        }
+        .control-btn:active { background: var(--neon-cyan); color: #000; }
+
+        .submit-btn {
+            background: var(--neon-green); border: none; color: #000; padding: 10px 25px;
+            font-size: 18px; font-weight: bold; font-family: 'Share Tech Mono', monospace; border-radius: 5px;
+            cursor: pointer; box-shadow: 0 0 15px rgba(57, 255, 20, 0.4);
+        }
+        .submit-btn:active { transform: scale(0.95); }
+
+        /* MODAL */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: flex; justify-content: center; align-items: center; z-index: 1000; visibility: hidden; opacity: 0; transition: all 0.3s; }
+        .modal-overlay.active { visibility: visible; opacity: 1; }
+        .modal-box { background: #050510; padding: 40px; border-radius: 10px; text-align: center; max-width: 85%; width: 450px; transform: scale(0.9); transition: transform 0.3s; border: 2px solid var(--neon-cyan); box-shadow: 0 0 30px rgba(0,243,255,0.3);}
+        .modal-overlay.active .modal-box { transform: scale(1); }
+        .modal-title { font-family: 'Share Tech Mono', monospace; font-size: 32px; margin-top: 0; margin-bottom: 15px; color: var(--neon-cyan); text-shadow: 0 0 10px var(--neon-cyan);}
+        .modal-msg { font-size: 18px; margin-bottom: 25px; color: #ddd; white-space: pre-line; line-height: 1.5; }
+        .modal-btn { background: transparent; border: 2px solid var(--neon-cyan); color: var(--neon-cyan); padding: 12px 30px; font-size: 18px; border-radius: 5px; text-transform: uppercase; font-family: 'Share Tech Mono', monospace; cursor:pointer; transition: all 0.2s;}
+        .modal-btn:hover { background: var(--neon-cyan); color: #000; }
+    </style>
+</head>
+<body>
+
+    <audio id="bgm" loop><source src="../assets/musicaFondo/cancion1.mp3" type="audio/mpeg"></audio>
+    <button id="soundToggle" class="sound-toggle" aria-label="Activar sonido">🔇</button>
+
+    <div class="decorations"><div class="scanlines"></div></div>
+
+    <!-- LOBBY -->
+    <div id="setup-screen">
+        <div class="setup-card">
+            <h1>VECTOR CORE</h1>
+            <p style="margin:0; color:#888; font-size:14px;">> SISTEMA DE OPTIMIZACIÓN MATEMÁTICA_</p>
+            
+            <div class="setup-section">
+                <h3>Módulo de Operación</h3>
+                <div class="setup-row">
+                    <button id="setup-mod-lineal" class="setup-btn diff active" onclick="selectMod('lineal')">Funciones Lineales (m y b)</button>
+                    <button id="setup-mod-vectores" class="setup-btn diff" onclick="selectMod('vectores')">Vectores y Componentes</button>
+                </div>
+            </div>
+
+            <button class="start-btn" onclick="startGame()">INICIALIZAR NÚCLEO</button>
+        </div>
+    </div>
+
+    <!-- JUEGO -->
+    <div id="game-screen">
+        <div class="game-header">
+            <button class="back-menu-btn" onclick="backToMenu()">[ REINICIAR ]</button>
+            <div class="hud-group">
+                <div class="hud-box lives-box">ESTABILIDAD: <span id="lives-display">3</span>❤️</div>
+                <div class="hud-box">NODOS: <span id="score-display">0</span> / 5</div>
+            </div>
+        </div>
+
+        <div class="task-panel" id="task-panel">
+            Ajusta la función <span class="highlight-eq" id="eq-display">y = mx + b</span> para conectar el Terminal Energético.
+        </div>
+
+        <div class="game-area-wrapper" id="canvas-wrapper">
+            <canvas id="gameCanvas"></canvas>
+        </div>
+
+        <div class="controls-panel" id="controls-panel">
+            <!-- Controles dinámicos según el módulo -->
+        </div>
+    </div>
+
+    <!-- MODAL -->
+    <div class="modal-overlay" id="modal">
+        <div class="modal-box">
+            <h2 class="modal-title" id="m-title">Título</h2>
+            <p class="modal-msg" id="m-msg">Mensaje</p>
+            <button class="modal-btn" onclick="closeModal()">ACEPTAR</button>
+        </div>
+    </div>
+
+    <script>
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        let audioCtx; let isMuted = true;
+        const bgAudio = document.getElementById('bgm');
+        const soundToggle = document.getElementById('soundToggle');
+
+        soundToggle.addEventListener('click', () => {
+            if (!audioCtx) audioCtx = new AudioContext();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            isMuted = !isMuted;
+            if(isMuted) { bgAudio.pause(); soundToggle.innerText = '🔇'; } 
+            else { bgAudio.volume = 0.25; bgAudio.play().catch(e=>e); soundToggle.innerText = '🔊'; }
+        });
+
+        function playTone(freq, type, duration, vol = 0.1) {
+            if (!audioCtx || isMuted) return;
+            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+            osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gain.gain.setValueAtTime(vol, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+            osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + duration);
+        }
+
+        function sfxClick() { playTone(800, 'square', 0.05, 0.05); }
+        function sfxSuccess() { playTone(523.25, 'triangle', 0.15, 0.15); setTimeout(()=>playTone(783.99, 'triangle', 0.2, 0.15), 100); }
+        function sfxError() { playTone(150, 'sawtooth', 0.3, 0.3); }
+
+        let currentModule = 'lineal'; // 'lineal' o 'vectores'
+        let score = 0; let lives = 3;
+        let targetM = 1; let targetB = 0;
+        let currentM = 0; let currentB = 0;
+        let targetX = 0; let targetY = 0; // Para vectores
+
+        const canvas = document.getElementById('gameCanvas'); const ctx = canvas.getContext('2d');
+        const canvasWrapper = document.getElementById('canvas-wrapper');
+
+        function resizeCanvas() { canvas.width = canvasWrapper.offsetWidth; canvas.height = canvasWrapper.offsetHeight; }
+        window.addEventListener('resize', resizeCanvas);
+
+        function selectMod(mod) {
+            sfxClick(); currentModule = mod;
+            document.querySelectorAll('.setup-btn.diff').forEach(b => b.classList.remove('active'));
+            document.getElementById('setup-mod-' + mod).classList.add('active');
+        }
+
+        function startGame() {
+            if (!audioCtx && !isMuted) { audioCtx = new AudioContext(); bgAudio.play().catch(e=>e); }
+            sfxClick();
+            document.getElementById('setup-screen').style.display = 'none';
+            document.getElementById('game-screen').style.display = 'flex';
+            resizeCanvas();
+            score = 0; lives = 3;
+            nextProblem();
+            requestAnimationFrame(gameLoop);
+        }
+
+        function backToMenu() {
+            sfxClick();
+            document.getElementById('game-screen').style.display = 'none';
+            document.getElementById('setup-screen').style.display = 'flex';
+        }
+
+        function nextProblem() {
+            document.getElementById('lives-display').innerText = lives;
+            document.getElementById('score-display').innerText = score;
+
+            if (currentModule === 'lineal') {
+                // Generar pendiente m (-3 a 3 entero, excepto 0) y corte b (-5 a 5)
+                targetM = (Math.random() > 0.5 ? 1 : -1) * Math.floor(Math.random() * 3 + 1);
+                targetB = Math.floor(Math.random() * 10 - 5);
+                currentM = 0; currentB = 0;
+
+                document.getElementById('task-panel').innerHTML = `Ajusta la función <span class="highlight-eq">y = mx + b</span> para que cruce el nodo objetivo.`;
+                
+                let controls = document.getElementById('controls-panel');
+                controls.innerHTML = `
+                    <div class="control-group">m: <button class="control-btn" onclick="adjustM(-1)">-</button><span id="val-m">0</span><button class="control-btn" onclick="adjustM(1)">+</button></div>
+                    <div class="control-group">b: <button class="control-btn" onclick="adjustB(-1)">-</button><span id="val-b">0</span><button class="control-btn" onclick="adjustB(1)">+</button></div>
+                    <button class="submit-btn" onclick="checkLineal()">ENLAZAR</button>
+                `;
+                updateControlsDisplay();
+            } else {
+                // Módulo Vectores: el usuario debe alinear las componentes v = <vx, vy>
+                targetX = Math.floor(Math.random() * 8 - 4); if(targetX === 0) targetX = 2;
+                targetY = Math.floor(Math.random() * 8 - 4); if(targetY === 0) targetY = -2;
+                currentM = 0; currentB = 0; // Usaremos currentM como componente X y currentB como componente Y del vector respuesta
+
+                document.getElementById('task-panel').innerHTML = `Configura el vector de impulso <span class="highlight-eq">v = &lt;x, y&gt;</span> para alcanzar la baliza cuántica en (${targetX}, ${targetY}).`;
+
+                let controls = document.getElementById('controls-panel');
+                controls.innerHTML = `
+                    <div class="control-group">X: <button class="control-btn" onclick="adjustM(-1)">-</button><span id="val-m">0</span><button class="control-btn" onclick="adjustM(1)">+</button></div>
+                    <div class="control-group">Y: <button class="control-btn" onclick="adjustB(-1)">-</button><span id="val-b">0</span><button class="control-btn" onclick="adjustB(1)">+</button></div>
+                    <button class="submit-btn" onclick="checkVectores()">PROPULSAR</button>
+                `;
+                updateControlsDisplay();
+            }
+        }
+
+        function adjustM(delta) { sfxClick(); currentM += delta; updateControlsDisplay(); }
+        function adjustB(delta) { sfxClick(); currentB += delta; updateControlsDisplay(); }
+
+        function updateControlsDisplay() {
+            let elM = document.getElementById('val-m');
+            let elB = document.getElementById('val-b');
+            if(elM) elM.innerText = currentM;
+            if(elB) elB.innerText = currentB;
+        }
+
+        function checkLineal() {
+            // Verificar si la línea pasa cerca del punto objetivo (ej: x = 2, y = targetM*2 + targetB)
+            // Para asegurar que el usuario acertó, evaluamos si la recta cumple con pasar por un punto clave generado aleatoriamente.
+            let testX = 2;
+            let expectedY = targetM * testX + targetB;
+            let userY = currentM * testX + currentB;
+
+            if (currentM === targetM && currentB === targetB) {
+                sfxSuccess();
+                score++;
+                showModal("¡Nodo Sincronizado! ⚡", "El flujo energético es estable a través de la función lineal.", () => {
+                    if(score >= 5) {
+                        showModal("¡Núcleo Optimizado! 🏆", "Has dominado el control de funciones lineales.", () => backToMenu());
+                    } else {
+                        nextProblem();
+                    }
+                });
+            } else {
+                sfxError();
+                lives--;
+                document.getElementById('lives-display').innerText = lives;
+                if(lives <= 0) {
+                    showModal("¡Colapso del Sistema! 💥", "La inestabilidad superó los límites de seguridad.", () => backToMenu());
+                } else {
+                    showModal("¡Desalineación! ⚠️", `La recta no pasa por el nodo correcto. Revisa la pendiente (m) y el intercepto (b).`, null);
+                }
+            }
+        }
+
+        function checkVectores() {
+            if (currentM === targetX && currentB === targetY) {
+                sfxSuccess();
+                score++;
+                showModal("¡Impacto Preciso! 🎯", "El vector de componentes calculó la trayectoria exacta.", () => {
+                    if(score >= 5) {
+                        showModal("¡Núcleo Optimizado! 🏆", "Has dominado el cálculo vectorial.", () => backToMenu());
+                    } else {
+                        nextProblem();
+                    }
+                });
+            } else {
+                sfxError();
+                lives--;
+                document.getElementById('lives-display').innerText = lives;
+                if(lives <= 0) {
+                    showModal("¡Colapso del Sistema! 💥", "La baliza se desvió al espacio profundo.", () => backToMenu());
+                } else {
+                    showModal("¡Trayectoria Errónea! ⚠️", `El vector v=<${currentM}, ${currentB}> no alcanzó el objetivo (${targetX}, ${targetY}).`, null);
+                }
+            }
+        }
+
+        // RENDERIZADO DEL PLANO CARTESIANO EN CANVAS
+        function gameLoop(ts) {
+            requestAnimationFrame(gameLoop);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            let centerX = canvas.width / 2;
+            let centerY = canvas.height / 2;
+            let scale = 30; // 30 pixeles por unidad cartesiana
+
+            // Dibujar grilla cartesiana
+            ctx.strokeStyle = "rgba(0, 243, 255, 0.08)"; ctx.lineWidth = 1;
+            for (let x = centerX % scale; x < canvas.width; x += scale) {
+                ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+            }
+            for (let y = centerY % scale; y < canvas.height; y += scale) {
+                ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+            }
+
+            // Ejes X e Y
+            ctx.strokeStyle = "rgba(0, 243, 255, 0.5)"; ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.moveTo(0, centerY); ctx.lineTo(canvas.width, centerY); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(centerX, 0); ctx.lineTo(centerX, canvas.height); ctx.stroke();
+
+            if (currentModule === 'lineal') {
+                // Dibujar Nodo Objetivo exacto (ej en x=2, y = targetM*2 + targetB)
+                let objX = centerX + (2 * scale);
+                let objY = centerY - ((targetM * 2 + targetB) * scale);
+                
+                ctx.fillStyle = "#f1c40f";
+                ctx.beginPath(); ctx.arc(objX, objY, 8, 0, Math.PI*2); ctx.fill();
+                ctx.shadowBlur = 10; ctx.shadowColor = "#f1c40f"; ctx.stroke(); ctx.shadowBlur = 0;
+
+                // Dibujar la recta actual del usuario: y = currentM * x + currentB
+                ctx.strokeStyle = "#00f3ff"; ctx.lineWidth = 3;
+                ctx.beginPath();
+                for (let px = 0; px <= canvas.width; px += 5) {
+                    let mathX = (px - centerX) / scale;
+                    let mathY = currentM * mathX + currentB;
+                    let py = centerY - (mathY * scale);
+                    if (px === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+                }
+                ctx.stroke();
+
+            } else {
+                // Dibujar baliza objetivo
+                let targetScreenX = centerX + (targetX * scale);
+                let targetScreenY = centerY - (targetY * scale);
+
+                ctx.fillStyle = "#ff0055";
+                ctx.beginPath(); ctx.arc(targetScreenX, targetScreenY, 10, 0, Math.PI*2); ctx.fill();
+
+                // Dibujar vector del usuario desde el origen (centerX, centerY)
+                let userEndX = centerX + (currentM * scale);
+                let userEndY = centerY - (currentB * scale);
+
+                ctx.strokeStyle = "#39ff14"; ctx.lineWidth = 4;
+                ctx.beginPath(); ctx.moveTo(centerX, centerY); ctx.lineTo(userEndX, userEndY); ctx.stroke();
+
+                // Punta de flecha del vector
+                ctx.fillStyle = "#39ff14";
+                ctx.beginPath(); ctx.arc(userEndX, userEndY, 5, 0, Math.PI*2); ctx.fill();
+            }
+        }
+
+        let modalCallback = null;
+        function showModal(title, msg, callback = null) {
+            document.getElementById('m-title').innerText = title;
+            document.getElementById('m-msg').innerText = msg;
+            document.getElementById('modal').classList.add('active');
+            modalCallback = callback;
+        }
+
+        function closeModal() {
+            sfxClick();
+            document.getElementById('modal').classList.remove('active');
+            if (modalCallback) { modalCallback(); modalCallback = null; }
+        }
+    </script>
+</body>
+</html>
