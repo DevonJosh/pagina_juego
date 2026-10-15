@@ -2408,6 +2408,25 @@ body{min-height:100dvh}
 @media(max-width:390px){.topic-card{min-height:220px}.topic-content p{display:none}.card-play{min-height:32px}.sequence-card{border-width:2px}.sequence-card.blank{font-size:25px}}
 @media(max-height:530px) and (orientation:portrait){#gameScreen{min-height:520px}.sequence{flex:0 0 auto}.sequence-card{max-height:105px}.option-card{max-height:100px}}
 
+
+/* Secuencias progresivas: distribución adaptable */
+.sequence{display:flex;flex-wrap:wrap;justify-content:center;align-content:center;gap:clamp(5px,1vw,14px);width:100%}
+.sequence-card{width:clamp(52px,9vw,122px);flex:0 1 auto}
+.sequence-card.active-blank{outline:3px solid #8e6ae2;outline-offset:3px}
+.sequence-card.filled-blank{border-color:#8ccf9e;background:#effcf1}
+.options{flex-wrap:wrap;gap:clamp(8px,1.6vw,18px)}
+.option-card{width:clamp(76px,10vw,132px)}
+.feedback.instruction-message{display:block;background:#f2edff;color:#6d58ac;border:2px solid #ded3fa}
+@media(max-width:700px){
+ .game-panel{overflow:visible;padding:clamp(10px,3vw,18px);gap:10px}
+ .sequence-card{width:clamp(49px,15vw,88px)}
+ .option-card{width:clamp(70px,19vw,105px)}
+ #gameScreen{min-height:0}
+}
+@media(max-width:700px) and (orientation:landscape){
+ .sequence-card{width:clamp(45px,9vw,80px)}
+ .option-card{width:clamp(65px,11vw,95px)}
+}
 </style>
 </head>
 
@@ -4415,287 +4434,115 @@ function shuffle(arr){
    CARGAR NIVEL
 ========================================================= */
 
+// La dificultad aumenta: 1, 1, 2, 2 y 3 respuestas.
+let pendingAnswers = [];
+let activeBlank = 0;
+let levelMistakes = 0;
+
+function buildProgressiveExercise(exercise, level){
+    const count = level < 2 ? 1 : level < 4 ? 2 : 3;
+    const known = exercise.seq.filter(value => value !== "?");
+    // Reconstruimos el patrón usando los datos originales del ejercicio.
+    const full = [...known, exercise.answer];
+    let period = full.length;
+    for(let n=1; n<=full.length; n++){
+        if(full.every((v,i)=>v===full[i%n])){period=n;break;}
+    }
+    const pattern=full.slice(0,period);
+    // Mostrar al menos dos repeticiones del patrón antes de preguntar.
+    const visible=Math.max(known.length,period*2);
+    const seq=Array.from({length:visible+count},(_,i)=>
+        i<visible?pattern[i%period]:"?"
+    );
+    const answers=Array.from({length:count},(_,i)=>pattern[(visible+i)%period]);
+    return {seq,answers,options:exercise.options};
+}
+
 function loadLevel(){
-
-    answered = false;
-
-    const topic =
-        topics[currentTopic];
-
-    const exercise =
-        topic.sequences[
-            currentLevel
-        ];
-
-
-    sequenceContainer.innerHTML =
-        "";
-
-    optionsContainer.innerHTML =
-        "";
-
-    feedback.className =
-        "feedback";
-
-    feedback.textContent =
-        "";
-
-    nextBtn.style.display =
-        "none";
-
-
-    topicName.textContent =
-        currentTopic.toUpperCase();
-
-
-    levelText.textContent =
-        `Nivel ${currentLevel + 1} de 5`;
-
-
-    progressBar.style.width =
-        `${
-            (
-                (currentLevel + 1)
-                / 5
-            ) * 100
-        }%`;
-
-
-    exercise.seq.forEach(
-        value=>{
-
-            const card =
-                document.createElement(
-                    "div"
-                );
-
-            card.className =
-                "sequence-card";
-
-            createCardContent(
-                card,
-                value,
-                topic.type
-            );
-
-            sequenceContainer.appendChild(
-                card
-            );
-
-        }
-    );
-
-
-    const options =
-        shuffle(
-            exercise.options
-        );
-
-
-    options.forEach(
-        value=>{
-
-            const button =
-                document.createElement(
-                    "button"
-                );
-
-            button.className =
-                "option-card";
-
-            button.dataset.value =
-                value;
-
-            button.setAttribute(
-                "aria-label",
-                "Opción de respuesta"
-            );
-
-
-            createCardContent(
-                button,
-                value,
-                topic.type
-            );
-
-
-            attachHoverSound(
-                button
-            );
-
-
-            button.addEventListener(
-                "click",
-                ()=>{
-                    checkAnswer(
-                        button,
-                        value
-                    );
-                }
-            );
-
-
-            optionsContainer.appendChild(
-                button
-            );
-
-        }
-    );
-
+    answered=false;
+    levelMistakes=0;
+    const topic=topics[currentTopic];
+    const exercise=buildProgressiveExercise(topic.sequences[currentLevel],currentLevel);
+    pendingAnswers=exercise.answers;
+    activeBlank=0;
+    sequenceContainer.innerHTML="";
+    optionsContainer.innerHTML="";
+    feedback.className="feedback";
+    feedback.textContent="";
+    nextBtn.style.display="none";
+    topicName.textContent=currentTopic.toUpperCase();
+    levelText.textContent=`Nivel ${currentLevel+1} de 5 · ${pendingAnswers.length} ${pendingAnswers.length===1?'respuesta':'respuestas'}`;
+    progressBar.style.width=`${((currentLevel+1)/5)*100}%`;
+    exercise.seq.forEach(value=>{
+        const card=document.createElement("div");
+        card.className="sequence-card";
+        createCardContent(card,value,topic.type);
+        sequenceContainer.appendChild(card);
+    });
+    const blanks=[...sequenceContainer.querySelectorAll('.sequence-card.blank')];
+    if(blanks[0])blanks[0].classList.add('active-blank');
+    shuffle(exercise.options).forEach(value=>{
+        const button=document.createElement("button");
+        button.className="option-card";
+        button.dataset.value=value;
+        button.setAttribute("aria-label","Elegir respuesta de la secuencia");
+        createCardContent(button,value,topic.type);
+        attachHoverSound(button);
+        button.addEventListener("click",()=>checkAnswer(button,value));
+        optionsContainer.appendChild(button);
+    });
+    feedback.textContent=`Completa ${pendingAnswers.length} ${pendingAnswers.length===1?'espacio':'espacios'} en orden, de izquierda a derecha.`;
+    feedback.className="feedback instruction-message";
 }
 
-
-/* =========================================================
-   COMPROBAR RESPUESTA
-========================================================= */
-
-function checkAnswer(
-    selectedButton,
-    selectedValue
-){
-
-    if(answered)
-        return;
-
-    answered = true;
-
+function checkAnswer(selectedButton,selectedValue){
+    if(answered)return;
     Sound.playClick();
-
-
-    const exercise =
-        topics[currentTopic]
-        .sequences[
-            currentLevel
-        ];
-
-
-    const correct =
-        exercise.answer;
-
-
-    document
-    .querySelectorAll(
-        ".option-card"
-    )
-    .forEach(
-        b=>{
-            b.disabled = true;
-        }
-    );
-
-
-    if(
-        selectedValue === correct
-    ){
-
-        selectedButton.classList.add(
-            "correct"
-        );
-
-        score += 10;
-
-        correctCount++;
-
-
-        if(
-            currentTopic === "animales" &&
-            topics.animales.animalSounds[
-                correct
-            ]
-        ){
-
-            Sound.playAnimal(
-                topics.animales.animalSounds[
-                    correct
-                ]
-            );
-
-        }else{
-
-            Sound.playCategory(
-                currentTopic
-            );
-
-        }
-
-
-        feedback.textContent =
-            "¡Muy bien! Descubriste el patrón. 🎉";
-
-        feedback.className =
-            "feedback correct-message";
-
-
-        burstStars(
-            selectedButton
-        );
-
-    }
-
-    else{
-
-        selectedButton.classList.add(
-            "wrong"
-        );
-
+    const correct=pendingAnswers[activeBlank];
+    if(selectedValue!==correct){
+        levelMistakes++;
+        selectedButton.classList.remove('wrong');
+        void selectedButton.offsetWidth;
+        selectedButton.classList.add('wrong');
         Sound.playFail();
-
-
-        feedback.textContent =
-            "Casi. Observa nuevamente el patrón. 💪";
-
-        feedback.className =
-            "feedback wrong-message";
-
-
-        document
-        .querySelectorAll(
-            ".option-card"
-        )
-        .forEach(
-            b=>{
-
-                if(
-                    b.dataset.value ===
-                    correct
-                ){
-
-                    b.classList.add(
-                        "correct"
-                    );
-
-                }
-
-            }
-        );
-
+        feedback.textContent='¡Inténtalo de nuevo! Observa el patrón y elige la siguiente figura. 💪';
+        feedback.className='feedback wrong-message';
+        setTimeout(()=>selectedButton.classList.remove('wrong'),550);
+        return;
     }
-
-
-    scoreTop.textContent =
-        `${score} puntos`;
-
-
-    pointsBox.classList.add(
-        "bump"
-    );
-
-
-    setTimeout(
-        ()=>{
-            pointsBox.classList.remove(
-                "bump"
-            );
-        },
-        400
-    );
-
-
-    nextBtn.style.display =
-        "block";
-
+    const blanks=[...sequenceContainer.querySelectorAll('.sequence-card.blank')];
+    const blank=blanks[0];
+    if(blank){
+        blank.classList.remove('blank','active-blank');
+        blank.textContent='';
+        createCardContent(blank,correct,topics[currentTopic].type);
+        blank.classList.add('filled-blank');
+    }
+    selectedButton.classList.add('correct');
+    setTimeout(()=>selectedButton.classList.remove('correct'),420);
+    score+=10;
+    scoreTop.textContent=`${score} puntos`;
+    pointsBox.classList.add('bump');
+    setTimeout(()=>pointsBox.classList.remove('bump'),400);
+    if(currentTopic==='animales' && topics.animales.animalSounds[correct]){
+        Sound.playAnimal(topics.animales.animalSounds[correct]);
+    }else{Sound.playCategory(currentTopic);}
+    burstStars(selectedButton);
+    activeBlank++;
+    const nextBlank=sequenceContainer.querySelector('.sequence-card.blank');
+    if(nextBlank)nextBlank.classList.add('active-blank');
+    if(activeBlank>=pendingAnswers.length){
+        answered=true;
+        if(levelMistakes===0)correctCount++;
+        feedback.textContent='¡Excelente! Completaste toda la secuencia. 🎉';
+        feedback.className='feedback correct-message';
+        optionsContainer.querySelectorAll('button').forEach(b=>b.disabled=true);
+        nextBtn.style.display='block';
+    }else{
+        feedback.textContent=`¡Bien! Llevas ${activeBlank} de ${pendingAnswers.length}. ¿Cuál sigue? ✨`;
+        feedback.className='feedback correct-message';
+    }
 }
-
 
 /* =========================================================
    SIGUIENTE
