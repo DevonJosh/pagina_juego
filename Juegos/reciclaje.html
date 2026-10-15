@@ -21,15 +21,13 @@
         }
 
         /* PAISAJE DE FONDO */
-        .decorations { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: -1; pointer-events: none; overflow: hidden; background: linear-gradient(180deg, #74ebd5 0%, #ACB6E5 100%); }
+        .decorations { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; background: linear-gradient(180deg, #74ebd5 0%, #ACB6E5 100%); }
         .decorations::before { content: ''; position: absolute; inset: 0; background-image: url("data:image/svg+xml,%3Csvg width='60' height='104' viewBox='0 0 60 104' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 52l15-26 15 26v52l-15 26-15-26zM0 0l15 26v52L0 104V0zm60 0v104L45 78V26z' fill='%23ffffff' fill-opacity='0.15' fill-rule='evenodd'/%3E%3C/svg%3E"); z-index: 1; }
         .sun { position: absolute; top: 2%; right: 4%; font-size: clamp(40px, 8vh, 80px); z-index: 2; filter: drop-shadow(0 0 25px rgba(255, 215, 0, 0.8)); animation: pulse-sun 3s infinite alternate; }
         @keyframes pulse-sun { 0% { transform: scale(1) rotate(0deg); } 100% { transform: scale(1.1) rotate(10deg); } }
         .grass { position: absolute; bottom: -5vh; left: -10vw; width: 120vw; height: 25vh; background: #a9dfbf; border-radius: 50% 50% 0 0; z-index: 2; box-shadow: inset 0 15px 0 #82e0aa, 0 -30px 50px rgba(46,204,113,0.3); }
 
-        /* ============================================================
-           PANTALLA DE CONFIGURACIÓN PREVIA (LOBBY)
-           ============================================================ */
+        /* PANTALLA DE CONFIGURACIÓN PREVIA (LOBBY) */
         #setup-screen {
             position: absolute; inset: 0; z-index: 500;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
@@ -43,32 +41,30 @@
             display: flex; flex-direction: column; gap: 15px;
         }
 
-        .setup-card h1 { font-size: 32px; color: #ff9800; margin: 0; text-shadow: none;}
+        .setup-card h1 { font-size: 32px; color: #ff9800; margin: 0; }
         
         .setup-section {
             background: #fff9c4; padding: 12px; border-radius: 15px; border: 2px dashed #f1c40f;
             display: flex; flex-direction: column; gap: 10px; align-items: center;
         }
-        .setup-section h3 { margin: 0; color: #d35400; font-size: 16px; text-transform: uppercase;}
+        .setup-section h3 { margin: 0; color: #d35400; font-size: 16px; text-transform: uppercase; }
         
-        .setup-row { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; width: 100%;}
+        .setup-row { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; width: 100%; }
         
-        .setup-btn { background: #fff; border: 3px solid #bdc3c7; padding: 8px 16px; border-radius: 15px; font-size: 15px; font-weight: bold; color: #7f8c8d; cursor: pointer; transition: all 0.2s; font-family: 'Fredoka', sans-serif;}
+        .setup-btn { background: #fff; border: 3px solid #bdc3c7; padding: 8px 16px; border-radius: 15px; font-size: 15px; font-weight: bold; color: #7f8c8d; cursor: pointer; transition: all 0.2s; font-family: 'Fredoka', sans-serif; }
         .setup-btn.active.mode { background: #9b59b6; border-color: #8e44ad; color: #fff; box-shadow: 0 4px 0 #8e44ad; transform: translateY(-2px); }
         .setup-btn.active.diff { background: #f1c40f; border-color: #f39c12; color: #d35400; box-shadow: 0 4px 0 #f39c12; transform: translateY(-2px); }
 
-        .time-input-group { display: flex; align-items: center; gap: 10px; background: #fff; padding: 6px 15px; border-radius: 15px; border: 3px solid #3498db;}
+        .time-input-group { display: flex; align-items: center; gap: 10px; background: #fff; padding: 6px 15px; border-radius: 15px; border: 3px solid #3498db; }
         .time-input-group label { color: #2980b9; font-weight: bold; font-size: 16px; }
-        .time-input-group input { width: 60px; border: 2px solid #2980b9; border-radius: 8px; text-align: center; font-weight: bold; font-family: 'Fredoka', sans-serif; font-size: 16px; padding: 4px; outline: none;}
+        .time-input-group input { width: 60px; border: 2px solid #2980b9; border-radius: 8px; text-align: center; font-weight: bold; font-family: 'Fredoka', sans-serif; font-size: 16px; padding: 4px; outline: none; }
         
         .start-btn {
-            background: #4CAF50; border: none; box-shadow: 0 6px 0 #388E3C; padding: 12px 30px; font-size: 22px; color: white; border-radius: 15px; text-transform: uppercase; font-weight: bold; font-family: 'Fredoka', sans-serif; cursor:pointer; margin-top: 5px; transition: all 0.1s;
+            background: #4CAF50; border: none; box-shadow: 0 6px 0 #388E3C; padding: 12px 30px; font-size: 22px; color: white; border-radius: 15px; text-transform: uppercase; font-weight: bold; font-family: 'Fredoka', sans-serif; cursor: pointer; margin-top: 5px; transition: all 0.1s;
         }
         .start-btn:active { transform: translateY(6px); box-shadow: 0 0 0 #388E3C; }
 
-        /* ============================================================
-           PANTALLA DE JUEGO (GAME SCREEN)
-           ============================================================ */
+        /* PANTALLA DE JUEGO */
         #game-screen {
             display: none; flex-direction: column; align-items: center; justify-content: flex-start;
             width: 100vw; height: 100vh; padding: 1vh 1vw; box-sizing: border-box; overflow: hidden;
@@ -79,9 +75,9 @@
             display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 1200px;
             margin-bottom: 5px; z-index: 10;
         }
-        .game-header h1 { font-size: clamp(20px, 3.5vh, 28px); margin: 0; color: #2c3e50; text-shadow: 2px 2px 0px #fff;}
+        .game-header h1 { font-size: clamp(20px, 3.5vh, 28px); margin: 0; color: #2c3e50; text-shadow: 2px 2px 0px #fff; }
         
-        .back-menu-btn { background: #ecf0f1; border: 2px solid #bdc3c7; padding: 6px 12px; border-radius: 12px; font-size: clamp(11px, 1.5vh, 14px); font-weight: bold; color: #2c3e50; cursor: pointer; transition: all 0.2s; font-family: 'Fredoka', sans-serif; box-shadow: 0 4px 0 #bdc3c7;}
+        .back-menu-btn { background: #ecf0f1; border: 2px solid #bdc3c7; padding: 6px 12px; border-radius: 12px; font-size: clamp(11px, 1.5vh, 14px); font-weight: bold; color: #2c3e50; cursor: pointer; transition: all 0.2s; font-family: 'Fredoka', sans-serif; box-shadow: 0 4px 0 #bdc3c7; }
         .back-menu-btn:active { transform: translateY(4px); box-shadow: none; }
 
         /* TEMPORIZADOR FLOTANTE */
@@ -97,7 +93,7 @@
         .timer-btn:active { transform: translateY(3px); box-shadow: none; }
         .timer-container.warning .timer-btn { background: #e74c3c; box-shadow: 0 3px 0 #c0392b; }
 
-        /* PROMPT DE MISION */
+        /* PROMPT DE MISIÓN */
         .prompt-box { 
             text-align: center; background: rgba(255, 255, 255, 0.95); padding: 6px 15px; 
             border-radius: 15px; font-size: clamp(13px, 2vh, 16px); font-weight: 600; 
@@ -108,18 +104,15 @@
         .prompt-box .bins-legend {
             display: flex; gap: 10px; margin-top: 5px; font-size: clamp(10px, 1.5vh, 12px);
         }
-        .bin-lg { display: flex; align-items: center; gap: 4px;}
-        .circle-color { width: 12px; height: 12px; border-radius: 50%; display: inline-block;}
+        .bin-lg { display: flex; align-items: center; gap: 4px; }
+        .circle-color { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
 
-        /* ============================================================
-           CONTENEDOR PRINCIPAL FLUIDO Y CONSTREÑIDO
-           ============================================================ */
+        /* CONTENEDOR PRINCIPAL */
         #game-board-area {
             flex: 1 1 auto; width: 100%; display: flex; justify-content: center; align-items: center; 
             z-index: 10; min-height: 0; box-sizing: border-box; margin-bottom: 1vh;
         }
         
-        /* === MODO 1 y 2 JUGADORES COMPARTIDO === */
         .shared-wrapper { 
             display: flex; flex-direction: column; align-items: center; justify-content: flex-start; 
             gap: 1.5vh; height: 100%; width: 100%; max-width: 800px; margin: 0 auto;
@@ -135,7 +128,7 @@
             flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: flex-start;
         }
 
-        /* === MODO 3, 4 Y 2v2 (1 FILA DE ESTACIONES, MAXIMIZADO) === */
+        /* MODO MULTIJUGADOR */
         body.mode-multi .stations-container {
             display: flex; flex-direction: row; flex-wrap: nowrap;
             gap: 1vw; width: 100%; max-width: 1800px; height: 100%; justify-content: center; align-items: stretch;
@@ -154,42 +147,39 @@
             width: 100%; flex: 1 1 auto; padding: 5px; min-height: 0; display: flex; flex-direction: column; justify-content: flex-start;
             background: transparent; box-shadow: none; border: none; gap: 1vh;
         }
-        body.mode-multi .panel h3 { font-size: clamp(14px, 2.5vh, 20px); margin-bottom: 2px; border-bottom: 2px dashed rgba(0,0,0,0.2); padding-bottom: 2px;}
+        body.mode-multi .panel h3 { font-size: clamp(14px, 2.5vh, 20px); margin-bottom: 2px; border-bottom: 2px dashed rgba(0,0,0,0.2); padding-bottom: 2px; }
         body.mode-multi .controls-row { margin-bottom: 0; }
-        body.mode-multi .cmd-btn { font-size: clamp(16px, 3vh, 26px); padding: 1vh 2px; border-radius: 8px;}
-        body.mode-multi .seq-container { flex: 1 1 auto; padding: 6px; gap: 4px; border: 3px dashed rgba(0,0,0,0.1); border-radius: 10px; background: rgba(0,0,0,0.05);}
+        body.mode-multi .cmd-btn { font-size: clamp(16px, 3vh, 26px); padding: 1vh 2px; border-radius: 8px; }
+        body.mode-multi .seq-container { flex: 1 1 auto; padding: 6px; gap: 4px; border: 3px dashed rgba(0,0,0,0.1); border-radius: 10px; background: rgba(0,0,0,0.05); }
         body.mode-multi .cmd-block { width: clamp(20px, 3.5vh, 32px); height: clamp(20px, 3.5vh, 32px); font-size: clamp(11px, 2vh, 16px); border-radius: 6px; }
-        body.mode-multi .btn-text { display: none; } /* Oculta el texto para que los botones sean masivos y legibles */
+        body.mode-multi .btn-text { display: none; }
 
-        /* DISEÑO DE LA CUADRÍCULA INTERNA (COMÚN) */
-        .game-grid { display: grid; width: 100%; height: 100%; gap: 3px; background-color: var(--grid-bg); border-radius: 8px; padding: 3px; box-sizing: border-box;}
+        /* CUADRÍCULA Y ELEMENTOS */
+        .game-grid { display: grid; width: 100%; height: 100%; gap: 3px; background-color: var(--grid-bg); border-radius: 8px; padding: 3px; box-sizing: border-box; }
         .cell { background-color: #fff9c4; border-radius: 6px; display: flex; justify-content: center; align-items: center; position: relative; user-select: none; box-shadow: inset 0 -3px 0 rgba(0,0,0,0.1); font-size: clamp(16px, 4vh, 35px); }
         .cell[data-start="true"] { background-color: #e2f1f8; box-shadow: inset 0 -3px 0 rgba(0,0,0,0.05); }
 
-        /* ESTILOS DE TACHOS DE BASURA */
-        .bin-green { background-color: #a9dfbf !important; box-shadow: inset 0 -4px 0 #27ae60 !important;}
-        .bin-yellow { background-color: #f9e79f !important; box-shadow: inset 0 -4px 0 #f39c12 !important;}
-        .bin-blue { background-color: #aed6f1 !important; box-shadow: inset 0 -4px 0 #2980b9 !important;}
+        .bin-green { background-color: #a9dfbf !important; box-shadow: inset 0 -4px 0 #27ae60 !important; }
+        .bin-yellow { background-color: #f9e79f !important; box-shadow: inset 0 -4px 0 #f39c12 !important; }
+        .bin-blue { background-color: #aed6f1 !important; box-shadow: inset 0 -4px 0 #2980b9 !important; }
 
         .drawing-canvas { 
             position: absolute; top: 6px; left: 6px; right: 6px; bottom: 6px; 
             z-index: 10; cursor: crosshair; border-radius: 8px; width: calc(100% - 12px); height: calc(100% - 12px); pointer-events: auto;
         }
 
-        /* ABEJAS Y CARGA (RECOLECCION) */
         .bee-container { position: absolute; z-index: 15; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; }
-        .bee-orientation { transition: transform 0.2s ease; display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; position: relative;}
-        .bee-sprite { display: flex; justify-content: center; align-items: center; width: 75%; height: 75%; animation: float 2s ease-in-out infinite; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.3));}
+        .bee-orientation { transition: transform 0.2s ease; display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; position: relative; }
+        .bee-sprite { display: flex; justify-content: center; align-items: center; width: 75%; height: 75%; animation: float 2s ease-in-out infinite; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.3)); }
         @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-3px); } }
         
-        .bee-item { position: absolute; top: -5px; right: -5px; font-size: clamp(12px, 2.5vh, 20px); z-index: 20; background: rgba(255,255,255,0.8); border-radius: 50%; padding: 2px; box-shadow: 0 2px 5px rgba(0,0,0,0.3);}
+        .bee-item { position: absolute; top: -5px; right: -5px; font-size: clamp(12px, 2.5vh, 20px); z-index: 20; background: rgba(255,255,255,0.8); border-radius: 50%; padding: 2px; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
 
-        /* PANELES DE COMANDOS (DISEÑO BASE) */
-        .panel { box-sizing: border-box; background: #fff; padding: 12px; border-radius: 12px; width: 100%; display: flex; flex-direction: column;}
-        .panel h3 { margin: 0 0 1vh 0; font-size: clamp(14px, 2vh, 20px); display: flex; justify-content: space-between; width: 100%; align-items: center; border-bottom: 2px dashed rgba(0,0,0,0.1); padding-bottom: 4px;}
-        .score-badge { background: #333; color: #fff; padding: 2px 8px; border-radius: 12px; font-size: clamp(12px, 1.8vh, 16px); text-shadow: none;}
+        .panel { box-sizing: border-box; background: #fff; padding: 12px; border-radius: 12px; width: 100%; display: flex; flex-direction: column; }
+        .panel h3 { margin: 0 0 1vh 0; font-size: clamp(14px, 2vh, 20px); display: flex; justify-content: space-between; width: 100%; align-items: center; border-bottom: 2px dashed rgba(0,0,0,0.1); padding-bottom: 4px; }
+        .score-badge { background: #333; color: #fff; padding: 2px 8px; border-radius: 12px; font-size: clamp(12px, 1.8vh, 16px); text-shadow: none; }
 
-        .controls-row { display: flex; width: 100%; gap: 6px; margin-bottom: 1vh; justify-content: center; flex-wrap: nowrap;}
+        .controls-row { display: flex; width: 100%; gap: 6px; margin-bottom: 1vh; justify-content: center; flex-wrap: nowrap; }
         
         button.cmd-btn { 
             flex: 1; padding: 1vh 2px; font-size: clamp(14px, 2.5vh, 20px); font-weight: bold; color: white; border: none; border-radius: 8px; 
@@ -197,27 +187,25 @@
             display: flex; justify-content: center; align-items: center; gap: 4px;
         }
         button.cmd-btn:active { transform: translateY(3px); box-shadow: none !important; }
-        button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none !important;}
+        button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none !important; }
         .undo-btn { background-color: #e74c3c !important; box-shadow: 0 4px 0 #c0392b !important; }
 
-        .seq-container { display: flex; flex-wrap: wrap; gap: 4px; flex: 1 1 auto; min-height: 5vh; background: rgba(0,0,0,0.03); padding: 8px; border-radius: 12px; width: 100%; box-sizing: border-box; border: 2px dashed rgba(0,0,0,0.1); align-content: flex-start;}
+        .seq-container { display: flex; flex-wrap: wrap; gap: 4px; flex: 1 1 auto; min-height: 5vh; background: rgba(0,0,0,0.03); padding: 8px; border-radius: 12px; width: 100%; box-sizing: border-box; border: 2px dashed rgba(0,0,0,0.1); align-content: flex-start; }
         .cmd-block { display: inline-flex; align-items: center; justify-content: center; width: clamp(20px, 3vh, 28px); height: clamp(20px, 3vh, 28px); border-radius: 6px; color: white; font-weight: bold; font-size: clamp(11px, 1.8vh, 15px); box-shadow: 0 2px 0 rgba(0,0,0,0.2); animation: popIn 0.2s ease-out; }
 
-        /* CONTROLES GLOBALES DE EJECUCIÓN (HASTA ABAJO) */
-        .global-controls { flex: 0 0 auto; display: flex; justify-content: center; gap: 15px; margin-bottom: 2vh; position: relative; z-index: 10; width: 100%; max-width: 600px;}
-        button.global-btn { padding: 1.5vh 25px; font-size: clamp(18px, 3vh, 24px); color: white; border-radius: 15px; letter-spacing: 1px; font-weight: bold; font-family: 'Fredoka', sans-serif; border:none; cursor:pointer;}
-        button#go-btn { background-color: #ff9800; box-shadow: 0 6px 0 #f57c00; flex: 2; transition: all 0.1s;}
-        button.reset-btn { background-color: #95a5a6; box-shadow: 0 6px 0 #7f8c8d; flex: 1; transition: all 0.1s;}
+        .global-controls { flex: 0 0 auto; display: flex; justify-content: center; gap: 15px; margin-bottom: 2vh; position: relative; z-index: 10; width: 100%; max-width: 600px; }
+        button.global-btn { padding: 1.5vh 25px; font-size: clamp(18px, 3vh, 24px); color: white; border-radius: 15px; letter-spacing: 1px; font-weight: bold; font-family: 'Fredoka', sans-serif; border: none; cursor: pointer; }
+        button#go-btn { background-color: #ff9800; box-shadow: 0 6px 0 #f57c00; flex: 2; transition: all 0.1s; }
+        button.reset-btn { background-color: #95a5a6; box-shadow: 0 6px 0 #7f8c8d; flex: 1; transition: all 0.1s; }
         button.global-btn:active { transform: translateY(4px); box-shadow: none !important; }
 
-        /* MODAL */
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: flex; justify-content: center; align-items: center; z-index: 1000; visibility: hidden; opacity: 0; transition: all 0.3s; backdrop-filter: blur(5px);}
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: flex; justify-content: center; align-items: center; z-index: 1000; visibility: hidden; opacity: 0; transition: all 0.3s; backdrop-filter: blur(5px); }
         .modal-overlay.active { visibility: visible; opacity: 1; }
-        .modal-box { background: white; padding: 30px; border-radius: 25px; text-align: center; max-width: 85%; width: 500px; transform: scale(0.7); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 15px 40px rgba(0,0,0,0.3); border: 8px solid #ff9800;}
+        .modal-box { background: white; padding: 30px; border-radius: 25px; text-align: center; max-width: 85%; width: 500px; transform: scale(0.7); transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 15px 40px rgba(0,0,0,0.3); border: 8px solid #ff9800; }
         .modal-overlay.active .modal-box { transform: scale(1); }
         .modal-title { font-size: 32px; margin-top: 0; margin-bottom: 15px; color: #ff9800; }
-        .modal-msg { font-size: 20px; margin-bottom: 25px; color: #555; white-space: pre-line; line-height: 1.4; font-weight: 600;}
-        .modal-btn { background: #4CAF50; border: none; box-shadow: 0 6px 0 #388E3C; padding: 15px 40px; font-size: 20px; color: white; border-radius: 15px; text-transform: uppercase; font-weight: bold; font-family: 'Fredoka', sans-serif; cursor:pointer;}
+        .modal-msg { font-size: 20px; margin-bottom: 25px; color: #555; white-space: pre-line; line-height: 1.4; font-weight: 600; }
+        .modal-btn { background: #4CAF50; border: none; box-shadow: 0 6px 0 #388E3C; padding: 15px 40px; font-size: 20px; color: white; border-radius: 15px; text-transform: uppercase; font-weight: bold; font-family: 'Fredoka', sans-serif; cursor: pointer; }
         .modal-btn:active { transform: translateY(4px); box-shadow: none; }
     </style>
 </head>
@@ -232,9 +220,7 @@
         <div class="grass"></div>
     </div>
 
-    <!-- ============================================================
-         PANTALLA DE CONFIGURACIÓN (LOBBY)
-         ============================================================ -->
+    <!-- PANTALLA DE CONFIGURACIÓN (LOBBY) -->
     <div id="setup-screen">
         <div class="setup-card">
             <h1>Configuración ⚙️</h1>
@@ -272,9 +258,7 @@
         </div>
     </div>
 
-    <!-- ============================================================
-         PANTALLA DEL JUEGO
-         ============================================================ -->
+    <!-- PANTALLA DEL JUEGO -->
     <div id="game-screen">
         
         <div class="game-header">
@@ -550,43 +534,36 @@
             `;
         }
 
-        // GENERACIÓN LÓGICA DE NIVELES (Basureros y Elementos de Miel)
+        // GENERACIÓN LÓGICA DE NIVELES
         function generateLevel() {
             logicalMap = { bins: {}, items: {} };
             let coords = [];
             for(let y=0; y<gridSize; y++) for(let x=0; x<gridSize; x++) if(x!==0 || y!==0) coords.push({x,y});
             coords.sort(() => Math.random() - 0.5);
             
-            // Asignar los 3 basureros
             logicalMap.bins[`${coords[0].x},${coords[0].y}`] = 'green';
             logicalMap.bins[`${coords[1].x},${coords[1].y}`] = 'yellow';
             logicalMap.bins[`${coords[2].x},${coords[2].y}`] = 'blue';
 
-            // Generar items para recoger según dificultad
             totalItemsTarget = currentDifficulty === 1 ? 2 : (currentDifficulty === 2 ? 3 : 4);
             let colors = Object.keys(recycleData);
             
-            // Crear set de objetos a recolectar
             for(let i = 0; i < totalItemsTarget; i++) {
                 let bin = colors[i % colors.length];
                 let itemSprite = recycleData[bin][Math.floor(Math.random() * recycleData[bin].length)];
-                let c = coords[3 + i]; // Los primeros 3 fueron los tachos
+                let c = coords[3 + i]; 
                 logicalMap.items[`${c.x},${c.y}`] = { sprite: itemSprite, targetBin: bin };
             }
         }
 
         function populateItems() {
             let activeIds = getActiveIds();
-            // Restaurar visuales de celdas
             document.querySelectorAll('.cell').forEach(c => {
                 c.classList.remove('visited-wrong');
-                // Quitar solo los emojis generados flotantes
                 let e = c.querySelector('.target-emoji');
                 if(e) e.remove();
             });
 
-            // En modo compartido cada abeja tiene su instancia de los objetos, o comparten.
-            // Para reciclaje competitivo, es mejor instanciar los objetos por jugador
             activeIds.forEach(id => {
                 players[id].pendingItems = JSON.parse(JSON.stringify(logicalMap.items)); 
                 players[id].carrying = null;
@@ -603,7 +580,6 @@
                         let span = document.createElement('span');
                         span.className = 'target-emoji';
                         span.innerText = item.sprite;
-                        // En modo compartido, los objetos de P2 tienen filtro para distinguirse (o se superponen)
                         if(gameMode <= 2 && id === 2) { span.style.marginTop = "20px"; span.style.marginLeft = "20px"; span.style.fontSize = "50%"; }
                         c.appendChild(span);
                     }
@@ -680,11 +656,9 @@
                 
                 orient.appendChild(sprite); 
                 
-                // Si la abeja lleva un item, dibujarlo
                 if(p.carrying) {
                     const itemBadge = document.createElement('div'); itemBadge.className = 'bee-item';
                     itemBadge.innerText = p.carrying.sprite;
-                    // Neutralizar rotación del padre para que el emoji se vea siempre derecho
                     let revTransform = '';
                     if (p.dir === 0) revTransform = 'rotate(-90deg)';  
                     if (p.dir === 1) revTransform = 'rotate(-180deg)'; 
@@ -711,7 +685,7 @@
             const container = document.getElementById(`seq${id}`); container.innerHTML = ''; 
             players[id].commands.forEach(cmd => { 
                 const span = document.createElement('span'); span.className = 'cmd-block'; 
-                span.innerText = sym[cmd]; span.style.background = playerConfigs[id-1].color;
+                span.innerText = sym[cmd]; span.style.background = getPlayerConfigs()[id-1].color;
                 container.appendChild(span); 
             });
         }
@@ -722,13 +696,11 @@
             let cellId = gameMode <= 2 ? `cell-shared-${p.pos.x}-${p.pos.y}` : `cell-p${id}-${p.pos.x}-${p.pos.y}`;
             let cell = document.getElementById(cellId);
 
-            // 1. Recoger basura si hay y si no está cargando nada
             if (!p.carrying && p.pendingItems[key]) {
                 p.carrying = p.pendingItems[key];
-                delete p.pendingItems[key]; // Lo quita del mapa lógico
+                delete p.pendingItems[key]; 
                 sfxEat();
                 
-                // Remover visualmente la basura compartida o individual
                 Array.from(cell.children).forEach(child => {
                     if (child.classList.contains('target-emoji') && child.innerText === p.carrying.sprite) {
                         child.remove();
@@ -736,20 +708,16 @@
                 });
             }
 
-            // 2. Depositar basura si está sobre un tacho
             if (p.carrying && logicalMap.bins[key]) {
                 if (logicalMap.bins[key] === p.carrying.targetBin) {
-                    // Tacho Correcto
                     sfxEat();
                     p.carrying = null;
                     p.score++;
                     document.getElementById(`score-${id}`).innerText = `${p.score} / ${totalItemsTarget}`;
                 } else {
-                    // Tacho Incorrecto
                     sfxWrong();
                     cell.classList.add('visited-wrong');
                     p.errors++;
-                    // La abeja pierde el objeto por error
                     p.carrying = null; 
                 }
             }
@@ -827,10 +795,11 @@
                     }
                 } else if (gameMode === 1) {
                     let p = players[1];
+                    let remaining = totalItemsTarget - p.score;
                     if (p.score === totalItemsTarget) showModal("¡Misión Cumplida! 🎉", "¡Reciclaste todo correctamente!");
                     else if (p.errors > 0) showModal("¡Oh no! 😟", "Te equivocaste de tacho y perdiste la basura. Tienes que reiniciar el nivel.");
                     else if (timeOutFlag) showModal("¡Tiempo Acabado! ⏰", `Reciclaste ${p.score} de ${totalItemsTarget} objetos.`);
-                    else showModal("¡Falta basura por reciclar! ♻️", `Revisa tus comandos. Aún te faltan ${totalItemsTarget - p.score} objetos.`);
+                    else showModal("¡Falta basura por reciclar! ♻️", `Revisa tus comandos. Aún te faltan ${remaining} objetos.`);
                 } else {
                     let maxScore = -1;
                     activeIds.forEach(id => { if (players[id].score > maxScore) maxScore = players[id].score; });

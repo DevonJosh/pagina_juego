@@ -436,6 +436,10 @@ footer { color: #c6a493; }
 @media(max-width:760px){.final-layout{grid-template-columns:1fr;padding:0 12px 16px;gap:14px}.final-cell{font-size:28px}.final-cell .guide{font-size:28px}.peña-scene{height:145px}.command-list{min-height:65px;max-height:160px}.command-panel{padding:14px}.command-controls button{font-size:13px}.final-board{max-width:400px}.mission-checkpoints button{font-size:13px}}@media(prefers-reduced-motion:reduce){.confetti{display:none}.peña-scene.restored .musicians{animation:none}.final-cell .guide{transition:none}}
 
 #best{color:#fff5e6;text-shadow:0 2px 12px #000;font-variant-numeric:tabular-nums}#final-mission{grid-column:1/-1;border:2px solid #ef8138;background:linear-gradient(120deg,#512415,#21120e);min-height:180px}#final-mission.unlocked{border-color:#ffdb76;box-shadow:0 0 25px #ffbd4433}#mission-home-status{color:#ffdda6;font-weight:700}#storage-note{color:#ffc786;margin-top:10px;font-size:13px}
+.battle-hud{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:0 22px 12px}.battle-hud>div:first-child{flex:1}.battle-hud span{font-size:12px;letter-spacing:2px;color:#ffcb94;font-weight:800}.battle-hp-track{height:13px;border:1px solid #ff7d5c;background:#17090a;border-radius:8px;overflow:hidden;margin-top:6px}.battle-hp-track div{height:100%;width:100%;background:linear-gradient(90deg,#ae1743,#ff593e,#ffb148);transition:width .15s}#battle-phase{font-size:13px;font-weight:800;color:#ffb251}.battle-window{position:relative;margin:0 18px;border:1px solid #b8552b;border-radius:14px;overflow:hidden;background:#12090e}.battle-window canvas{width:100%;height:auto;display:block;touch-action:none}#battle-message{position:absolute;top:15%;left:10%;right:10%;text-align:center;color:#fff4ce;text-shadow:0 2px 6px #000;font-size:clamp(17px,3vw,30px);font-weight:900;pointer-events:none;letter-spacing:1px}.battle-player-hud{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 22px;font-size:13px;color:#ffd5aa}#battle-hearts{color:#ff7556;font-size:20px;letter-spacing:3px}.battle-controls{display:flex;justify-content:space-between;gap:12px;padding:0 18px 12px}.battle-move,.battle-actions{display:flex;gap:8px}.battle-controls button{touch-action:none;user-select:none;-webkit-user-select:none;min-height:52px;border-radius:12px;background:#422317;border:1px solid #d27d3d;color:#ffe5b8;padding:12px 17px;font-weight:800}.battle-actions button:first-child{background:#bb431d}.battle-controls button:active,.battle-controls button.held{background:#ff9e32;color:#251007}.battle-controls button:disabled{opacity:.45}#battle-special.ready{background:linear-gradient(100deg,#ff752a,#ffce57);color:#311207;box-shadow:0 0 18px #ffad4855}.battle-hint{text-align:center;font-size:12px;color:#cda78e;padding:0 12px 14px;margin:0}.battle-active .game-heading{padding-top:14px}.battle-active .game-heading p{margin-bottom:12px}.battle-active #quest-progress{display:none}.cards .card[data-game="finale"]{grid-column:span 2}#final-mission{grid-column:1/-1}
+@media(max-width:700px){.battle-window{margin:0 6px}.battle-hud{padding:0 12px 9px;gap:10px}.battle-hud span{font-size:10px;letter-spacing:1px}.battle-controls{padding:0 7px 10px;gap:6px;flex-wrap:wrap}.battle-move,.battle-actions{flex:1;justify-content:center;gap:5px}.battle-controls button{padding:11px 10px;min-height:48px;font-size:12px;flex:1}.battle-player-hud{padding:8px 10px;font-size:11px;flex-wrap:wrap}#battle-hearts{font-size:17px}.battle-hint{font-size:10px}.cards .card[data-game="finale"]{grid-column:auto}}
+@media(max-height:520px) and (orientation:landscape){.battle-active .game-heading{display:none}.battle-active .game-top{margin-bottom:5px}.battle-active .battle-window{max-width:650px;margin:auto}.battle-active .battle-window canvas{max-height:55dvh;object-fit:contain}.battle-active .battle-hint{display:none}.battle-active .battle-controls{max-width:850px;margin:auto}.battle-active .battle-controls button{min-height:38px;padding:6px 12px}.battle-player-hud{padding-top:4px;padding-bottom:4px}}
+
 </style>
 </head>
 <body>
@@ -502,7 +506,7 @@ footer { color: #c6a493; }
 <h2>Elige tu reto</h2>
 <span class="mini">Cinco retos · Acceso libre · Aventura completa</span>
 </div>
-<div class="cards"><button class="card" id="final-mission"><span class="icon">🧭</span><h3>Misión final · Enciende la Peña</h3><p>Programa pasos y giros, recoge las luces y devuelve la vida al escenario.</p><div class="card-foot"><span id="mission-home-status">0/5 metas · 0/500 energía</span><span id="mission-home-action">Ver progreso →</span></div></button>
+<div class="cards"><button class="card" data-game="finale"><span class="icon">🧭</span><h3>Camino de las Luces</h3><p>Programa pasos y giros por casillas. Recoge las luces y llega al escenario.</p><div class="card-foot"><span class="tag">Programación</span><span>Jugar →</span></div></button><button class="card" id="final-mission"><span class="icon">🧭</span><h3>Batalla final · La Última Jarana</h3><p>Enfrenta al Maestro de las Sombras en una batalla 2D con notas musicales, escudos y el poder de la jarana.</p><div class="card-foot"><span id="mission-home-status">0/6 metas · 0/600 energía</span><span id="mission-home-action">Ver progreso →</span></div></button>
 <button class="card" data-game="ghost">
 <span class="icon">👻</span>
 <h3>Caza Fantasmas</h3>
@@ -563,7 +567,7 @@ footer { color: #c6a493; }
 <b>➕</b>Maestro del cálculo</div>
 <div class="medal" id="medal-memory">
 <b>🧠</b>Memoria mágica</div>
-<div class="medal" id="medal-adventure">
+<div class="medal" id="medal-finale"><b>🧭</b>Guía de las luces</div><div class="medal" id="medal-adventure">
 <b>🏆</b>Rey de la jarana</div>
 </div>
 </div>
@@ -571,7 +575,7 @@ footer { color: #c6a493; }
 <div class="mini">Mejor aventura · puntos acumulados</div>
 <div class="record" id="best">0 <span style="font-size:16px">puntos</span>
 </div>
-<div class="mini" style="margin-top:12px">Suma tus mejores puntos de los cinco juegos, también jugando desde sus tarjetas. Reintentar no duplica los puntos.</div><div id="free-best" class="mini" style="margin-top:10px">Mejor juego libre: 0 puntos</div><div id="storage-note" role="status"></div>
+<div class="mini" style="margin-top:12px">Suma tus mejores puntos de los seis juegos, también jugando desde sus tarjetas. Reintentar no duplica los puntos.</div><div id="free-best" class="mini" style="margin-top:10px">Mejor juego libre: 0 puntos</div><div id="storage-note" role="status"></div>
 </div>
 </div>
 </section>
@@ -637,6 +641,7 @@ footer { color: #c6a493; }
 <div class="memory-grid" id="memory-grid">
 </div>
 </div>
+<div id="battle-area" class="hidden"><div class="battle-hud"><div><span>MAESTRO DE LAS SOMBRAS</span><div class="battle-hp-track"><div id="boss-hp-bar"></div></div></div><div id="battle-phase">FASE 1 / 3</div></div><div class="battle-window"><canvas id="battle-canvas" width="960" height="540" aria-label="Batalla 2D: muévete, salta, dispara notas y esquiva los hechizos"></canvas><div id="battle-message" role="status" aria-live="polite"></div></div><div class="battle-player-hud"><span id="battle-hearts"></span><span id="battle-shield-status"></span><span id="battle-power-status"></span></div><div class="battle-controls"><div class="battle-move"><button id="battle-left" aria-label="Mover a la izquierda">◀</button><button id="battle-right" aria-label="Mover a la derecha">▶</button><button id="battle-jump">↑ Saltar</button></div><div class="battle-actions"><button id="battle-fire">♪ Notas · J</button><button id="battle-shield">◈ Escudo · K</button><button id="battle-special">⚡ Jarana · Q</button></div></div><p class="battle-hint">← → / A D mover · ↑ / W / Espacio saltar · Mantén J para disparar · K escudo · Q especial · P pausa</p></div>
 <div id="finale-area" class="hidden"><div class="final-layout"><div><div id="final-scene" class="peña-scene"></div><div id="final-board" class="final-board" role="group" aria-label="Tablero de la misión final"></div><div id="final-status" class="final-status" role="status" aria-live="polite"></div></div><div class="command-panel"><h3>Programa el camino</h3><p class="mini">La flecha indica hacia dónde miras. Girar cambia tu orientación; avanzar y retroceder mueven una casilla. Toca una instrucción del programa para eliminarla.</p><div class="command-controls"><button id="cmd-forward">↑ Un paso adelante</button><button id="cmd-back">↓ Un paso atrás</button><button id="cmd-left">↶ Giro a la izquierda</button><button id="cmd-right">↷ Giro a la derecha</button></div><div id="command-count" class="mini" style="margin-top:12px"></div><ol id="command-list" class="command-list" aria-label="Tu programa"></ol><div class="final-tools"><button class="primary" id="run-program">▶ Ejecutar</button><button class="soft" id="undo-program">Deshacer</button><button class="soft" id="clear-program">Borrar</button><button class="soft" id="reset-program">Volver al inicio</button></div><p id="final-tip" class="mini" style="margin-top:14px"></p></div></div></div>
 <div class="feedback" id="feedback" role="status" aria-live="polite">
 </div>
@@ -674,11 +679,12 @@ const $=id=>document.getElementById(id),cfg={
 };
 function gameTimeLimit(){
   const c=cfg[difficulty];
-  if(mode==='finale')return Infinity;
+  if(mode==='finale'||mode==='battle')return Infinity;
   return mode==='ghost'?c.ghostTime:mode==='catch'?c.catchTime:mode==='memory'?c.memory:mode==='sequence'?sequenceTimeLimit():mathTimeLimit();
 }
 function gameDescription(k){
   const c=cfg[difficulty];
+  if(k==='battle')return 'Enfréntate al Maestro de las Sombras: esquiva sus hechizos, dispara notas musicales y libera el poder de la jarana para recuperar la peña.';
   if(k==='finale')return 'Recoge todas las luces ✨ y llega al escenario 🎪. Programa pasos y giros para encender la peña. Puedes corregir tu programa sin perder vidas.';
   if(k==='ghost')return 'Captura '+c.ghostGoal+' fantasmas. Evita las calaveras. Tienes '+c.ghostLives+' vidas. '+(difficulty==='easy'?'Fantasmas grandes y pausados.':difficulty==='normal'?'Más fantasmas y trampas.':'Fantasmas más pequeños, rápidos y con más movimiento.');
   if(k==='catch')return 'Recupera dulces, guitarras y melodías. Meta: '+c.catchGoal+' puntos. Tienes '+c.catchLives+' vidas. '+(difficulty==='easy'?'Caída lenta y pocas trampas.':difficulty==='normal'?'Caída moderada y más trampas.':'Caída rápida y muchas trampas.');
@@ -699,13 +705,17 @@ try{
 if(!Array.isArray(saved.medals))saved.medals=[];
 if(!saved.progress||typeof saved.progress!=='object'||Array.isArray(saved.progress))saved.progress={};
 // Old medals prove a completed goal. Scores were not stored per game before this version.
-['ghost','catch','memory','rhythm','sequence'].forEach(k=>{
+['ghost','catch','memory','rhythm','sequence','finale'].forEach(k=>{
   const r=saved.progress[k]||{};
   saved.progress[k]={score:Math.max(0,Number(r.score)||0),quality:Math.max(0,Number(r.quality)||0),won:Boolean(r.won)};
   if(saved.medals.includes(k)&&!saved.progress[k].won){saved.progress[k].won=true;saved.progress[k].quality=Math.max(80,saved.progress[k].quality)}
 });
+if(!saved.battleMigration){
+  if(saved.finalBonus){saved.progress.finale={score:Math.max(saved.progress.finale.score,saved.finalBonus),quality:Math.max(saved.progress.finale.quality,80),won:true};saved.finalBonus=0}
+  saved.battleMigration=true;
+}
 let storageAvailable=true;
-function progressPoints(){return ['ghost','catch','memory','rhythm','sequence'].reduce((sum,k)=>sum+(saved.progress[k]?.score||0),0)+(saved.finalBonus||0)}
+function progressPoints(){return ['ghost','catch','memory','rhythm','sequence','finale'].reduce((sum,k)=>sum+(saved.progress[k]?.score||0),0)+(saved.finalBonus||0)}
 function save(){
   try{
     localStorage.setItem('pena-v1',JSON.stringify(saved));storageAvailable=true
@@ -715,7 +725,7 @@ function save(){
   $('free-best').textContent='Mejor juego libre: '+Number(saved.freeBest||0)+' puntos';
   paintHomeMission();
   $('storage-note').textContent=storageAvailable?'':'Este navegador no permite guardar el avance. Los puntos cuentan mientras mantengas esta página abierta.';
-  ['ghost','catch','rhythm','memory','sequence','adventure'].forEach(k=>$('medal-'+k).classList.toggle('earned',saved.medals.includes(k)))
+  ['ghost','catch','rhythm','memory','sequence','finale','adventure'].forEach(k=>$('medal-'+k).classList.toggle('earned',saved.medals.includes(k)))
 }
 let audio=null,sound=true,musicBeat=-1,audioUnlocked=false;
 // PERSONALIZA AQUÍ LAS RUTAS si quieres incluir los archivos con tu página.
@@ -1054,14 +1064,14 @@ function modal(html){
     syncPersonalMusic();
     keys={
     }
-  }modal('<div class="big">👻</div><h2 id="modal-title">Bienvenido a la peña</h2><p>Una fiesta de Halloween con cajón, guitarra y palmas.</p><ul><li><b>Aventura:</b> completa las cinco metas y consigue 400 de 500 puntos de energía para desbloquear Enciende la Peña. Un reto con 1, 2 o 3 estrellas da 60, 80 o 100 de energía. Puedes mejorar cada reto desde el panel final. Las tarjetas de juego libre también cuentan; tu progreso se conserva al volver al menú y al recargar. Los puntos reales se guardan tras cada juego; los reintentos no los duplican.</li><li><b>Enciende la Peña:</b> programa pasos, retrocesos y giros, recoge las luces y llega al escenario. La flecha marca la orientación. Sin tiempo límite ni pérdida de vidas.</li><li><b>Caza Fantasmas:</b> captura 8, 18 o 28 fantasmas según tu dificultad. Cambian el tamaño, movimiento, trampas y vidas.</li><li><b>Ritmo de Medianoche:</b> Suavecito usa 2 instrumentos y 3 rondas; Con sabor usa 4 instrumentos y 5 rondas; ¡Qué tal jarana! usa 4 instrumentos y 7 rondas más largas.</li><li><b>Dulces:</b> flechas ← →, botones o arrastra en el escenario. 🍬 y 🎸 +20 · ♪ +35 · 🎃 y 🦇 −1 vida. Meta: 140, 300 o 550 puntos según tu dificultad.</li><li><b>Operaciones Criollas:</b> lee las operaciones de abajo y toca el número correcto de su columna mientras cae. Hay una respuesta correcta entre tres. Completa 8 operaciones con 5 vidas. Suavecito: sumas y restas; Con sabor: multiplicaciones y divisiones fáciles; ¡Qué tal jarana!: multiplicaciones y divisiones más complejas.</li><li><b>Parejas:</b> encuentra 3, 6 o 9 parejas. Suavecito permite una vista previa larga; Con sabor, una vista breve; ¡Qué tal jarana!, ninguna.</li><li>Gana una medalla al alcanzar la meta de cada reto. La medalla Rey de la Jarana se obtiene al recuperar la peña en la misión final. Puedes volver a intentar las veces que quieras.</li></ul><button class="primary" id="close-help">¡Entendido!</button>');
+  }modal('<div class="big">👻</div><h2 id="modal-title">Bienvenido a la peña</h2><p>Una fiesta de Halloween con cajón, guitarra y palmas.</p><ul><li><b>Aventura:</b> completa las seis metas y consigue 480 de 600 puntos de energía para desbloquear La Última Jarana. Un reto con 1, 2 o 3 estrellas da 60, 80 o 100 de energía. Puedes mejorar cada reto desde el panel final. Las tarjetas de juego libre también cuentan; tu progreso se conserva al volver al menú y al recargar. Los puntos reales se guardan tras cada juego; los reintentos no los duplican.</li><li><b>Batalla final:</b> seis metas y 480 de 600 de energía. Muévete con flechas o A/D; salta con Espacio; mantén J para disparar; K activa el escudo y Q el especial. También hay botones táctiles.</li><li><b>Camino de las Luces:</b> programa pasos, retrocesos y giros, recoge las luces y llega al escenario. La flecha marca la orientación. Sin tiempo límite ni pérdida de vidas.</li><li><b>Caza Fantasmas:</b> captura 8, 18 o 28 fantasmas según tu dificultad. Cambian el tamaño, movimiento, trampas y vidas.</li><li><b>Ritmo de Medianoche:</b> Suavecito usa 2 instrumentos y 3 rondas; Con sabor usa 4 instrumentos y 5 rondas; ¡Qué tal jarana! usa 4 instrumentos y 7 rondas más largas.</li><li><b>Dulces:</b> flechas ← →, botones o arrastra en el escenario. 🍬 y 🎸 +20 · ♪ +35 · 🎃 y 🦇 −1 vida. Meta: 140, 300 o 550 puntos según tu dificultad.</li><li><b>Operaciones Criollas:</b> lee las operaciones de abajo y toca el número correcto de su columna mientras cae. Hay una respuesta correcta entre tres. Completa 8 operaciones con 5 vidas. Suavecito: sumas y restas; Con sabor: multiplicaciones y divisiones fáciles; ¡Qué tal jarana!: multiplicaciones y divisiones más complejas.</li><li><b>Parejas:</b> encuentra 3, 6 o 9 parejas. Suavecito permite una vista previa larga; Con sabor, una vista breve; ¡Qué tal jarana!, ninguna.</li><li>Gana una medalla al alcanzar la meta de cada reto. La medalla Rey de la Jarana se obtiene al vencer en la batalla final. Puedes volver a intentar las veces que quieras.</li></ul><button class="primary" id="close-help">¡Entendido!</button>');
   $('close-help').onclick=()=>{
     closeModal();
     if(running) { paused=false; syncPersonalMusic(); }
   }
 }$('help').onclick=help;
-const order=['ghost','catch','memory','rhythm','sequence'],titles={
-  ghost:'Caza Fantasmas',sequence:'Ritmo de Medianoche',catch:'Rescate Criollo',rhythm:'Operaciones Criollas',memory:'Memoria Embrujada',finale:'Enciende la Peña'
+const order=['ghost','catch','memory','rhythm','sequence','finale'],titles={
+  ghost:'Caza Fantasmas',sequence:'Ritmo de Medianoche',catch:'Rescate Criollo',rhythm:'Operaciones Criollas',memory:'Memoria Embrujada',finale:'Camino de las Luces',battle:'La Última Jarana'
 },descs={
   ghost:'Captura 18 fantasmas. Las calaveras son trampas. Tienes 3 vidas.',sequence:'Observa y escucha. Después repite la secuencia con A, S, D y F.',catch:'Atrapa 🍬 y ♪. Esquiva 🎃 y 🦇. Meta: 300 puntos.',rhythm:'Resuelve las 3 operaciones de abajo y toca la respuesta correcta de cada columna mientras cae. Meta: 8 aciertos. Tienes 5 vidas.',memory:'Encuentra las 6 parejas antes de que termine el tiempo.'
 };
@@ -1088,8 +1098,8 @@ function prepare(k){
   descs[k]=gameDescription(k);
   $('game-title').textContent=titles[k];
   $('game-description').textContent=descs[k];
-  $('chapter').textContent=campaign?(k==='finale'?'Aventura · Misión final · ':'Aventura · Reto '+(chapter+1)+' de 5 · ')+$('difficulty').selectedOptions[0].textContent:'Juego libre · '+$('difficulty').selectedOptions[0].textContent;
-  ['ghost','catch','rhythm','memory','sequence','finale'].forEach(x=>$(x+'-area').classList.toggle('hidden',x!==k));
+  $('chapter').textContent=campaign?(k==='battle'?'Aventura · Batalla final · ':'Aventura · Reto '+(chapter+1)+' de 6 · ')+$('difficulty').selectedOptions[0].textContent:'Juego libre · '+$('difficulty').selectedOptions[0].textContent;
+  ['ghost','catch','rhythm','memory','sequence','finale','battle'].forEach(x=>$(x+'-area').classList.toggle('hidden',x!==k));
   score=0;
   elapsed=0;
   paused=false;
@@ -1103,12 +1113,14 @@ function prepare(k){
   if(k==='rhythm')setupRhythm();
   if(k==='memory')setupMemory();
   if(k==='finale')setupFinale();
+  $('game').classList.toggle('battle-active',k==='battle');
+  if(k==='battle')setupBattle();
   paintQuestProgress();
   updateStats();
   modal('<div class="big">'+({
-    ghost:'👻',sequence:'🎶',catch:'🍬',rhythm:'➕',memory:'🎃',finale:'🧭'
+    ghost:'👻',sequence:'🎶',catch:'🍬',rhythm:'➕',memory:'🎃',finale:'🧭',battle:'⚡'
   }[k])+'</div><h2 id="modal-title">'+titles[k]+'</h2><p>'+descs[k]+'</p><p>'+({
-    ghost:'Toca los fantasmas o selecciónalos con Tab y Enter. Las trampas cuestan una vida. Los fantasmas que escapan rompen la racha.',sequence:difficulty==='easy'?'Cajón: A · Guitarra: S. Cada ronda añade un sonido; puedes repetirla dos veces.':'Cajón: A · Guitarra: S · Palmas: D · Melodía: F. Cada ronda añade un sonido. Las repeticiones disponibles dependen de tu dificultad.',catch:'Mueve la canasta con las flechas, los botones o el dedo. Evita las calabazas y los murciélagos.',rhythm:'Toca o haz clic en el número que responde a la operación de su columna. Puedes elegirlo mientras cae. Los errores y respuestas que escapan cuestan una vida.',memory:'Cada pareja suma 100 puntos. Al terminar, el tiempo restante suma puntos extra.',finale:'Añade instrucciones, ejecútalas y observa al guía 🧭. Si choca o le faltan luces, corrige el programa. No hay límite de tiempo.'
+    ghost:'Toca los fantasmas o selecciónalos con Tab y Enter. Las trampas cuestan una vida. Los fantasmas que escapan rompen la racha.',sequence:difficulty==='easy'?'Cajón: A · Guitarra: S. Cada ronda añade un sonido; puedes repetirla dos veces.':'Cajón: A · Guitarra: S · Palmas: D · Melodía: F. Cada ronda añade un sonido. Las repeticiones disponibles dependen de tu dificultad.',catch:'Mueve la canasta con las flechas, los botones o el dedo. Evita las calabazas y los murciélagos.',rhythm:'Toca o haz clic en el número que responde a la operación de su columna. Puedes elegirlo mientras cae. Los errores y respuestas que escapan cuestan una vida.',memory:'Cada pareja suma 100 puntos. Al terminar, el tiempo restante suma puntos extra.',battle:'Muévete con ← → o A/D; salta con ↑, W o Espacio. Mantén J para lanzar notas, pulsa K para el escudo y Q para el especial cuando esté listo. En pantalla tienes los mismos controles. Los ataques rojos se anuncian antes de aparecer.',finale:'Añade instrucciones, ejecútalas y observa al guía 🧭. Si choca o le faltan luces, corrige el programa. No hay límite de tiempo.'
   }[k])+'</p><button class="primary" id="start">¡Vamos a jugar!</button>');
   $('start').onclick=async()=>{
     $('start').disabled=true;
@@ -1124,8 +1136,8 @@ function prepare(k){
 }function updateStats(){
   trackLiveScore();
   $('score').textContent=score;
-  $('time').textContent=mode==='finale'?'Sin límite':Math.max(0,Math.ceil(gameTimeLimit()-elapsed))+' s';
-  $('extra').innerHTML=mode==='finale'?'Luces <b>'+finalCollected.size+'/'+finalLevel.lights.length+'</b>':mode==='catch'?'Vidas <b>'+lives+' ♥</b>':mode==='memory'?'Parejas <b>'+pairs+'/'+cfg[difficulty].memoryPairs+'</b>':mode==='ghost'?'Vidas <b>'+ghostLives+' ♥</b>':mode==='sequence'?'Vidas <b>'+sequenceLives+' ♥</b>':'Vidas <b>'+mathLives+' ♥</b> · Aciertos <b>'+hits+'/8</b>'
+  $('time').textContent=(mode==='finale'||mode==='battle')?'Sin límite':Math.max(0,Math.ceil(gameTimeLimit()-elapsed))+' s';
+  $('extra').innerHTML=mode==='battle'?'Vidas <b>'+battle.hp+' ♥</b> · Fase <b>'+battle.phase+'/3</b>':mode==='finale'?'Luces <b>'+finalCollected.size+'/'+finalLevel.lights.length+'</b>':mode==='catch'?'Vidas <b>'+lives+' ♥</b>':mode==='memory'?'Parejas <b>'+pairs+'/'+cfg[difficulty].memoryPairs+'</b>':mode==='ghost'?'Vidas <b>'+ghostLives+' ♥</b>':mode==='sequence'?'Vidas <b>'+sequenceLives+' ♥</b>':'Vidas <b>'+mathLives+' ♥</b> · Aciertos <b>'+hits+'/8</b>'
 }function finish(reason=''){
   if(!running)return;
   running=false;
@@ -1134,8 +1146,8 @@ function prepare(k){
   cancelAnimationFrame(raf);
   keys={
   };
-  const won=mode==='ghost'?ghostHits>=cfg[difficulty].ghostGoal:mode==='sequence'?sequenceCompleted===cfg[difficulty].sequenceRounds:mode==='catch'?score>=cfg[difficulty].catchGoal:mode==='rhythm'?hits>=8:pairs===cfg[difficulty].memoryPairs;
-  const stars=!won?0:mode==='ghost'?(ghostMistakes===0?3:ghostMistakes<=2?2:1):mode==='sequence'?(sequenceMistakes===0?3:sequenceMistakes===1?2:1):mode==='memory'?(moves<=cfg[difficulty].memoryPairs+2?3:moves<=cfg[difficulty].memoryPairs*2?2:1):mode==='rhythm'?(misses===0?3:misses<=2?2:1):(lives===cfg[difficulty].catchLives?3:lives>=Math.ceil(cfg[difficulty].catchLives/2)?2:1);
+  const won=mode==='ghost'?ghostHits>=cfg[difficulty].ghostGoal:mode==='sequence'?sequenceCompleted===cfg[difficulty].sequenceRounds:mode==='catch'?score>=cfg[difficulty].catchGoal:mode==='rhythm'?hits>=8:mode==='finale'?finalWon:pairs===cfg[difficulty].memoryPairs;
+  const stars=!won?0:mode==='finale'?(finalAttempts<=1?3:finalAttempts<=3?2:1):mode==='ghost'?(ghostMistakes===0?3:ghostMistakes<=2?2:1):mode==='sequence'?(sequenceMistakes===0?3:sequenceMistakes===1?2:1):mode==='memory'?(moves<=cfg[difficulty].memoryPairs+2?3:moves<=cfg[difficulty].memoryPairs*2?2:1):mode==='rhythm'?(misses===0?3:misses<=2?2:1):(lives===cfg[difficulty].catchLives?3:lives>=Math.ceil(cfg[difficulty].catchLives/2)?2:1);
   const old=saved.progress[mode]||{score:0,quality:0,won:false};
   const quality=won?(stars===3?100:stars===2?80:60):Math.min(50,Math.round(stageProgress()*50));
   saved.progress[mode]={score:Math.max(old.score,score),quality:Math.max(old.quality,quality),won:old.won||won};
@@ -1148,7 +1160,7 @@ function prepare(k){
   if(won&&!saved.medals.includes(mode)){saved.medals.push(mode);toast('¡Nueva medalla en tu colección!')}
   save();paintRecords();paintQuestProgress();tone(won?659:220,.3);
   const final=campaign&&chapter===order.length-1;
-  modal('<div class="big">'+(won?'🌟':'👻')+'</div><div class="eyebrow">'+(campaign?'Reto '+(chapter+1)+' de 5':'Juego libre')+'</div><h2 id="modal-title">'+(won?'¡Reto completado!':'¡Inténtalo otra vez!')+'</h2><div class="result-stars">'+('★'.repeat(stars)+'☆'.repeat(3-stars))+'</div><p>'+reason+'</p><p>'+(won?'Recuperaste una parte de la fiesta. ¡Buen trabajo!':'Puedes reintentar para alcanzar la meta.')+'</p><div class="result-stats"><div><b>'+score+'</b><span>Puntos del reto</span></div>'+(campaign?'<div><b>'+total+'</b><span>Total aventura</span></div>':'')+'</div>'+(campaign?'<p>Energía de la peña: <b>'+questEnergy()+'/500</b> · Necesitas 400 y completar las cinco metas.</p>':'')+'<div class="modal-actions">'+(campaign?'<button class="primary" id="next">'+(reviewingCheckpoint?'Volver al panel de misión':final?'Preparar misión final':'Siguiente reto')+'</button><button class="soft" id="retry">Reintentar reto</button>':'<button class="primary" id="again">Volver a jugar</button>')+'<button class="primary" id="open-final-progress">'+(finaleUnlocked()?'¡Ir a la misión final!':'Ver avance de la misión')+'</button><button class="soft" id="home-btn">Menú principal</button></div>');
+  modal('<div class="big">'+(won?'🌟':'👻')+'</div><div class="eyebrow">'+(campaign?'Reto '+(chapter+1)+' de 6':'Juego libre')+'</div><h2 id="modal-title">'+(won?'¡Reto completado!':'¡Inténtalo otra vez!')+'</h2><div class="result-stars">'+('★'.repeat(stars)+'☆'.repeat(3-stars))+'</div><p>'+reason+'</p><p>'+(won?'Recuperaste una parte de la fiesta. ¡Buen trabajo!':'Puedes reintentar para alcanzar la meta.')+'</p><div class="result-stats"><div><b>'+score+'</b><span>Puntos del reto</span></div>'+(campaign?'<div><b>'+total+'</b><span>Total aventura</span></div>':'')+'</div>'+(campaign?'<p>Energía de la peña: <b>'+questEnergy()+'/600</b> · Necesitas 480 y completar las seis metas.</p>':'')+'<div class="modal-actions">'+(campaign?'<button class="primary" id="next">'+(reviewingCheckpoint?'Volver al panel de misión':final?'Preparar misión final':'Siguiente reto')+'</button><button class="soft" id="retry">Reintentar reto</button>':'<button class="primary" id="again">Volver a jugar</button>')+'<button class="primary" id="open-final-progress">'+(finaleUnlocked()?'¡Ir a la misión final!':'Ver avance de la misión')+'</button><button class="soft" id="home-btn">Menú principal</button></div>');
   if($('next'))$('next').onclick=()=>{closeModal();if(final||reviewingCheckpoint)missionHub();else{chapter++;prepare(order[chapter])}};
   if($('retry'))$('retry').onclick=()=>{closeModal();prepare(mode)};
   if($('again'))$('again').onclick=()=>{closeModal();prepare(mode)};
@@ -1223,6 +1235,7 @@ document.addEventListener('keydown',e=>{
       }
     }return
   }if(!running||paused)return;
+  if(mode==='battle'&&battleKeyDown(e))return;
   if(mode==='finale'&&!e.repeat&&['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)){e.preventDefault();addCommand({ArrowUp:'forward',ArrowDown:'back',ArrowLeft:'left',ArrowRight:'right'}[e.key]);return}
   if(['ArrowLeft','ArrowRight',' '].includes(e.key))e.preventDefault();
   if(e.key==='Escape'||e.key==='p'){
@@ -1235,6 +1248,7 @@ document.addEventListener('keydown',e=>{
   }
 });
 document.addEventListener('keyup',e=>{
+  keys[e.key.toLowerCase()]=false;
   keys[e.key]=false
 });
 window.addEventListener('blur',()=>{
@@ -1534,6 +1548,7 @@ function loop(now){
     else if(mode==='sequence')sequenceTick();
     else if(mode==='rhythm')rhythmTick();
     else if(mode==='finale')finaleTick();
+    else if(mode==='battle')battleTick(dt);
     else memoryTick();
     if(!running)return;
     updateStats();
@@ -1741,31 +1756,31 @@ function trackLiveScore(){
   save();paintRecords();paintQuestProgress();
 }
 function paintHomeMission(){
-  const done=['ghost','catch','memory','rhythm','sequence'].filter(k=>saved.progress[k]?.won).length,ready=finaleUnlocked();
-  $('mission-home-status').textContent=done+'/5 metas · '+questEnergy()+'/500 energía';
+  const done=['ghost','catch','memory','rhythm','sequence','finale'].filter(k=>saved.progress[k]?.won).length,ready=finaleUnlocked();
+  $('mission-home-status').textContent=done+'/6 metas · '+questEnergy()+'/600 energía';
   $('mission-home-action').textContent=ready?'¡Jugar misión final! →':'Ver lo que falta →';
   $('final-mission').classList.toggle('unlocked',ready);
 }
 // Campaign checkpoints and final computational-thinking mission.
 function stageProgress(){
   const c=cfg[difficulty];
-  return Math.min(1,mode==='ghost'?ghostHits/c.ghostGoal:mode==='catch'?score/c.catchGoal:mode==='memory'?pairs/c.memoryPairs:mode==='sequence'?sequenceCompleted/c.sequenceRounds:hits/8);
+  return Math.min(1,mode==='ghost'?ghostHits/c.ghostGoal:mode==='catch'?score/c.catchGoal:mode==='memory'?pairs/c.memoryPairs:mode==='sequence'?sequenceCompleted/c.sequenceRounds:mode==='finale'?finalCollected.size/Math.max(1,finalLevel?.lights.length||1):hits/8);
 }
-function questEnergy(){return ['ghost','catch','memory','rhythm','sequence'].reduce((sum,k)=>sum+(saved.progress[k]?.quality||0),0)}
-function finaleUnlocked(){return ['ghost','catch','memory','rhythm','sequence'].every(k=>saved.progress[k]?.won)&&questEnergy()>=400}
+function questEnergy(){return ['ghost','catch','memory','rhythm','sequence','finale'].reduce((sum,k)=>sum+(saved.progress[k]?.quality||0),0)}
+function finaleUnlocked(){return ['ghost','catch','memory','rhythm','sequence','finale'].every(k=>saved.progress[k]?.won)&&questEnergy()>=480}
 function paintQuestProgress(){
   $('quest-progress').classList.remove('hidden');
   const energy=questEnergy(),done=Object.values(saved.progress).filter(r=>r?.won).length;
-  $('quest-progress').innerHTML='<b>Recupera la peña · '+done+'/5 metas · '+total+' puntos</b><p>Energía '+energy+'/500 · Misión final: 400 de energía y cinco metas cumplidas</p><progress max="500" value="'+energy+'" aria-label="Energía de la peña"></progress>';
+  $('quest-progress').innerHTML='<b>Recupera la peña · '+done+'/6 metas · '+total+' puntos</b><p>Energía '+energy+'/600 · Misión final: 480 de energía y seis metas cumplidas</p><progress max="600" value="'+energy+'" aria-label="Energía de la peña"></progress>';
 }
 function missionHub(){
   running=false;stopSamples();cancelAnimationFrame(raf);syncPersonalMusic();
   total=progressPoints();campaignResults=order.map(k=>saved.progress[k]);
   difficulty=$('difficulty').value;
   const unlocked=finaleUnlocked();
-  modal('<div class="big">'+(unlocked?'🔥':'🕯️')+'</div><div class="eyebrow">El último desafío</div><h2 id="modal-title">'+(unlocked?'¡Enciende la Peña!':'La fiesta necesita más luz')+'</h2><p>'+ (unlocked?'La música y los recuerdos están recuperados. Falta llevar las luces al escenario: programa el camino del guía y devuelve la vida a la peña.':'Completa las cinco metas y reúne 400 de 500 de energía. No necesitas una partida perfecta: dos estrellas en cada reto bastan. Mejora el reto que prefieras; siempre conservamos tu mejor resultado.')+'</p><div class="result-stats"><div><b>'+total+'</b><span>Puntos de aventura</span></div><div><b>'+questEnergy()+'/500</b><span>Energía recuperada</span></div></div><div class="mission-checkpoints">'+order.map((k,i)=>'<button id="checkpoint-'+i+'">'+titles[k]+'<span>'+(campaignResults[i]?.won?'✓ ':'○ ')+(campaignResults[i]?.quality||0)+'/100 ↻</span></button>').join('')+'</div><div class="modal-actions">'+(unlocked?'<button class="primary" id="enter-final">¡Vamos al desafío final!</button>':'')+'<button class="soft" id="mission-home">Menú principal</button></div>');
+  modal('<div class="big">'+(unlocked?'🔥':'🕯️')+'</div><div class="eyebrow">El último desafío</div><h2 id="modal-title">'+(unlocked?'¡La Última Jarana!':'Reúne el poder de la jarana')+'</h2><p>'+ (unlocked?'Las seis partes de la fiesta están recuperadas, pero el Maestro de las Sombras aún controla el escenario. ¡Es hora de una batalla musical 2D!':'Completa las seis metas y reúne 480 de 600 de energía. No necesitas una partida perfecta: dos estrellas en cada reto bastan. Mejora el reto que prefieras; siempre conservamos tu mejor resultado.')+'</p><div class="result-stats"><div><b>'+total+'</b><span>Puntos de aventura</span></div><div><b>'+questEnergy()+'/600</b><span>Energía recuperada</span></div></div><div class="mission-checkpoints">'+order.map((k,i)=>'<button id="checkpoint-'+i+'">'+titles[k]+'<span>'+(campaignResults[i]?.won?'✓ ':'○ ')+(campaignResults[i]?.quality||0)+'/100 ↻</span></button>').join('')+'</div><div class="modal-actions">'+(unlocked?'<button class="primary" id="enter-final">¡Vamos al desafío final!</button>':'')+'<button class="soft" id="mission-home">Menú principal</button></div>');
   order.forEach((k,i)=>$('checkpoint-'+i).onclick=()=>{closeModal();campaign=true;reviewingCheckpoint=true;chapter=i;prepare(k)});
-  if(unlocked)$('enter-final').onclick=()=>{if(!finaleUnlocked())return;campaign=true;chapter=5;closeModal();prepare('finale')};
+  if(unlocked)$('enter-final').onclick=()=>{if(!finaleUnlocked())return;campaign=true;chapter=6;closeModal();prepare('battle')};
   $('mission-home').onclick=home;
 }
 const finalLevels={
@@ -1774,12 +1789,13 @@ const finalLevels={
   hard:{size:6,limit:42,path:[[0,5],[0,4],[1,4],[2,4],[2,5],[3,5],[4,5],[4,4],[4,3],[3,3],[2,3],[2,2],[3,2],[4,2],[5,2],[5,1],[4,1],[4,0],[5,0]],lights:[4,10,15],hint:'Tres luces y un camino con más giros. Retroceder te mueve a la casilla de atrás sin cambiar tu orientación.'}
 };
 const commandInfo={forward:{icon:'↑',label:'Paso adelante'},back:{icon:'↓',label:'Paso atrás'},left:{icon:'↶',label:'Giro a la izquierda'},right:{icon:'↷',label:'Giro a la derecha'}};
+let finalAttempts=0;
 let finalLevel=null,finalPlan=[],finalPosition=null,finalDirection=0,finalCollected=new Set(),finalVisited=new Set(),finalExecuting=false,finalIndex=0,finalNextAt=0,finalWon=false,finalCelebratingAt=0;
 function sceneMarkup(celebrate=false){
   return '<div class="bulbs">'+Array.from({length:10},()=>'<i></i>').join('')+'</div><div class="musicians">🎸 🥁 👏 🎶</div>'+(celebrate?Array.from({length:26},(_,i)=>'<i class="confetti" style="left:'+(i*3.8)+'%;animation-delay:'+(-(i%7)*.4)+'s;background:'+['#ff9238','#ffd36b','#ff4532'][i%3]+'"></i>').join(''):'');
 }
 function setupFinale(){
-  finalLevel=finalLevels[difficulty];finalPlan=[];finalWon=false;finalCelebratingAt=0;
+  finalLevel=finalLevels[difficulty];finalPlan=[];finalWon=false;finalCelebratingAt=0;finalAttempts=0;
   $('final-scene').classList.remove('restored');$('final-scene').innerHTML=sceneMarkup();
   $('final-tip').textContent=finalLevel.hint;
   $('final-board').style.gridTemplateColumns='repeat('+finalLevel.size+',1fr)';
@@ -1825,13 +1841,13 @@ function renderFinalBoard(){
 function runFinalProgram(){
   if(!canEditFinal())return;
   if(!finalPlan.length){$('final-status').textContent='Añade primero una instrucción.';return}
-  resetFinalPosition();finalExecuting=true;finalNextAt=elapsed+.55;renderFinalPlan();$('final-status').textContent='Observa: el guía ejecuta tu programa paso a paso.';
+  finalAttempts++;resetFinalPosition();finalExecuting=true;finalNextAt=elapsed+.55;renderFinalPlan();$('final-status').textContent='Observa: el guía ejecuta tu programa paso a paso.';
 }
 function finalProgramError(message){
   finalExecuting=false;playErrorSound();renderFinalPlan();$('final-status').textContent=message+' Corrige tu programa y vuelve a ejecutar desde el inicio.';
 }
 function finaleTick(){
-  if(finalWon){if(finalCelebratingAt&&elapsed>=finalCelebratingAt){finalCelebratingAt=0;showFinalVictory()}return}
+  if(finalWon)return;
   if(!finalExecuting||elapsed<finalNextAt)return;
   const k=finalPlan[finalIndex];
   if(k==='left')finalDirection=(finalDirection+3)%4;
@@ -1850,19 +1866,191 @@ function finaleTick(){
   renderFinalPlan();
 }
 function completeFinale(){
-  if(finalWon)return;finalWon=true;finalExecuting=false;finalCelebratingAt=elapsed+2.2;
-  score=500;saved.finalBonus=500;total=progressPoints();
-  saved.best=Math.max(saved.best||0,total);
-  if(!saved.medals.includes('adventure'))saved.medals.push('adventure');
-  save();paintRecords();paintQuestProgress();updateStats();updateFinalControls();
-  $('final-scene').innerHTML=sceneMarkup(true);$('final-scene').classList.add('restored');
-  $('final-status').textContent='¡Lo lograste! La peña recupera sus luces y la jarana vuelve a sonar.';
-  playSuccessSound();
+  if(finalWon||!running)return;finalWon=true;finalExecuting=false;
+  score=350+finalLevel.lights.length*50;
+  $('final-scene').innerHTML=sceneMarkup();$('final-scene').classList.add('restored');
+  $('final-status').textContent='¡Ruta completada! Las luces ya están listas para la batalla final.';
+  playSuccessSound();updateFinalControls();finish('Programaste el camino y recuperaste todas las luces.');
 }
 function showFinalVictory(){
   running=false;stopSamples();cancelAnimationFrame(raf);syncPersonalMusic();
-  modal('<div class="peña-scene restored victory-scene">'+sceneMarkup(true)+'</div><div class="eyebrow">Misión cumplida</div><h2 id="modal-title">¡Recuperaste la Peña Embrujada!</h2><p>Espantaste a los fantasmas, rescataste la fiesta y programaste el camino de las luces. ¡La guitarra, el cajón y las palmas vuelven a sonar gracias a ti!</p><div class="result-stars">★★★</div><p>🏆 <b>¡Ahora eres Rey de la Jarana!</b></p><div class="result-stats"><div><b>'+total+'</b><span>Puntos de aventura</span></div><div><b>+500</b><span>Misión final</span></div></div><div class="modal-actions"><button class="primary" id="new-adventure">Otra aventura</button><button class="soft" id="celebrate-home">Volver al menú</button></div>');
+  modal('<div class="peña-scene restored victory-scene">'+sceneMarkup(true)+'</div><div class="eyebrow">Misión cumplida</div><h2 id="modal-title">¡Recuperaste la Peña Embrujada!</h2><p>Superaste los seis retos y venciste al Maestro de las Sombras en la batalla musical. ¡La guitarra, el cajón y las palmas vuelven a sonar gracias a ti!</p><div class="result-stars">★★★</div><p>🏆 <b>¡Ahora eres Rey de la Jarana!</b></p><div class="result-stats"><div><b>'+total+'</b><span>Puntos de aventura</span></div><div><b>'+score+'</b><span>Batalla final</span></div></div><div class="modal-actions"><button class="primary" id="new-adventure">Otra aventura</button><button class="soft" id="celebrate-home">Volver al menú</button></div>');
   $('new-adventure').onclick=()=>{closeModal();begin('ghost',true)};$('celebrate-home').onclick=home;
+}
+
+// 2D musical boss battle. All simulation uses the shared pause-aware clock.
+const battleProfiles={easy:{hp:7,boss:480,speed:160,interval:3.5,volley:2},normal:{hp:5,boss:660,speed:210,interval:2.9,volley:3},hard:{hp:4,boss:840,speed:255,interval:2.5,volley:4}};
+let battle=null;
+const battleCanvas=$('battle-canvas'),bc=battleCanvas.getContext('2d');
+const reduceBattleMotion=window.matchMedia?.('(prefers-reduced-motion: reduce)').matches||false;
+function battleMessage(text,duration=2){$('battle-message').textContent=text;battle.messageUntil=elapsed+duration}
+function setupBattle(){
+  const c=battleProfiles[difficulty];
+  battle={hp:c.hp,maxHP:c.hp,bossHP:c.boss,maxBossHP:c.boss,phase:1,p:{x:150,y:450,vy:0,facing:1},boss:{x:770,y:235},shots:[],hazards:[],particles:[],rings:[],pickups:[],warning:null,attackIndex:0,nextAttack:2,fireAt:0,invincibleUntil:0,shieldUntil:0,shieldReady:0,power:30,specialDown:false,jumpDown:false,hurtFlash:0,bossFlash:0,shake:0,messageUntil:0,endAt:0,won:false,lost:false};
+  ['left','right','fire'].forEach(name=>{
+    const btn=$('battle-'+name),key={left:'ArrowLeft',right:'ArrowRight',fire:'j'}[name];
+    btn.onpointerdown=e=>{if(!running||paused||mode!=='battle')return;e.preventDefault();btn.setPointerCapture?.(e.pointerId);keys[key]=true;btn.classList.add('held')};
+    ['onpointerup','onpointercancel','onlostpointercapture'].forEach(ev=>btn[ev]=()=>{keys[key]=false;btn.classList.remove('held')});
+  });
+  $('battle-jump').onpointerdown=e=>{e.preventDefault();battleJump()};
+  $('battle-shield').onpointerdown=e=>{e.preventDefault();battleShield()};
+  $('battle-special').onpointerdown=e=>{e.preventDefault();battleSpecial()};
+  ['jump','shield','special'].forEach(k=>$('battle-'+k).onclick=e=>{if(e.detail===0)({jump:battleJump,shield:battleShield,special:battleSpecial}[k])()});
+  battleMessage('¡La Última Jarana!',2.3);paintBattleHUD();drawBattle();
+}
+function battleKeyDown(e){
+  const k=e.key.toLowerCase(),valid=['arrowleft','arrowright','arrowup','a','d','w',' ','j','k','q'];
+  if(!valid.includes(k))return false;e.preventDefault();
+  if(e.repeat&&['k','q','w','arrowup',' '].includes(k))return true;
+  if(['w','arrowup',' '].includes(k))battleJump();else if(k==='k')battleShield();else if(k==='q')battleSpecial();else keys[k==='arrowleft'?'ArrowLeft':k==='arrowright'?'ArrowRight':k]=true;
+  return true;
+}
+function battleCanAct(){return mode==='battle'&&running&&!paused&&battle&&!battle.won&&!battle.lost}
+function battleJump(){if(!battleCanAct()||battle.p.y<449)return;battle.p.vy=-590;tone(330,.09,'triangle',.04);battleBurst(battle.p.x,450,10,'#ffc26b')}
+function battleShield(){if(!battleCanAct()||elapsed<battle.shieldReady)return;battle.shieldUntil=elapsed+1.15;battle.shieldReady=elapsed+4.3;battle.rings.push({x:battle.p.x,y:battle.p.y-36,r:15,max:95,life:.5,color:'#ffc35b'});tone(740,.12,'sine',.06)}
+function battleSpecial(){
+  if(!battleCanAct()||battle.power<100)return;battle.power=0;battle.hazards=[];battle.warning=null;battle.nextAttack=Math.max(battle.nextAttack,elapsed+1.7);battle.shake=6;
+  battle.rings.push({x:battle.p.x,y:battle.p.y-40,r:10,max:1100,life:1.05,color:'#ffcc69'});battleDamageBoss(65);if(battle.won)return;battleBurst(battle.boss.x,battle.boss.y,55,'#ffb441');battleMessage('¡PODER DE LA JARANA!',1.4);playSuccessSound();
+}
+function battleBurst(x,y,n,color){
+  for(let i=0;i<n;i++){const a=Math.random()*Math.PI*2,v=40+Math.random()*210;battle.particles.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,life:.35+Math.random()*.6,max:1,color,size:2+Math.random()*4})}
+  if(battle.particles.length>220)battle.particles.splice(0,battle.particles.length-220);
+}
+function battleDamageBoss(amount){
+  if(!battleCanAct())return;
+  battle.bossHP=Math.max(0,battle.bossHP-amount);battle.bossFlash=.13;battle.shake=Math.max(battle.shake,2);battle.power=Math.min(100,battle.power+3);score+=Math.round(amount*2);tone(520+Math.random()*170,.045,'triangle',.025);
+  const phase=battle.bossHP<=battle.maxBossHP*.33?3:battle.bossHP<=battle.maxBossHP*.66?2:1;
+  if(phase>battle.phase){battle.phase=phase;battleMessage(phase===2?'FASE 2 · ¡Redoble de sombras!':'FASE 3 · ¡Último compás!',2);battleBurst(battle.boss.x,battle.boss.y,40,'#ff794c');battle.pickups.push({x:180+Math.random()*300,y:130,vy:80});battle.nextAttack=Math.max(battle.nextAttack,elapsed+1.4)}
+  if(battle.bossHP<=0)winBattle();
+}
+function battleDamagePlayer(){
+  if(!battleCanAct()||elapsed<battle.invincibleUntil)return;
+  battle.hp--;battle.invincibleUntil=elapsed+1.35;battle.hurtFlash=.25;battle.shake=6;battle.power=Math.min(100,battle.power+18);battleBurst(battle.p.x,battle.p.y-30,20,'#ff6351');playErrorSound();
+  if(battle.hp<=0){battle.lost=true;battle.endAt=elapsed+1.1;battleMessage('La jarana aún no termina…',1.2)}
+}
+function battleTelegraph(){
+  const kind=battle.attackIndex++%3;
+  battle.warning={kind,at:elapsed+(difficulty==='easy'?1.15:.9),x:battle.p.x};
+  battle.nextAttack=elapsed+battleProfiles[difficulty].interval-.2*(battle.phase-1)+(kind===2?.8:0);
+  battleMessage(kind===0?'¡Esquiva las notas oscuras!':kind===1?'¡Salta la onda del suelo!':'¡Sal de los círculos rojos!',.95);
+}
+function battleReleaseAttack(w){
+  const c=battleProfiles[difficulty],phase=battle.phase;
+  if(w.kind===0){
+    const aim=Math.atan2(battle.p.y-35-battle.boss.y,battle.p.x-battle.boss.x),count=c.volley+(phase===3?1:0);
+    for(let i=0;i<count;i++){const a=aim+(i-(count-1)/2)*.2,v=c.speed+phase*16;battle.hazards.push({kind:'orb',x:battle.boss.x-40,y:battle.boss.y+20,vx:Math.cos(a)*v,vy:Math.sin(a)*v,r:13,life:8})}
+  }else if(w.kind===1){
+    battle.hazards.push({kind:'wave',x:850,y:435,vx:-(c.speed+30),vy:0,r:24,life:7});
+    if(phase===3)battle.hazards.push({kind:'wave',x:1010,y:435,vx:-(c.speed+30),vy:0,r:24,life:7});
+  }else{
+    const xs=[w.x];if(phase>=2)xs.push(Math.max(75,Math.min(865,w.x+170)));if(phase===3)xs.push(Math.max(75,w.x-170));
+    xs.forEach(x=>battle.hazards.push({kind:'rain',x,y:60,vx:0,vy:c.speed+45,r:18,life:3}));
+  }
+}
+function battleTick(dt){
+  if(!battle)return;
+  battle.boss.x=770+Math.sin(elapsed*.9)*55;battle.boss.y=225+Math.sin(elapsed*1.8)*44;
+  battle.shake=Math.max(0,battle.shake-dt*18);battle.hurtFlash=Math.max(0,battle.hurtFlash-dt);battle.bossFlash=Math.max(0,battle.bossFlash-dt);
+  battle.particles=battle.particles.filter(p=>{p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=80*dt;p.life-=dt;return p.life>0});
+  battle.rings=battle.rings.filter(p=>{p.r+=(p.max-p.r)*dt*5;p.life-=dt;return p.life>0});
+  if(battle.messageUntil&&elapsed>battle.messageUntil){$('battle-message').textContent='';battle.messageUntil=0}
+  if(battle.won||battle.lost){drawBattle();paintBattleHUD();if(elapsed>=battle.endAt){if(battle.won)showFinalVictory();else battleDefeat()}return}
+  const p=battle.p,move=(keys.ArrowRight||keys.d?1:0)-(keys.ArrowLeft||keys.a?1:0);p.x=Math.max(45,Math.min(890,p.x+move*295*dt));if(move)p.facing=move;
+  p.vy+=1450*dt;p.y=Math.min(450,p.y+p.vy*dt);if(p.y>=450)p.vy=0;
+  battle.power=Math.min(100,battle.power+dt*5);
+  if((keys.j||keys.J)&&elapsed>=battle.fireAt){
+    const dx=battle.boss.x-p.x,dy=battle.boss.y-(p.y-43),dist=Math.hypot(dx,dy)||1;
+    battle.shots.push({x:p.x+12,y:p.y-43,vx:dx/dist*640,vy:dy/dist*640,life:2});battle.fireAt=elapsed+.30;tone(680,.055,'triangle',.025);battleBurst(p.x+15,p.y-43,3,'#ffe1a0');
+  }
+  if(elapsed>=battle.nextAttack&&!battle.warning)battleTelegraph();
+  if(battle.warning&&elapsed>=battle.warning.at){battleReleaseAttack(battle.warning);battle.warning=null}
+  battle.shots=battle.shots.filter(s=>{s.x+=s.vx*dt;s.y+=s.vy*dt;s.life-=dt;if(Math.hypot(s.x-battle.boss.x,s.y-battle.boss.y)<67){battleDamageBoss(7);battleBurst(s.x,s.y,7,'#ffb95c');return false}return s.life>0&&s.x<1000&&s.x>-40});
+  if(battle.won){drawBattle();paintBattleHUD();return}
+  battle.hazards=battle.hazards.filter(h=>{
+    h.x+=h.vx*dt;h.y+=h.vy*dt;h.life-=dt;
+    const hit=h.kind==='wave'?Math.abs(h.x-p.x)<h.r+17&&p.y>409:Math.hypot(h.x-p.x,h.y-(p.y-32))<h.r+21;
+    if(hit){if(elapsed<battle.shieldUntil){battleBurst(h.x,h.y,12,'#ffdb8e');battle.power=Math.min(100,battle.power+8);tone(990,.06)}else battleDamagePlayer();return false}
+    return h.life>0&&h.x>-80&&h.y<550;
+  });
+  battle.pickups=battle.pickups.filter(h=>{h.y=Math.min(425,h.y+h.vy*dt);if(Math.hypot(h.x-p.x,h.y-(p.y-30))<40){battle.hp=Math.min(battle.maxHP,battle.hp+1);battle.power=Math.min(100,battle.power+22);battleBurst(h.x,h.y,15,'#ffdc7b');playSuccessSound();return false}return true});
+  paintBattleHUD();drawBattle();
+}
+function paintBattleHUD(){
+  $('boss-hp-bar').style.width=(Math.max(0,battle.bossHP)/battle.maxBossHP*100)+'%';
+  $('battle-phase').textContent='FASE '+battle.phase+' / 3';$('battle-hearts').textContent='♥'.repeat(Math.max(0,battle.hp))+'♡'.repeat(Math.max(0,battle.maxHP-battle.hp));
+  $('battle-shield-status').textContent=elapsed<battle.shieldUntil?'◈ Escudo activo':elapsed>=battle.shieldReady?'◈ Escudo listo':'◈ Escudo en '+Math.ceil(battle.shieldReady-elapsed)+' s';
+  $('battle-power-status').textContent='⚡ Jarana '+Math.floor(battle.power)+'%';$('battle-special').disabled=battle.power<100||battle.won||battle.lost;$('battle-special').classList.toggle('ready',battle.power>=100);$('battle-shield').disabled=elapsed<battle.shieldReady||battle.won||battle.lost;
+}
+function winBattle(){
+  if(battle.won)return;battle.won=true;battle.endAt=elapsed+2.5;battle.hazards=[];battle.warning=null;keys={};score+=500+Math.max(0,battle.hp)*50;
+  saved.finalBonus=Math.max(saved.finalBonus||0,score);saved.battleWon=true;total=progressPoints();saved.best=Math.max(saved.best||0,total);if(!saved.medals.includes('adventure'))saved.medals.push('adventure');save();paintRecords();paintQuestProgress();
+  battleBurst(battle.boss.x,battle.boss.y,100,'#ffcc68');battle.rings.push({x:battle.boss.x,y:battle.boss.y,r:20,max:1200,life:2});battleMessage('¡LA PEÑA VUELVE A BRILLAR!',3);playSuccessSound();
+}
+function battleDefeat(){
+  running=false;cancelAnimationFrame(raf);stopSamples();syncPersonalMusic();
+  modal('<div class="big">🕯️</div><h2 id="modal-title">¡La jarana continúa!</h2><p>El Maestro de las Sombras resistió esta vez. Tu progreso y los seis retos siguen guardados. Salta las ondas del suelo y usa el escudo cuando se acerquen los proyectiles.</p><div class="modal-actions"><button class="primary" id="battle-retry">Reintentar batalla</button><button class="soft" id="battle-home">Volver al menú</button></div>');
+  $('battle-retry').onclick=()=>{closeModal();prepare('battle')};$('battle-home').onclick=home;
+}
+// Canvas artwork: illuminated peña, cartoon hero and spectral conductor.
+function bEllipse(x,y,rx,ry,color){bc.fillStyle=color;bc.beginPath();bc.ellipse(x,y,rx,ry,0,0,Math.PI*2);bc.fill()}
+function bRound(x,y,w,h,r,color){bc.fillStyle=color;bc.beginPath();bc.roundRect(x,y,w,h,r);bc.fill()}
+function drawBattle(){
+  const b=battle,t=elapsed,w=960,h=540,restored=b.won;
+  bc.save();bc.clearRect(0,0,w,h);
+  if(!reduceBattleMotion&&b.shake)bc.translate((Math.random()-.5)*b.shake,(Math.random()-.5)*b.shake);
+  let bg=bc.createLinearGradient(0,0,0,h);bg.addColorStop(0,restored?'#542218':'#180f20');bg.addColorStop(1,restored?'#ab4e20':'#4a1d19');bc.fillStyle=bg;bc.fillRect(0,0,w,h);
+  // Moon, clouds, roof tiles and balconies.
+  bEllipse(138,82,49,49,'#ffd59b');bEllipse(157,67,42,43,restored?'#66301e':'#241222');
+  for(let i=0;i<6;i++){bc.globalAlpha=.1; bEllipse((i*210+t*7)%1200-90,105+(i%2)*40,105,16,'#f5ae85')}bc.globalAlpha=1;
+  for(let i=0;i<5;i++){
+    const x=40+i*194;bRound(x,145,150,230,8,'#2c1819');bRound(x+12,157,126,205,5,'#7b3c25');bRound(x+25,170,100,145,4,'#170f16');
+    bc.fillStyle='#a76837';bc.fillRect(x+65,171,8,145);bc.fillRect(x+25,235,100,6);bRound(x+14,308,122,18,3,'#c27b42');
+    for(let j=0;j<7;j++)bc.fillRect(x+23+j*17,307,4,44);
+  }
+  // Festive banner and strings of lights.
+  bc.strokeStyle='#d88e49';bc.lineWidth=3;bc.beginPath();bc.moveTo(0,25);bc.quadraticCurveTo(480,130,960,25);bc.stroke();
+  for(let i=0;i<18;i++){const x=i*57,y=28+Math.sin(i/17*Math.PI)*45;bc.save();bc.translate(x,y);bc.fillStyle=i%2?'#c34723':'#f4a348';bc.beginPath();bc.moveTo(-14,0);bc.lineTo(14,0);bc.lineTo(0,27);bc.fill();bc.restore();bEllipse(x,y+31,5,7,restored?'#ffe388':'#e3893f')}
+  bRound(300,92,360,61,10,'#341611');bc.strokeStyle='#da9251';bc.lineWidth=2;bc.strokeRect(310,102,340,41);bc.fillStyle=restored?'#ffe9a4':'#f1b476';bc.font='bold 25px sans-serif';bc.textAlign='center';bc.fillText('PEÑA EMBRUJADA',480,132);
+  // Stage floor and warm lamps.
+  bg=bc.createLinearGradient(0,450,0,540);bg.addColorStop(0,'#c46d32');bg.addColorStop(1,'#35170f');bc.fillStyle=bg;bc.fillRect(0,450,960,90);bc.fillStyle='#ffb768';bc.fillRect(0,448,960,5);
+  bc.strokeStyle='#713218';bc.lineWidth=2;for(let x=-300;x<1300;x+=95){bc.beginPath();bc.moveTo(480+(x-480)*.55,455);bc.lineTo(x,540);bc.stroke()}
+  for(const x of [35,920]){bRound(x-10,410,20,38,3,'#ffb65b');const a=.85+Math.sin(t*8+x)*.1;bEllipse(x,406,5,10,'#ffe9a4');bc.globalAlpha=.12*a;bEllipse(x,402,55,65,'#ffc76b');bc.globalAlpha=1}
+  // Floating dust.
+  for(let i=0;i<26;i++){const x=(i*71+Math.sin(t+i)*15)%960,y=170+(i*47+t*11)%280;bc.globalAlpha=.2+Math.sin(t+i)*.15;bEllipse(x,y,2,2,'#ffcd78')}bc.globalAlpha=1;
+  if(b.warning){
+    bc.globalAlpha=.25+.15*Math.sin(t*20);bc.fillStyle='#ff4c42';
+    if(b.warning.kind===1)bc.fillRect(30,428,900,22);
+    else if(b.warning.kind===2){for(const x of [b.warning.x,...(b.phase>=2?[Math.min(865,b.warning.x+170)]:[]),...(b.phase===3?[Math.max(75,b.warning.x-170)]:[])]){bEllipse(x,447,40,9,'#ff6351');bc.fillRect(x-2,50,4,400)}}
+    else{bc.strokeStyle='#ff6853';bc.lineWidth=3;bc.setLineDash([8,12]);bc.beginPath();bc.moveTo(b.boss.x-30,b.boss.y);bc.lineTo(b.p.x,b.p.y-35);bc.stroke();bc.setLineDash([])}bc.globalAlpha=1;
+  }
+  if(!b.won)drawBattleBoss(b.boss.x,b.boss.y,t);
+  for(const s of b.shots){bc.save();bc.translate(s.x,s.y);bc.rotate(t*3);bc.shadowColor='#ffc65e';bc.shadowBlur=15;bc.fillStyle='#ffe7a4';bc.font='bold 29px serif';bc.textAlign='center';bc.fillText('♪',0,8);bc.restore()}
+  for(const a of b.hazards){bc.save();bc.translate(a.x,a.y);bc.shadowColor='#fb483e';bc.shadowBlur=18;if(a.kind==='wave'){bc.strokeStyle='#ff6342';bc.lineWidth=8;bc.beginPath();bc.arc(0,0,25,Math.PI,0);bc.stroke();bc.strokeStyle='#ffcb76';bc.lineWidth=3;bc.stroke()}else{bEllipse(0,0,a.r,a.r,'#d63c42');bEllipse(-3,-4,a.r*.45,a.r*.45,'#ffb082');bc.fillStyle='#3e1022';bc.font='bold 22px serif';bc.fillText(a.kind==='rain'?'♦':'♭',-7,8)}bc.restore()}
+  for(const a of b.pickups){bc.save();bc.shadowColor='#ffce69';bc.shadowBlur=20;bc.fillStyle='#ffca7b';bc.font='28px serif';bc.fillText('♥',a.x-12,a.y+8);bc.restore()}
+  if(elapsed>=b.invincibleUntil||Math.floor(t*15)%2===0)drawBattleHero(b.p.x,b.p.y,t);
+  if(elapsed<b.shieldUntil){bc.save();bc.strokeStyle='#ffd581';bc.shadowColor='#ffb84f';bc.shadowBlur=18;bc.lineWidth=4;bc.beginPath();bc.arc(b.p.x,b.p.y-34,46,0,Math.PI*2);bc.stroke();bc.restore()}
+  for(const r of b.rings){bc.save();bc.globalAlpha=Math.min(1,r.life);bc.strokeStyle=r.color||'#ffdb8b';bc.lineWidth=8;bc.beginPath();bc.arc(r.x,r.y,r.r,0,Math.PI*2);bc.stroke();bc.restore()}
+  for(const p of b.particles){bc.globalAlpha=Math.min(1,p.life*2);bc.fillStyle=p.color;bc.fillRect(p.x,p.y,p.size,p.size)}bc.globalAlpha=1;
+  if(b.hurtFlash&&!reduceBattleMotion){bc.fillStyle='rgba(255,55,30,'+b.hurtFlash*.7+')';bc.fillRect(0,0,960,540)}
+  if(restored){for(let i=0;i<45;i++){bc.fillStyle=['#ffae3f','#ffd77b','#ff5a42'][i%3];bc.save();bc.translate((i*79)%960,(t*90+i*43)%560);bc.rotate(t+i);bc.fillRect(0,0,6,12);bc.restore()}}
+  bc.restore();
+}
+function drawBattleHero(x,y,t){
+  bc.save();bc.translate(x,y);const moving=keys.ArrowLeft||keys.ArrowRight||keys.a||keys.d,swing=moving?Math.sin(t*15)*5:0;
+  bEllipse(0,1,29,6,'#1a0b0a88');
+  bRound(-17,-22+swing,14,22,5,'#261b22');bRound(3,-22-swing,14,22,5,'#261b22');bRound(-20,-4+swing,22,8,4,'#5a3025');bRound(1,-4-swing,22,8,4,'#5a3025');
+  bRound(-23,-58,46,40,13,'#f4e3c5');bc.fillStyle='#e15b2b';bc.beginPath();bc.moveTo(-23,-55);bc.lineTo(23,-55);bc.lineTo(26,-20);bc.lineTo(-26,-20);bc.fill();bc.strokeStyle='#ffd787';bc.lineWidth=4;bc.beginPath();bc.moveTo(-20,-40);bc.lineTo(20,-40);bc.stroke();
+  bEllipse(0,-73,20,23,'#d99a67');bEllipse(-9,-77,3,4,'#281310');bEllipse(9,-77,3,4,'#281310');bc.strokeStyle='#6a321d';bc.lineWidth=2;bc.beginPath();bc.arc(1,-69,7,0,Math.PI);bc.stroke();
+  bRound(-23,-96,46,17,8,'#f5deaa');bEllipse(0,-82,32,6,'#f5deaa');bRound(-23,-85,46,5,2,'#a84324');
+  bc.save();bc.translate(15,-37);bc.rotate(-.4);bEllipse(0,0,14,19,'#b5652b');bEllipse(0,1,8,11,'#f4b25c');bEllipse(0,-1,4,5,'#432219');bRound(-3,-38,6,30,2,'#e9b56d');bc.strokeStyle='#fff0b1';bc.lineWidth=1;bc.beginPath();bc.moveTo(0,-37);bc.lineTo(0,13);bc.stroke();bc.restore();bc.restore();
+}
+function drawBattleBoss(x,y,t){
+  bc.save();bc.translate(x,y);bc.shadowBlur=35;bc.shadowColor=battle.phase===3?'#ff5b35':'#ae4267';
+  bc.fillStyle=battle.bossFlash?'#fff0d0':battle.phase===3?'#d34543':'#895078';bc.beginPath();bc.moveTo(-59,30);bc.bezierCurveTo(-80,-80,75,-99,64,29);bc.quadraticCurveTo(83,75,52,100);for(let i=0;i<5;i++)bc.quadraticCurveTo(40-i*23,66+Math.sin(t*5+i)*10,27-i*23,93);bc.quadraticCurveTo(-77,77,-59,30);bc.fill();bc.shadowBlur=0;
+  bc.fillStyle='#4b1737';bc.beginPath();bc.moveTo(-46,20);bc.lineTo(45,20);bc.lineTo(30,67);bc.lineTo(-30,67);bc.fill();bc.fillStyle='#ffb751';bc.beginPath();bc.moveTo(0,24);bc.lineTo(-10,42);bc.lineTo(0,54);bc.lineTo(10,42);bc.fill();
+  bEllipse(-23,-10,13,18,'#34132c');bEllipse(23,-10,13,18,'#34132c');bEllipse(-20,-11,5,9,'#ffbd6d');bEllipse(20,-11,5,9,'#ffbd6d');bc.strokeStyle='#ffb16a';bc.lineWidth=4;bc.beginPath();bc.arc(0,14,16,0,Math.PI);bc.stroke();
+  bRound(-36,-91,72,43,10,'#291729');bRound(-39,-60,78,11,3,'#e26938');bEllipse(0,-48,58,9,'#35152b');
+  bc.strokeStyle='#aa5b78';bc.lineCap='round';bc.lineWidth=18;bc.beginPath();bc.moveTo(-50,8);bc.quadraticCurveTo(-90,15,-98,48+Math.sin(t*3)*12);bc.moveTo(50,8);bc.quadraticCurveTo(85,-5,100,-25);bc.stroke();bc.strokeStyle='#ffbf78';bc.lineWidth=5;bc.beginPath();bc.moveTo(93,-8);bc.lineTo(125,-65);bc.stroke();bEllipse(126,-67,7,7,'#ffe3a6');bc.restore();
 }
 
 paintRecords();
@@ -1883,11 +2071,11 @@ if(document.modelContext?.registerTool){
       name:'start_festival_game',description:'Abre la preparación de un reto o aventura. El jugador debe pulsar Vamos a jugar para iniciar.',inputSchema:{
         type:'object',properties:{
           game:{
-            type:'string',enum:['ghost','catch','rhythm','memory','sequence','adventure']
+            type:'string',enum:['ghost','catch','rhythm','memory','sequence','finale','adventure']
           }
         },required:['game'],additionalProperties:false
       },execute:input=>{
-        if(!['ghost','catch','rhythm','memory','sequence','adventure'].includes(input.game))throw Error('Reto inválido');
+        if(!['ghost','catch','rhythm','memory','sequence','finale','adventure'].includes(input.game))throw Error('Reto inválido');
         if(running)throw Error('Termina o sal de la partida actual');
         closeModal();
         begin(input.game==='adventure'?'ghost':input.game,input.game==='adventure');
