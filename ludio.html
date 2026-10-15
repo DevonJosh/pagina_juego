@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="description" content="Aventuras de Rugged — Portal de 20 minijuegos educativos para el nivel Primaria">
-    <meta name="theme-color" content="#ff8c42">
-    <title>🏎️ Aventuras de Rugged | Primaria</title>
+    <meta name="description" content="Aventuras de Ludio — Portal de 20 minijuegos educativos para el nivel Secundaria">
+    <meta name="theme-color" content="#0a0e27">
+    <title>🤖 Aventuras de Ludio | Secundaria</title>
 
     <!-- Tipografías -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -14,17 +14,13 @@
 
     <!-- Estilos -->
     <link rel="stylesheet" href="css/styles.css">
-    <link rel="stylesheet" href="css/rayet.css">
+    <link rel="stylesheet" href="css/ludio.css">
 
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏎️</text></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤖</text></svg>">
 
-    <!-- CSS PARA MINIATURAS DINÁMICAS Y CORRECCIONES VISUALES -->
+    <!-- CSS PARA MINIATURAS DINÁMICAS Y TODAS LAS CORRECCIONES VISUALES -->
     <style>
-        /* ============================================================
-           CORRECCIONES ESTRUCTURALES Y TEXTOS FLOTANTES
-           ============================================================ */
-        body, html { overflow-x: hidden; }
-
+        /* Contenedor relativo para evitar desbordamientos */
         .game-card-thumb {
             position: relative;
             overflow: hidden;
@@ -32,9 +28,11 @@
             line-height: 0;
         }
 
+        /* iFrame Escalado (Carga el juego como miniatura) */
         .dynamic-thumb {
             position: absolute;
-            top: 0; left: 0;
+            top: 0;
+            left: 0;
             width: 400%; 
             height: 400%;
             transform: scale(0.25); 
@@ -45,78 +43,13 @@
             background-color: transparent;
         }
 
+        /* Aseguramos que los adornos de UI queden flotando ENCIMA del iframe */
         .game-thumb-bg { z-index: 2; }
         .game-number, .game-difficulty, .game-badge-new, .game-badge-featured { z-index: 3; }
 
-        .bubble, .about-rayet-bubble {
-            max-width: 95%;
-            word-wrap: break-word;
-            position: relative;
-            z-index: 10;
-        }
-
-        .game-title { margin: 12px 0 6px 0; line-height: 1.2; }
-        .game-desc { margin: 0 0 12px 0; line-height: 1.4; }
-
-        .hero-text .portal-hero-subtitle {
-            background-color: rgba(255, 255, 255, 0.95);
-            color: #1a2530 !important;
-            padding: 10px 25px;
-            border-radius: 30px;
-            display: inline-block;
-            font-weight: 700;
-            margin-top: 10px;
-            margin-bottom: 25px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-        }
-
-        .hero-stats {
-            background-color: rgba(26, 37, 48, 0.85);
-            padding: 15px 30px;
-            border-radius: 20px;
-            display: inline-flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 30px;
-            margin-bottom: 30px;
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            border: 2px solid rgba(255, 255, 255, 0.15);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.25);
-        }
-
-        .hero-stat {
-            color: #ffffff !important;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .hero-stat-num {
-            display: block;
-            font-size: 1.8rem;
-            font-weight: 900;
-            color: #ffaa00; 
-            line-height: 1;
-            margin-bottom: 6px;
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.6);
-        }
-
-        .hero-stat-lbl {
-            display: block;
-            font-size: 0.9rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            opacity: 0.9;
-        }
-
         /* ============================================================
-           MEJORAS DE UI Y NUEVO ESTADO "PRÓXIMAMENTE"
+           NUEVO ESTADO "PRÓXIMAMENTE"
            ============================================================ */
-
-        /* Overlay Próximamente para juegos Placeholder */
         .placeholder-overlay {
             position: absolute;
             inset: 0;
@@ -155,120 +88,41 @@
             pointer-events: none; /* Desactiva el clic por completo */
         }
 
-        /* Resto de UI */
-        .scroll-hint {
-            position: absolute;
-            bottom: 30px !important;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 50;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            color: #fff;
-            background-color: rgba(26, 37, 48, 0.85);
-            padding: 12px 25px;
-            border-radius: 25px;
-            backdrop-filter: blur(6px);
-            -webkit-backdrop-filter: blur(6px);
-            border: 2px solid rgba(255, 255, 255, 0.15);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
-        }
+        /* ============================================================
+           CORRECCIONES ESTRUCTURALES Y TEXTOS FLOTANTES
+           ============================================================ */
+        body, html { overflow-x: hidden; }
 
-        .scroll-txt {
-            font-size: 0.85rem;
-            font-weight: 700;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            margin-bottom: 8px;
-            opacity: 0.95;
-        }
-
-        .hero-actions { margin-bottom: 60px; }
-
-        .about-section {
-            background: linear-gradient(180deg, #eef2f5 0%, #ffffff 100%);
-            padding: 80px 20px;
-            color: #2c3e50;
-        }
-
-        .about-inner { max-width: 1100px; margin: 0 auto; }
-        .about-header { text-align: center; margin-bottom: 50px; }
-
-        .about-mission {
-            display: flex;
-            align-items: center;
-            gap: 40px;
-            background: #fff;
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.05);
-            margin-bottom: 60px;
-        }
-
-        .about-mission-text { flex: 1; font-size: 1.1rem; line-height: 1.6; }
-
-        .about-mission-visual {
-            flex: 0 0 320px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-end;
+        .bubble, .bubble-secundaria {
+            max-width: 95%;
+            word-wrap: break-word;
             position: relative;
+            z-index: 10;
         }
 
-        .about-rayet-img-wrap { width: 100%; display: flex; justify-content: center; }
-        .about-rayet-img { max-width: 250px; height: auto; display: block; }
+        .game-title { margin: 12px 0 6px 0; line-height: 1.2; }
+        .game-desc { margin: 0 0 12px 0; line-height: 1.4; }
 
-        @media (max-width: 768px) {
-            .about-mission { flex-direction: column; text-align: center; padding: 30px 20px; }
-            .about-mission-visual { flex: 0 0 auto; }
+        .hero-text .portal-hero-subtitle {
+            background-color: rgba(255, 255, 255, 0.95);
+            color: #0a0e27 !important; 
+            padding: 10px 25px;
+            border-radius: 30px;
+            display: inline-block;
+            font-weight: 700;
+            margin-top: 10px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
         }
-
-        .about-values-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 25px;
-            margin-bottom: 60px;
-        }
-
-        .about-value-card {
-            background: #fff;
-            padding: 30px 25px;
-            border-radius: 15px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.06);
-            border-top: 5px solid #ffaa00;
-            transition: transform 0.2s;
-        }
-
-        .about-value-card:hover { transform: translateY(-5px); }
-        .about-values-title { text-align: center; font-size: 2rem; margin-bottom: 40px; }
-
-        .about-cta {
-            text-align: center;
-            background: #1a2530;
-            color: #fff;
-            padding: 50px 20px;
-            border-radius: 20px;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
-        }
-
-        .about-cta-desc { margin-bottom: 30px; font-size: 1.1rem; opacity: 0.9; }
     </style>
 </head>
-<body class="world-portal portal-primaria">
-
-<!-- ============================================================
-     AUDIO DE FONDO INTEGRAD O
-     ============================================================ -->
-<audio id="bgm" loop>
-    <source src="assets/musicaFondo/cancion2.mp3" type="audio/mpeg">
-</audio>
+<body class="world-portal portal-secundaria">
 
 <!-- ============================================================
      BOTÓN FLOTANTE: SONIDO
      ============================================================ -->
 <button id="soundToggle" class="sound-toggle" aria-label="Activar o desactivar sonido" title="Sonido">
+    <span class="sound-icon sound-on">🔊</span>
     <span class="sound-icon sound-off">🔇</span>
 </button>
 
@@ -279,14 +133,14 @@
 <header class="site-header" id="siteHeader">
     <div class="header-inner">
 
-        <a href="index.html" class="brand brand-primaria" aria-label="Volver a la plataforma principal">
-            <div class="brand-logo brand-logo-primaria" aria-hidden="true">
+        <a href="index.html" class="brand brand-secundaria" aria-label="Volver a la plataforma principal">
+            <div class="brand-logo brand-logo-secundaria" aria-hidden="true">
                 <span class="brand-logo-glow"></span>
-                <span class="brand-logo-emoji">🏎️</span>
+                <span class="brand-logo-emoji">🤖</span>
             </div>
             <div class="brand-text">
-                <h1 class="brand-name">AVENTURAS DE RUGGED</h1>
-                <p class="brand-tagline">Nivel Primaria · Aprende a toda velocidad</p>
+                <h1 class="brand-name">AVENTURAS DE LUDIO</h1>
+                <p class="brand-tagline">Nivel Secundaria · Programa tu futuro</p>
             </div>
         </a>
 
@@ -303,15 +157,15 @@
             </a>
             <a href="#ayuda" class="nav-btn nav-ayuda" data-nav="ayuda">
                 <span class="nav-btn-ico">💡</span>
-                <span class="nav-btn-txt">Nosotros</span>
+                <span class="nav-btn-txt">Ayuda</span>
             </a>
-            <a href="beebot.html" class="nav-btn nav-inicial" data-nav="inicial">
-                <img src="assets/robots/beebot.png" alt="" class="nav-robot-img">
-                <span class="nav-btn-txt">Inicial · BeeBot</span>
+            <a href="inicial.html" class="nav-btn nav-inicial" data-nav="inicial">
+                <span class="nav-btn-ico">🐝</span>
+                <span class="nav-btn-txt">Inicial</span>
             </a>
-            <a href="ludio.html" class="nav-btn nav-secundaria" data-nav="secundaria">
-                <img src="assets/robots/ludio.png" alt="" class="nav-robot-img">
-                <span class="nav-btn-txt">Secundaria</span>
+            <a href="primaria.html" class="nav-btn nav-primaria" data-nav="primaria">
+                <span class="nav-btn-ico">🏎️</span>
+                <span class="nav-btn-txt">Primaria</span>
             </a>
         </nav>
 
@@ -324,987 +178,151 @@
 
 
 <!-- ============================================================
-     HERO — Ciudad y pista de carreras con Rugged como guía
+     HERO — Mundo Cyber con Ludio como guía
      ============================================================ -->
-<section id="hero" class="portal-hero hero-primaria">
+<section id="hero" class="portal-hero hero-secundaria">
 
     <!-- Fondo en capas -->
     <div class="portal-hero-bg" aria-hidden="true">
         <div class="layer layer-sky">
-            <div class="sun sun-primaria"><span class="sun-rays"></span></div>
-            <div class="cloud cloud-1"></div>
-            <div class="cloud cloud-2"></div>
-            <div class="cloud cloud-3"></div>
-            <div class="speed-lines"></div>
+            <div class="cyber-nebula nebula-1"></div>
+            <div class="cyber-nebula nebula-2"></div>
+            <div class="cyber-nebula nebula-3"></div>
+            <div class="star-field" id="starField"></div>
+            <div class="data-stream stream-1"></div>
+            <div class="data-stream stream-2"></div>
         </div>
         <div class="layer layer-mountains">
-            <div class="city-skyline-back"></div>
-            <div class="city-skyline-front"></div>
+            <div class="cyber-grid"></div>
+            <div class="cyber-horizon"></div>
         </div>
         <div class="layer layer-trees">
-            <div class="road-sign sign-1"></div>
-            <div class="road-sign sign-2"></div>
-            <div class="traffic-light tl-1">
-                <span class="tl-red"></span>
-                <span class="tl-yellow"></span>
-                <span class="tl-green"></span>
-            </div>
-            <div class="urban-tree ut-1"></div>
-            <div class="urban-tree ut-2"></div>
+            <div class="circuit-lines"></div>
+            <div class="holo holo-1"></div>
+            <div class="holo holo-2"></div>
+            <div class="holo holo-3"></div>
+            <div class="holo holo-4"></div>
         </div>
         <div class="layer layer-deco">
-            <div class="checkered-flag flag-1"></div>
-            <div class="checkered-flag flag-2"></div>
-            <div class="speed-particle sp-1">💨</div>
-            <div class="speed-particle sp-2">💨</div>
-            <div class="speed-particle sp-3">⚡</div>
+            <div class="particles" id="cyberParticles"></div>
+            <div class="data-panel panel-1">
+                <span class="panel-header">SYS.LOG</span>
+                <span>01001</span>
+                <span>11010</span>
+            </div>
+            <div class="data-panel panel-2">
+                <span class="panel-header">LINK</span>
+                <span>10110</span>
+                <span>00111</span>
+            </div>
+            <div class="data-panel panel-3">
+                <span class="panel-header">AI.CORE</span>
+                <span>01110</span>
+                <span>10001</span>
+            </div>
+            <div class="binary-rain" id="binaryRain"></div>
         </div>
         <div class="layer layer-ground">
-            <div class="sidewalk"></div>
-            <div class="road">
-                <div class="road-lines"></div>
-            </div>
-            <div class="starting-line"></div>
+            <div class="cyber-floor"></div>
         </div>
     </div>
 
     <!-- Contenido hero -->
     <div class="portal-hero-content">
 
-        <!-- Rugged guía (lado izquierdo) -->
+        <!-- Ludio guía (lado izquierdo) -->
         <div class="hero-character reveal-child" data-reveal="1">
-            <div class="rayet-stage" data-robot="rayet">
-                <div class="rayet-shadow" aria-hidden="true"></div>
-                <div class="rayet-aura" aria-hidden="true"></div>
-                <div class="rayet-ring" aria-hidden="true"></div>
-                <img src="assets/robots/rayet.png" alt="Robot Rugged, guía del nivel Primaria" class="robot-img">
-                <div class="rayet-speed-lines" aria-hidden="true">
-                    <span></span><span></span><span></span>
-                </div>
-                <div class="rayet-sparkles" aria-hidden="true">
-                    <span class="spark spark-1">✨</span>
-                    <span class="spark spark-2">⚡</span>
-                    <span class="spark spark-3">✨</span>
-                </div>
+            <div class="character-platform platform-cyber"></div>
+            <div class="robot-display has-image" data-robot="ludio">
+                <img src="assets/robots/ludio.png"
+                     alt="Robot Ludio, guía del nivel Secundaria"
+                     class="robot-img">
             </div>
-            <div class="character-platform platform-road" aria-hidden="true"></div>
         </div>
 
         <!-- Texto (lado derecho) -->
         <div class="hero-text reveal-child" data-reveal="2">
-            <div class="hero-badge hero-badge-primaria">
+            <div class="hero-badge hero-badge-secundaria">
                 <span class="badge-dot"></span>
-                <span class="badge-text">Nivel Primaria · 6 a 11 años</span>
+                <span class="badge-text">Nivel Secundaria · 12 a 17 años</span>
                 <span class="badge-dot"></span>
             </div>
 
             <h2 class="portal-hero-title">
                 <span class="portal-hero-title-line">AVENTURAS DE</span>
-                <span class="portal-hero-title-line portal-hero-title-accent">RUGGED</span>
+                <span class="portal-hero-title-line portal-hero-title-accent">LUDIO</span>
             </h2>
 
-            <div class="bubble bubble-primaria">
+            <div class="bubble bubble-secundaria">
                 <span class="bubble-tail"></span>
                 <p class="bubble-text">
-                    ¡Piloto, enciende motores! 🏎️ ¿A qué desafío te enfrentas hoy?
+                    <span class="glitch-text" data-text="&gt; SYSTEM READY_"> &gt; SYSTEM READY_</span>
+                    ¿Preparado para programar tu próxima misión? 🤖
                 </p>
             </div>
 
             <p class="portal-hero-subtitle">
-                ¡Elige un juego y acelera tu aprendizaje!
+                Desafíos avanzados de lógica, ciencia y tecnología.
             </p>
 
-            <div class="hero-stats" aria-label="Resumen del portal">
-                <div class="hero-stat">
-                    <span class="hero-stat-num">20</span>
-                    <span class="hero-stat-lbl">Juegos</span>
-                </div>
-                <div class="hero-stat">
-                    <span class="hero-stat-num">5</span>
-                    <span class="hero-stat-lbl">Categorías</span>
-                </div>
-                <div class="hero-stat">
-                    <span class="hero-stat-num">∞</span>
-                    <span class="hero-stat-lbl">Diversión</span>
-                </div>
-            </div>
-
             <div class="hero-actions">
-                <a href="#juegos" class="btn btn-hero-primaria" data-scroll="#juegos">
+                <a href="#juegos" class="btn btn-hero-secundaria" data-scroll="#juegos">
                     <span class="btn-glow"></span>
-                    <span class="btn-icon">🏁</span>
-                    <span class="btn-label">ARRANCAR AVENTURA</span>
+                    <span class="btn-icon">⚡</span>
+                    <span class="btn-label">INICIAR PROTOCOLO</span>
                     <span class="btn-arrow">›</span>
                 </a>
             </div>
         </div>
     </div>
 
-    <!-- Indicador de scroll -->
     <div class="scroll-hint" aria-hidden="true">
-        <span class="scroll-txt">Desliza para acelerar</span>
+        <span class="scroll-txt">Desliza para hackear</span>
         <div class="scroll-mouse"><span class="scroll-wheel"></span></div>
     </div>
 </section>
 
 
 <!-- ============================================================
-     ÁREA DE JUEGOS — 20 juegos organizados por categorías
+     ÁREA DE JUEGOS
      ============================================================ -->
 <main id="juegos" class="games-area">
 
-    <div class="games-bg" aria-hidden="true">
-        <div class="games-bg-sky"></div>
-        <div class="games-bg-skyline"></div>
-        <div class="games-bg-road">
-            <div class="games-bg-road-lines"></div>
-        </div>
-        <div class="games-bg-grid"></div>
-        <div class="games-bg-glow games-bg-glow-1"></div>
-        <div class="games-bg-glow games-bg-glow-2"></div>
-        <div class="games-bg-flag games-bg-flag-1">🏁</div>
-        <div class="games-bg-flag games-bg-flag-2">🏁</div>
+    <div class="games-header reveal-child" data-reveal="1">
+        <h2 class="section-title">
+            <span class="section-title-ico">⚡</span>
+            <span class="section-title-txt">SELECCIONA MISIÓN</span>
+        </h2>
+        <p class="section-subtitle">
+            21 protocolos de aprendizaje te esperan. ¡Inicia tu carrera digital!
+        </p>
     </div>
 
-    <div class="games-area-inner">
+    <div class="filters filters-secundaria reveal-child" data-reveal="2" role="tablist" aria-label="Filtrar juegos por categoría">
+        <button class="filter-btn is-active" data-filter="all" role="tab" aria-selected="true">
+            <span class="filter-ico">🌐</span>
+            <span class="filter-txt">Todos</span>
+            <span class="filter-count" data-count="all">21</span>
+        </button>
 
-        <!-- Encabezado -->
-        <div class="games-header reveal-child" data-reveal="1">
-            <h2 class="section-title">
-                <span class="section-title-ico">🏁</span>
-                <span class="section-title-txt">ELIGE TU DESAFÍO</span>
-            </h2>
-            <p class="section-subtitle">
-                20 desafíos de pensamiento computacional te esperan. ¡Elige uno y empieza a resolver!
-            </p>
-        </div>
+        <button class="filter-btn" data-filter="matematicas" role="tab" aria-selected="false">
+            <span class="filter-ico">📐</span>
+            <span class="filter-txt">Matemáticas</span>
+            <span class="filter-count" data-count="matematicas">4</span>
+        </button>
 
-        <!-- Filtros -->
-        <div class="filters filters-primaria reveal-child" data-reveal="2" role="tablist" aria-label="Filtrar juegos por categoría">
-            <button class="filter-btn is-active" data-filter="all" role="tab" aria-selected="true">
-                <span class="filter-ico">🏁</span>
-                <span class="filter-txt">Todos</span>
-                <span class="filter-count" data-count="all">20</span>
-            </button>
+        <button class="filter-btn" data-filter="programacion" role="tab" aria-selected="false">
+            <span class="filter-ico">💻</span>
+            <span class="filter-txt">Programación</span>
+            <span class="filter-count" data-count="programacion">5</span>
+        </button>
 
-            <button class="filter-btn" data-filter="resolucion" role="tab" aria-selected="false">
-                <span class="filter-ico">🧠</span>
-                <span class="filter-txt">Resolución</span>
-                <span class="filter-count" data-count="resolucion">4</span>
-            </button>
+        <button class="filter-btn" data-filter="ciencias" role="tab" aria-selected="false">
+            <span class="filter-ico">🧪</span>
+            <span class="filter-txt">Ciencias</span>
+            <span class="filter-count" data-count="ciencias">5</span>
+        </button>
 
-<<<<<<< Updated upstream
-            <button class="filter-btn" data-filter="secuencias" role="tab" aria-selected="false">
-                <span class="filter-ico">🔁</span>
-                <span class="filter-txt">Secuencias</span>
-                <span class="filter-count" data-count="secuencias">4</span>
-            </button>
-
-            <button class="filter-btn" data-filter="clasificacion" role="tab" aria-selected="false">
-                <span class="filter-ico">🗂️</span>
-                <span class="filter-txt">Clasificación</span>
-                <span class="filter-count" data-count="clasificacion">4</span>
-            </button>
-
-            <button class="filter-btn" data-filter="logica" role="tab" aria-selected="false">
-                <span class="filter-ico">🧩</span>
-                <span class="filter-txt">Lógica y patrones</span>
-                <span class="filter-count" data-count="logica">5</span>
-            </button>
-
-            <button class="filter-btn" data-filter="retos" role="tab" aria-selected="false">
-                <span class="filter-ico">🏆</span>
-                <span class="filter-txt">Retos integradores</span>
-                <span class="filter-count" data-count="retos">3</span>
-            </button>
-        </div>
-
-
-        <!-- ══════════════════════════════════════════════════════════════
-             SECCIÓN 1 · MATEMÁTICAS
-             ══════════════════════════════════════════════════════════════ -->
-        <section class="games-section games-section-resolucion" data-section="resolucion" aria-labelledby="sec-resolucion-title">
-
-            <header class="games-section-head">
-                <div class="games-section-ico games-section-ico-matematicas">🔢</div>
-                <div class="games-section-info">
-                    <h3 class="games-section-title" id="sec-resolucion-title">Resolución de problemas</h3>
-                    <p class="games-section-desc">Analiza situaciones, elige estrategias y encuentra soluciones paso a paso</p>
-                </div>
-                <span class="games-section-count">
-                    <span class="games-section-count-num">4</span>
-                    <span class="games-section-count-txt">juegos</span>
-                </span>
-            </header>
-
-            <div class="games-grid" aria-live="polite">
-
-                <!-- 01 · Peña Embrujada (Activo) -->
-                <article class="game-card" data-category="resolucion" data-difficulty="facil">
-                    <a href="Juegos/Pena_Embrujada.html" class="game-card-link" target="_blank" rel="noopener noreferrer" aria-label="Abrir juego Carrera de Sumas">
-                        <div class="game-card-thumb thumb-matematicas has-image">
-                            <iframe src="Juegos/Pena_Embrujada.html" title="Carrera de Sumas" class="dynamic-thumb" loading="lazy" scrolling="no" tabindex="-1" sandbox="allow-same-origin allow-scripts"></iframe>
-                            <span class="game-thumb-bg"></span>
-                            <span class="game-number">01</span>
-                            <div class="game-difficulty difficulty-facil">
-                                <span class="diff-dot"></span>
-                                <span class="diff-txt">Matemáticas</span>
-                            </div>
-                        </div>
-                        <div class="game-card-body">
-                            <div class="game-card-top">
-                                <span class="game-category-tag tag-matematicas">🧠 Resolución de problemas</span>
-                                <span class="game-age">6-8 años</span>
-                            </div>
-                            <h3 class="game-title">Peña Embrujada</h3>
-                            <p class="game-desc">🎃🎶 Peña Embrujada une Halloween y la música criolla peruana.
-                                                 ¡Atrapa fantasmas, resuelve sumas y desafía tu memoria!</p>
-                            <div class="game-card-bottom">
-                                <span class="game-rating" aria-label="Dificultad 1 de 3">
-                                    <span class="star is-filled">★</span>
-                                    <span class="star">★</span>
-                                    <span class="star">★</span>
-                                </span>
-                                <span class="game-play">
-                                    <span class="game-play-ico">▶</span>
-                                    <span class="game-play-txt">Jugar</span>
-                                </span>
-                            </div>
-                        </div>
-                    </a>
-                </article>
-
-                <!-- 02 · Multiplica Rápido (Placeholder) -->
-                <article class="game-card disabled game-card-new" data-category="resolucion" data-difficulty="medio">
-                    <a href="#" class="game-card-link" aria-label="Juego no disponible">
-                        <div class="game-card-thumb thumb-matematicas">
-                            <div class="placeholder-overlay">
-                                <span class="placeholder-text">Próximamente</span>
-                            </div>
-                            <span class="game-thumb-bg"></span>
-                            <span class="game-number">02</span>
-                            <span class="game-badge-new">NUEVO</span>
-                            <div class="game-difficulty difficulty-medio">
-                                <span class="diff-dot"></span>
-                                <span class="diff-txt">Matemáticas</span>
-                            </div>
-                        </div>
-                        <div class="game-card-body">
-                            <div class="game-card-top">
-                                <span class="game-category-tag tag-matematicas">🧠 Resolución de problemas</span>
-                                <span class="game-age">8-10 años</span>
-                            </div>
-                            <h3 class="game-title">Multiplica Rápido</h3>
-                            <p class="game-desc">Domina las tablas de multiplicar y gana carreras contra el reloj.</p>
-                            <div class="game-card-bottom">
-                                <span class="game-rating" aria-label="Dificultad 2 de 3">
-                                    <span class="star is-filled">★</span>
-                                    <span class="star is-filled">★</span>
-                                    <span class="star">★</span>
-                                </span>
-                            </div>
-                        </div>
-                    </a>
-                </article>
-
-                <!-- 03 · Fracciones en Pista (Placeholder) -->
-                <article class="game-card disabled game-card-new" data-category="resolucion" data-difficulty="medio">
-                    <a href="#" class="game-card-link" aria-label="Juego no disponible">
-                        <div class="game-card-thumb thumb-matematicas">
-                            <div class="placeholder-overlay">
-                                <span class="placeholder-text">Próximamente</span>
-                            </div>
-                            <span class="game-thumb-bg"></span>
-                            <span class="game-number">03</span>
-                            <span class="game-badge-new">NUEVO</span>
-                            <div class="game-difficulty difficulty-medio">
-                                <span class="diff-dot"></span>
-                                <span class="diff-txt">Matemáticas</span>
-                            </div>
-                        </div>
-                        <div class="game-card-body">
-                            <div class="game-card-top">
-                                <span class="game-category-tag tag-matematicas">🧠 Resolución de problemas</span>
-                                <span class="game-age">9-11 años</span>
-                            </div>
-                            <h3 class="game-title">Fracciones en Pista</h3>
-                            <p class="game-desc">Compite dividiendo la pista en fracciones correctas para llegar primero.</p>
-                            <div class="game-card-bottom">
-                                <span class="game-rating" aria-label="Dificultad 2 de 3">
-                                    <span class="star is-filled">★</span>
-                                    <span class="star is-filled">★</span>
-                                    <span class="star">★</span>
-                                </span>
-                            </div>
-                        </div>
-                    </a>
-                </article>
-
-                <!-- 04 · Problemas de Velocidad (Placeholder) -->
-                <article class="game-card disabled game-card-new" data-category="resolucion" data-difficulty="dificil">
-                    <a href="#" class="game-card-link" aria-label="Juego no disponible">
-                        <div class="game-card-thumb thumb-matematicas">
-                            <div class="placeholder-overlay">
-                                <span class="placeholder-text">Próximamente</span>
-                            </div>
-                            <span class="game-thumb-bg"></span>
-                            <span class="game-number">04</span>
-                            <span class="game-badge-new">NUEVO</span>
-                            <div class="game-difficulty difficulty-dificil">
-                                <span class="diff-dot"></span>
-                                <span class="diff-txt">Matemáticas</span>
-                            </div>
-                        </div>
-                        <div class="game-card-body">
-                            <div class="game-card-top">
-                                <span class="game-category-tag tag-matematicas">🧠 Resolución de problemas</span>
-                                <span class="game-age">10-11 años</span>
-                            </div>
-                            <h3 class="game-title">Problemas de Velocidad</h3>
-                            <p class="game-desc">Resuelve problemas de distancia, velocidad y tiempo como un verdadero piloto.</p>
-                            <div class="game-card-bottom">
-                                <span class="game-rating" aria-label="Dificultad 3 de 3">
-                                    <span class="star is-filled">★</span>
-                                    <span class="star is-filled">★</span>
-                                    <span class="star is-filled">★</span>
-                                </span>
-                            </div>
-                        </div>
-                    </a>
-                </article>
-
-            </div>
-        </section>
-
-
-        <!-- ══════════════════════════════════════════════════════════════
-             SECCIÓN 2 · LENGUAJE
-             ══════════════════════════════════════════════════════════════ -->
-        <section class="games-section games-section-secuencias" data-section="secuencias" aria-labelledby="sec-secuencias-title">
-
-            <header class="games-section-head">
-                <div class="games-section-ico games-section-ico-lenguaje">📖</div>
-                <div class="games-section-info">
-                    <h3 class="games-section-title" id="sec-secuencias-title">Secuencias y comprensión</h3>
-                    <p class="games-section-desc">Ordena información, reconoce pasos y comprende relaciones entre elementos</p>
-                </div>
-                <span class="games-section-count">
-                    <span class="games-section-count-num">4</span>
-                    <span class="games-section-count-txt">juegos</span>
-                </span>
-            </header>
-
-            <div class="games-grid" aria-live="polite">
-
-                <!-- 05 · El Semáforo Travieso (Activo) -->
-                <article class="game-card" data-category="secuencias" data-difficulty="facil">
-                    <a href="Juegos/semaforo2/semaforo.html" class="game-card-link" target="_blank" rel="noopener noreferrer" aria-label="Abrir juego El Semáforo Travieso">
-                        <div class="game-card-thumb thumb-educacion-vial has-image">
-                            <img src="Juegos/semaforo2/assetsInicio/fondo/fondo-personalizado.png" alt="Vista previa de El Semáforo Travieso" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;">
-                            <span class="game-thumb-bg"></span>
-                            <span class="game-number">05</span>
-                            <div class="game-difficulty difficulty-facil">
-                                <span class="diff-dot"></span>
-                                <span class="diff-txt">Educación vial</span>
-                            </div>
-                        </div>
-                        <div class="game-card-body">
-                            <div class="game-card-top">
-                                <span class="game-category-tag tag-educacion-vial">🔁 Secuencias y comprensión</span>
-                                <span class="game-age">6-10 años</span>
-                            </div>
-                            <h3 class="game-title">El Semáforo Travieso</h3>
-                            <p class="game-desc">Explora la ciudad, observa los semáforos y aprende a cruzar las calles de forma segura.</p>
-                            <div class="game-card-bottom">
-                                <span class="game-rating" aria-label="Dificultad 1 de 3">
-                                    <span class="star is-filled">★</span>
-                                    <span class="star">★</span>
-                                    <span class="star">★</span>
-                                </span>
-                                <span class="game-play">
-                                    <span class="game-play-ico">▶</span>
-                                    <span class="game-play-txt">Jugar</span>
-                                </span>
-                            </div>
-                        </div>
-                    </a>
-                </article>
-
-                <!-- 06 · Sinónimos y Antónimos (Placeholder) -->
-                <article class="game-card disabled game-card-new" data-category="secuencias" data-difficulty="facil">
-                    <a href="#" class="game-card-link" aria-label="Juego no disponible">
-                        <div class="game-card-thumb thumb-lenguaje">
-                            <div class="placeholder-overlay"><span class="placeholder-text">Próximamente</span></div>
-                            <span class="game-thumb-bg"></span>
-                            <span class="game-number">06</span>
-                            <span class="game-badge-new">NUEVO</span>
-                            <div class="game-difficulty difficulty-facil">
-                                <span class="diff-dot"></span>
-                                <span class="diff-txt">Lenguaje</span>
-                            </div>
-                        </div>
-                        <div class="game-card-body">
-                            <div class="game-card-top">
-                                <span class="game-category-tag tag-lenguaje">🔁 Secuencias y comprensión</span>
-                                <span class="game-age">7-9 años</span>
-                            </div>
-                            <h3 class="game-title">Sinónimos y Antónimos</h3>
-                            <p class="game-desc">Une las palabras con su sinónimo o antónimo correcto en cada curva.</p>
-                            <div class="game-card-bottom">
-                                <span class="game-rating" aria-label="Dificultad 1 de 3">
-                                    <span class="star is-filled">★</span>
-                                    <span class="star">★</span>
-                                    <span class="star">★</span>
-                                </span>
-                            </div>
-                        </div>
-                    </a>
-                </article>
-
-                <!-- 07 · Constructor de Oraciones (Placeholder) -->
-                <article class="game-card disabled game-card-new" data-category="secuencias" data-difficulty="medio">
-                    <a href="#" class="game-card-link" aria-label="Juego no disponible">
-                        <div class="game-card-thumb thumb-lenguaje">
-                            <div class="placeholder-overlay"><span class="placeholder-text">Próximamente</span></div>
-                            <span class="game-thumb-bg"></span>
-                            <span class="game-number">07</span>
-                            <span class="game-badge-new">NUEVO</span>
-                            <div class="game-difficulty difficulty-medio">
-                                <span class="diff-dot"></span>
-                                <span class="diff-txt">Lenguaje</span>
-                            </div>
-                        </div>
-                        <div class="game-card-body">
-                            <div class="game-card-top">
-                                <span class="game-category-tag tag-lenguaje">🔁 Secuencias y comprensión</span>
-                                <span class="game-age">8-10 años</span>
-                            </div>
-                            <h3 class="game-title">Constructor de Oraciones</h3>
-                            <p class="game-desc">Ordena las palabras correctamente para formar oraciones completas.</p>
-                            <div class="game-card-bottom">
-                                <span class="game-rating" aria-label="Dificultad 2 de 3">
-                                    <span class="star is-filled">★</span>
-                                    <span class="star is-filled">★</span>
-                                    <span class="star">★</span>
-                                </span>
-                            </div>
-                        </div>
-                    </a>
-                </article>
-
-                <!-- 08 · Comprensión Lectora (Placeholder) -->
-                <article class="game-card disabled game-card-new" data-category="secuencias" data-difficulty="dificil">
-                    <a href="#" class="game-card-link" aria-label="Juego no disponible">
-                        <div class="game-card-thumb thumb-lenguaje">
-                            <div class="placeholder-overlay"><span class="placeholder-text">Próximamente</span></div>
-                            <span class="game-thumb-bg"></span>
-                            <span class="game-number">08</span>
-                            <span class="game-badge-new">NUEVO</span>
-                            <div class="game-difficulty difficulty-dificil">
-                                <span class="diff-dot"></span>
-                                <span class="diff-txt">Lenguaje</span>
-                            </div>
-                        </div>
-                        <div class="game-card-body">
-                            <div class="game-card-top">
-                                <span class="game-category-tag tag-lenguaje">🔁 Secuencias y comprensión</span>
-                                <span class="game-age">9-11 años</span>
-                            </div>
-                            <h3 class="game-title">Comprensión Lectora</h3>
-                            <p class="game-desc">Lee historias cortas y responde preguntas para desbloquear el siguiente nivel.</p>
-                            <div class="game-card-bottom">
-                                <span class="game-rating" aria-label="Dificultad 3 de 3">
-                                    <span class="star is-filled">★</span>
-                                    <span class="star is-filled">★</span>
-                                    <span class="star is-filled">★</span>
-                                </span>
-                            </div>
-                        </div>
-                    </a>
-                </article>
-
-            </div>
-        </section>
-
-
-        <!-- ══════════════════════════════════════════════════════════════
-             SECCIÓN 3 · CIENCIAS
-             ══════════════════════════════════════════════════════════════ -->
-        <section class="games-section games-section-clasificacion" data-section="clasificacion" aria-labelledby="sec-clasificacion-title">
-
-            <header class="games-section-head">
-                <div class="games-section-ico games-section-ico-ciencias">🔬</div>
-                <div class="games-section-info">
-                    <h3 class="games-section-title" id="sec-clasificacion-title">Clasificación y análisis</h3>
-                    <p class="games-section-desc">Observa características, compara elementos y organízalos según sus propiedades</p>
-                </div>
-                <span class="games-section-count">
-                    <span class="games-section-count-num">4</span>
-                    <span class="games-section-count-txt">juegos</span>
-                </span>
-            </header>
-
-            <div class="games-grid" aria-live="polite">
-
-                <!-- 09 · EcomoCamion (Activo - usa recolector_basura.html) -->
-                <article class="game-card" data-category="clasificacion" data-difficulty="facil">
-                    <a href="Juegos/recolector_basura.html" class="game-card-link" target="_blank" rel="noopener noreferrer" aria-label="Abrir juego EcoCamion">
-                        <div class="game-card-thumb thumb-ciencias has-image">
-                            <iframe src="Juegos/recolector_basura.html" title="EcoCamion" class="dynamic-thumb" loading="lazy" scrolling="no" tabindex="-1" sandbox="allow-same-origin allow-scripts"></iframe>
-                            <span class="game-thumb-bg"></span>
-                            <span class="game-number">09</span>
-                            <div class="game-difficulty difficulty-facil">
-                                <span class="diff-dot"></span>
-                                <span class="diff-txt">Ciencias</span>
-                            </div>
-                        </div>
-                        <div class="game-card-body">
-                            <div class="game-card-top">
-                                <span class="game-category-tag tag-ciencias">🗂️ Clasificación y análisis</span>
-                                <span class="game-age">6-9 años</span>
-                            </div>
-                            <h3 class="game-title">EcoCamion</h3>
-                            <p class="game-desc">Recolecta y clasifica los residuos en el contenedor correcto para cuidar el medio ambiente.</p>
-                            <div class="game-card-bottom">
-                                <span class="game-rating" aria-label="Dificultad 1 de 3">
-                                    <span class="star is-filled">★</span>
-                                    <span class="star">★</span>
-                                    <span class="star">★</span>
-                                </span>
-                                <span class="game-play">
-                                    <span class="game-play-ico">▶</span>
-                                    <span class="game-play-txt">Jugar</span>
-                                </span>
-                            </div>
-                        </div>
-                    </a>
-                </article>
-
-                <!-- 10 · Explorador de Animales (Activo) -->
-                <article class="game-card game-card-new" data-category="clasificacion" data-difficulty="facil">
-                    <a href="Juegos/explorador_animales.html" class="game-card-link" target="_blank" rel="noopener noreferrer" aria-label="Abrir juego Explorador de Animales">
-                        <div class="game-card-thumb thumb-ciencias has-image">
-                            <iframe src="Juegos/explorador_animales.html" title="Explorador de Animales" class="dynamic-thumb" loading="lazy" scrolling="no" tabindex="-1" sandbox="allow-same-origin allow-scripts"></iframe>
-                            <span class="game-thumb-bg"></span>
-                            <span class="game-number">10</span>
-                            <span class="game-badge-new">NUEVO</span>
-                            <div class="game-difficulty difficulty-facil">
-                                <span class="diff-dot"></span>
-                                <span class="diff-txt">Ciencias</span>
-                            </div>
-                        </div>
-                        <div class="game-card-body">
-                            <div class="game-card-top">
-                                <span class="game-category-tag tag-ciencias">🗂️ Clasificación y análisis</span>
-                                <span class="game-age">6-9 años</span>
-                            </div>
-                            <h3 class="game-title">Explorador de Animales</h3>
-                            <p class="game-desc">Observa y clasifica cada animal en su hábitat correcto para descubrir dónde vive cada uno.</p>
-                            <div class="game-card-bottom">
-                                <span class="game-rating" aria-label="Dificultad 1 de 3">
-                                    <span class="star is-filled">★</span>
-                                    <span class="star">★</span>
-                                    <span class="star">★</span>
-                                </span>
-                                <span class="game-play">
-                                    <span class="game-play-ico">▶</span>
-                                    <span class="game-play-txt">Jugar</span>
-                                </span>
-                            </div>
-                        </div>
-                    </a>
-                </article>
-
-                <!-- 11 · Genetica (Activo) -->
-                <article class="game-card game-card-new" data-category="clasificacion" data-difficulty="medio">
-                    <a href="Juegos/genetica.html" class="game-card-link" target="_blank" rel="noopener noreferrer" aria-label="Abrir juego Ecosistemas">
-                        <div class="game-card-thumb thumb-ciencias has-image">
-                            <iframe src="Juegos/genetica.html" title="Genética" class="dynamic-thumb" loading="lazy" scrolling="no" tabindex="-1" sandbox="allow-same-origin allow-scripts"></iframe>
-                            <span class="game-thumb-bg"></span>
-                            <span class="game-number">11</span>
-                            <span class="game-badge-new">NUEVO</span>
-                            <div class="game-difficulty difficulty-medio">
-                                <span class="diff-dot"></span>
-                                <span class="diff-txt">Ciencias</span>
-                            </div>
-                        </div>
-                        <div class="game-card-body">
-                            <div class="game-card-top">
-                                <span class="game-category-tag tag-ciencias">🗂️ Clasificación y análisis</span>
-                                <span class="game-age">8-10 años</span>
-                            </div>
-                            <h3 class="game-title">Ecosistemas</h3>
-                            <p class="game-desc">Clasifica animales y plantas según su hábitat natural.</p>
-                            <div class="game-card-bottom">
-                                <span class="game-rating" aria-label="Dificultad 2 de 3">
-                                    <span class="star is-filled">★</span>
-                                    <span class="star is-filled">★</span>
-                                    <span class="star">★</span>
-                                </span>
-                                <span class="game-play">
-                                    <span class="game-play-ico">▶</span>
-                                    <span class="game-play-txt">Jugar</span>
-                                </span>
-                            </div>
-                        </div>
-                    </a>
-                </article>
-
-                <!-- 12 · Estados del Agua (Placeholder) -->
-                <article class="game-card disabled game-card-new" data-category="clasificacion" data-difficulty="medio">
-                    <a href="#" class="game-card-link" aria-label="Juego no disponible">
-                        <div class="game-card-thumb thumb-ciencias">
-                            <div class="placeholder-overlay"><span class="placeholder-text">Próximamente</span></div>
-                            <span class="game-thumb-bg"></span>
-                            <span class="game-number">12</span>
-                            <span class="game-badge-new">NUEVO</span>
-                            <div class="game-difficulty difficulty-medio">
-                                <span class="diff-dot"></span>
-                                <span class="diff-txt">Ciencias</span>
-                            </div>
-                        </div>
-                        <div class="game-card-body">
-                            <div class="game-card-top">
-                                <span class="game-category-tag tag-ciencias">🗂️ Clasificación y análisis</span>
-                                <span class="game-age">8-10 años</span>
-                            </div>
-                            <h3 class="game-title">Estados del Agua</h3>
-                            <p class="game-desc">Descubre cómo el agua cambia de estado con la temperatura.</p>
-                            <div class="game-card-bottom">
-                                <span class="game-rating" aria-label="Dificultad 2 de 3">
-                                    <span class="star is-filled">★</span>
-                                    <span class="star is-filled">★</span>
-                                    <span class="star">★</span>
-                                </span>
-                            </div>
-                        </div>
-                    </a>
-                </article>
-
-            </div>
-        </section>
-
-
-        <!-- ══════════════════════════════════════════════════════════════
-             SECCIÓN 4 · LÓGICA
-             ══════════════════════════════════════════════════════════════ -->
-        <section class="games-section games-section-logica" data-section="logica" aria-labelledby="sec-logica-title">
-
-            <header class="games-section-head">
-                <div class="games-section-ico games-section-ico-logica">🧩</div>
-                <div class="games-section-info">
-                    <h3 class="games-section-title" id="sec-logica-title">Lógica y patrones</h3>
-                    <p class="games-section-desc">Descubre reglas, identifica patrones y fortalece el razonamiento lógico</p>
-                </div>
-                <span class="games-section-count">
-                    <span class="games-section-count-num">5</span>
-                    <span class="games-section-count-txt">juegos</span>
-                </span>
-            </header>
-
-            <div class="games-grid" aria-live="polite">
-
-                <!-- 13 · Sudoku Junior (Placeholder) -->
-                <article class="game-card disabled" data-category="logica" data-difficulty="medio">
-                    <a href="#" class="game-card-link" aria-label="Juego no disponible">
-                        <div class="game-card-thumb thumb-logica">
-                            <div class="placeholder-overlay"><span class="placeholder-text">Próximamente</span></div>
-                            <span class="game-thumb-bg"></span>
-                            <span class="game-number">13</span>
-                            <div class="game-difficulty difficulty-medio">
-                                <span class="diff-dot"></span>
-                                <span class="diff-txt">Lógica</span>
-                            </div>
-                        </div>
-                        <div class="game-card-body">
-                            <div class="game-card-top">
-                                <span class="game-category-tag tag-logica">🧩 Lógica y patrones</span>
-                                <span class="game-age">8-10 años</span>
-                            </div>
-                            <h3 class="game-title">Sudoku Junior</h3>
-                            <p class="game-desc">Completa el tablero 4x4 sin repetir números en filas ni columnas.</p>
-                            <div class="game-card-bottom">
-                                <span class="game-rating" aria-label="Dificultad 2 de 3">
-                                    <span class="star is-filled">★</span>
-                                    <span class="star is-filled">★</span>
-                                    <span class="star">★</span>
-                                </span>
-                            </div>
-                        </div>
-                    </a>
-                </article>
-
-                <!-- 14 · Patrones (Activo - usa p.secuencia.html) -->
-                <article class="game-card game-card-new" data-category="logica" data-difficulty="facil">
-                    <a href="Juegos/p.secuencia.html" class="game-card-link" target="_blank" rel="noopener noreferrer" aria-label="Abrir juego Patrones">
-                        <div class="game-card-thumb thumb-logica has-image">
-                            <iframe src="Juegos/p.secuencia.html" title="Patrones" class="dynamic-thumb" loading="lazy" scrolling="no" tabindex="-1" sandbox="allow-same-origin allow-scripts"></iframe>
-                            <span class="game-thumb-bg"></span>
-                            <span class="game-number">14</span>
-                            <span class="game-badge-new">NUEVO</span>
-                            <div class="game-difficulty difficulty-facil">
-                                <span class="diff-dot"></span>
-                                <span class="diff-txt">Lógica</span>
-                            </div>
-                        </div>
-                        <div class="game-card-body">
-                            <div class="game-card-top">
-                                <span class="game-category-tag tag-logica">🧩 Lógica y patrones</span>
-                                <span class="game-age">6-9 años</span>
-                            </div>
-                            <h3 class="game-title">Patrones</h3>
-                            <p class="game-desc">Descubre el patrón que sigue la secuencia y continúa la serie.</p>
-                            <div class="game-card-bottom">
-                                <span class="game-rating" aria-label="Dificultad 1 de 3">
-                                    <span class="star is-filled">★</span>
-                                    <span class="star">★</span>
-                                    <span class="star">★</span>
-                                </span>
-                                <span class="game-play">
-                                    <span class="game-play-ico">▶</span>
-                                    <span class="game-play-txt">Jugar</span>
-                                </span>
-                            </div>
-                        </div>
-                    </a>
-                </article>
-
-                <!-- 15 · Connect.Dots (Activo) -->
-                <article class="game-card game-card-new" data-category="logica" data-difficulty="medio">
-                    <a href="Juegos/connect.dots.html" class="game-card-link" target="_blank" rel="noopener noreferrer" aria-label="Abrir juego Connect.Dots">
-                        <div class="game-card-thumb thumb-logica has-image">
-                            <iframe src="Juegos/connect.dots.html" title="Connect.Dots" class="dynamic-thumb" loading="lazy" scrolling="no" tabindex="-1" sandbox="allow-same-origin allow-scripts"></iframe>
-                            <span class="game-thumb-bg"></span>
-                            <span class="game-number">15</span>
-                            <span class="game-badge-new">NUEVO</span>
-                            <div class="game-difficulty difficulty-medio">
-                                <span class="diff-dot"></span>
-                                <span class="diff-txt">Lógica</span>
-                            </div>
-                        </div>
-                        <div class="game-card-body">
-                            <div class="game-card-top">
-                                <span class="game-category-tag tag-logica">🧩 Lógica y patrones</span>
-                                <span class="game-age">8-10 años</span>
-                            </div>
-                            <h3 class="game-title">Connect.dots</h3>
-                            <p class="game-desc">Descubre la figura conectando sus puntos, sin saltar ni repetir líneas.
-                            Empieza donde quieras, piensa el recorrido y completa el desafío antes de que se acabe el tiempo.</p>
-                            <div class="game-card-bottom">
-                                <span class="game-rating" aria-label="Dificultad 2 de 3">
-                                    <span class="star is-filled">★</span>
-                                    <span class="star is-filled">★</span>
-                                    <span class="star">★</span>
-                                </span>
-                                <span class="game-play">
-                                    <span class="game-play-ico">▶</span>
-                                    <span class="game-play-txt">Jugar</span>
-                                </span>
-                            </div>
-                        </div>
-                    </a>
-                </article>
-
-                <!-- 16 · Código Secreto (Placeholder) -->
-                <article class="game-card disabled game-card-new" data-category="logica" data-difficulty="medio">
-                    <a href="#" class="game-card-link" aria-label="Juego no disponible">
-                        <div class="game-card-thumb thumb-logica">
-                            <div class="placeholder-overlay"><span class="placeholder-text">Próximamente</span></div>
-                            <span class="game-thumb-bg"></span>
-                            <span class="game-number">16</span>
-                            <span class="game-badge-new">NUEVO</span>
-                            <div class="game-difficulty difficulty-medio">
-                                <span class="diff-dot"></span>
-                                <span class="diff-txt">Lógica</span>
-                            </div>
-                        </div>
-                        <div class="game-card-body">
-                            <div class="game-card-top">
-                                <span class="game-category-tag tag-logica">🧩 Lógica y patrones</span>
-                                <span class="game-age">8-10 años</span>
-                            </div>
-                            <h3 class="game-title">Código Secreto</h3>
-                            <p class="game-desc">Descifra el código de la carrera usando las pistas que te dan.</p>
-                            <div class="game-card-bottom">
-                                <span class="game-rating" aria-label="Dificultad 2 de 3">
-                                    <span class="star is-filled">★</span>
-                                    <span class="star is-filled">★</span>
-                                    <span class="star">★</span>
-                                </span>
-                            </div>
-                        </div>
-                    </a>
-                </article>
-
-                <!-- 17 · Programación Básica (Placeholder) -->
-                <article class="game-card disabled game-card-new" data-category="logica" data-difficulty="dificil">
-                    <a href="#" class="game-card-link" aria-label="Juego no disponible">
-                        <div class="game-card-thumb thumb-logica">
-                            <div class="placeholder-overlay"><span class="placeholder-text">Próximamente</span></div>
-                            <span class="game-thumb-bg"></span>
-                            <span class="game-number">17</span>
-                            <span class="game-badge-new">NUEVO</span>
-                            <div class="game-difficulty difficulty-dificil">
-                                <span class="diff-dot"></span>
-                                <span class="diff-txt">Programación</span>
-                            </div>
-                        </div>
-                        <div class="game-card-body">
-                            <div class="game-card-top">
-                                <span class="game-category-tag tag-logica">🧩 Lógica y patrones</span>
-                                <span class="game-age">9-11 años</span>
-                            </div>
-                            <h3 class="game-title">Programación Básica</h3>
-                            <p class="game-desc">Aprende a programar los movimientos de Rugged con bloques simples.</p>
-                            <div class="game-card-bottom">
-                                <span class="game-rating" aria-label="Dificultad 3 de 3">
-                                    <span class="star is-filled">★</span>
-                                    <span class="star is-filled">★</span>
-                                    <span class="star is-filled">★</span>
-                                </span>
-                            </div>
-                        </div>
-                    </a>
-                </article>
-
-            </div>
-        </section>
-
-
-        <!-- ══════════════════════════════════════════════════════════════
-             SECCIÓN 5 · RETOS ESPECIALES
-             ══════════════════════════════════════════════════════════════ -->
-        <section class="games-section games-section-retos" data-section="retos" aria-labelledby="sec-retos-title">
-
-            <header class="games-section-head">
-                <div class="games-section-ico games-section-ico-retos">🏆</div>
-                <div class="games-section-info">
-                    <h3 class="games-section-title" id="sec-retos-title">Desafíos integradores</h3>
-                    <p class="games-section-desc">Combina distintas habilidades de pensamiento computacional en un mismo reto</p>
-                </div>
-                <span class="games-section-count">
-                    <span class="games-section-count-num">3</span>
-                    <span class="games-section-count-txt">juegos</span>
-                </span>
-            </header>
-
-            <div class="games-grid" aria-live="polite">
-
-                <!-- 18 · Peña Embrujada (Activo) -->
-                <article class="game-card" data-category="resolucion" data-difficulty="facil">
-                    <a href="Juegos/Pena_Embrujada.html" class="game-card-link" target="_blank" rel="noopener noreferrer" aria-label="Abrir juego Carrera de Sumas">
-                        <div class="game-card-thumb thumb-matematicas has-image">
-                            <iframe src="Juegos/Pena_Embrujada.html" title="Carrera de Sumas" class="dynamic-thumb" loading="lazy" scrolling="no" tabindex="-1" sandbox="allow-same-origin allow-scripts"></iframe>
-                            <span class="game-thumb-bg"></span>
-                            <span class="game-number">01</span>
-                            <div class="game-difficulty difficulty-facil">
-                                <span class="diff-dot"></span>
-                                <span class="diff-txt">Matemáticas</span>
-                            </div>
-                        </div>
-                        <div class="game-card-body">
-                            <div class="game-card-top">
-                                <span class="game-category-tag tag-matematicas">🧠 Resolución de problemas</span>
-                                <span class="game-age">6-8 años</span>
-                            </div>
-                            <h3 class="game-title">Peña Embrujada</h3>
-                            <p class="game-desc">🎃🎶 Peña Embrujada une Halloween y la música criolla peruana.
-                                                 ¡Atrapa fantasmas, resuelve sumas y desafía tu memoria!</p>
-                            <div class="game-card-bottom">
-                                <span class="game-rating" aria-label="Dificultad 1 de 3">
-                                    <span class="star is-filled">★</span>
-                                    <span class="star">★</span>
-                                    <span class="star">★</span>
-                                </span>
-                                <span class="game-play">
-                                    <span class="game-play-ico">▶</span>
-                                    <span class="game-play-txt">Jugar</span>
-                                </span>
-                            </div>
-                        </div>
-                    </a>
-                </article>
-
-                <!-- 19 · Maratón del Saber (Placeholder) -->
-                <article class="game-card disabled game-card-new" data-category="retos" data-difficulty="dificil">
-                    <a href="#" class="game-card-link" aria-label="Juego no disponible">
-                        <div class="game-card-thumb thumb-retos">
-                            <div class="placeholder-overlay"><span class="placeholder-text">Próximamente</span></div>
-                            <span class="game-thumb-bg"></span>
-                            <span class="game-number">19</span>
-                            <span class="game-badge-new">NUEVO</span>
-                            <div class="game-difficulty difficulty-dificil">
-                                <span class="diff-dot"></span>
-                                <span class="diff-txt">Integrado</span>
-                            </div>
-                        </div>
-                        <div class="game-card-body">
-                            <div class="game-card-top">
-                                <span class="game-category-tag tag-retos">🏆 Desafío integrador</span>
-                                <span class="game-age">10-11 años</span>
-                            </div>
-                            <h3 class="game-title">Maratón del Saber</h3>
-                            <p class="game-desc">Preguntas de matemáticas, lenguaje y ciencias en una sola carrera.</p>
-                            <div class="game-card-bottom">
-                                <span class="game-rating" aria-label="Dificultad 3 de 3">
-                                    <span class="star is-filled">★</span>
-                                    <span class="star is-filled">★</span>
-                                    <span class="star is-filled">★</span>
-                                </span>
-                            </div>
-                        </div>
-                    </a>
-                </article>
-
-                <!-- 20 · Campeonato Final (Placeholder) -->
-                <article class="game-card disabled game-card-featured" data-category="retos" data-difficulty="dificil">
-                    <a href="#" class="game-card-link" aria-label="Juego no disponible">
-                        <div class="game-card-thumb thumb-retos">
-                            <div class="placeholder-overlay"><span class="placeholder-text">Próximamente</span></div>
-                            <span class="game-thumb-bg"></span>
-                            <span class="game-number">20</span>
-                            <div class="game-badge-featured">👑 CAMPEONATO</div>
-                            <div class="game-difficulty difficulty-dificil">
-                                <span class="diff-dot"></span>
-                                <span class="diff-txt">Integrado</span>
-                            </div>
-                        </div>
-                        <div class="game-card-body">
-                            <div class="game-card-top">
-                                <span class="game-category-tag tag-retos">🏆 Desafío integrador</span>
-                                <span class="game-age">11+ años</span>
-                            </div>
-                            <h3 class="game-title">Campeonato Final</h3>
-                            <p class="game-desc">El reto definitivo: 5 minijuegos seguidos. ¡Solo los mejores llegan al podio!</p>
-                            <div class="game-card-bottom">
-                                <span class="game-rating" aria-label="Dificultad 3 de 3">
-                                    <span class="star is-filled">★</span>
-                                    <span class="star is-filled">★</span>
-                                    <span class="star is-filled">★</span>
-                                </span>
-                            </div>
-                        </div>
-                    </a>
-                </article>
-
-            </div>
-        </section>
-
-
-        <!-- ============================================
-             MENSAJE CUANDO NO HAY RESULTADOS
-             ============================================ -->
-        <div class="games-empty" id="gamesEmpty" hidden>
-            <span class="games-empty-ico">🔍</span>
-            <p class="games-empty-txt">No hay juegos en esta categoría todavía.</p>
-            <button class="btn btn-show-all" data-filter="all">
-                <span class="btn-icon">🏁</span>
-                <span class="btn-label">VER TODOS</span>
-            </button>
-        </div>
-
-    </div>
-=======
         <button class="filter-btn" data-filter="historia" role="tab" aria-selected="false">
             <span class="filter-ico">📜</span>
             <span class="filter-txt">Humanidades</span>
@@ -2111,72 +1129,21 @@
         </button>
     </div>
 
->>>>>>> Stashed changes
 </main>
 
 
 <!-- ============================================================
-     SOBRE NOSOTROS / INFO PARA DOCENTES Y FAMILIAS
+     SECCIÓN DE AYUDA / INFO PARA DOCENTES
      ============================================================ -->
-<section id="ayuda" class="about-section">
-    <div class="about-inner">
+<section id="ayuda" class="help-section help-secundaria">
+    <div class="help-inner">
 
-        <header class="about-header reveal-child" data-reveal="1">
-            <h2 class="about-values-title">
-                Aprender nunca fue tan <span style="color:#ffaa00;">veloz</span>
-            </h2>
-            <p style="font-size:1.2rem; opacity:0.8;">
-                Aventuras de Rugged es un portal educativo gratuito que combina juego,
-                velocidad y aprendizaje para estudiantes de primaria.
-            </p>
-        </header>
-
-        <div class="about-mission reveal-child" data-reveal="2">
-            <div class="about-mission-text">
-                <h3 style="color:#1a2530; font-size: 1.8rem; margin-top:0;">🎯 Nuestra misión</h3>
-                <p>
-                    Convertir el aprendizaje en una <strong>pista de carreras emocionante</strong>
-                    donde cada niño y niña pueda desarrollar sus habilidades a su propio ritmo,
-                    sin miedo a equivocarse y con ganas de intentarlo una vez más.
-                </p>
-                <p>
-                    Creemos que aprender matemáticas, lenguaje, ciencias y lógica puede
-                    ser tan divertido como ganar un Gran Premio. Cada juego está diseñado
-                    por educadores y probado con estudiantes reales.
-                </p>
-            </div>
-
-            <div class="about-mission-visual">
-                <div class="about-rayet-bubble">
-                    <span class="about-bubble-tail"></span>
-                    <p>¡Yo te acompaño en cada desafío! 🏎️</p>
-                </div>
-                <div class="about-rayet-img-wrap">
-                    <img src="assets/robots/rayet.png" alt="Rugged, el robot guía" class="about-rayet-img">
-                </div>
-            </div>
+        <div class="help-header reveal-child" data-reveal="1">
+            <span class="help-ico">💡</span>
+            <h2 class="help-title">¿Cómo usar Aventuras de Ludio?</h2>
+            <p class="help-subtitle">Consejos para docentes y estudiantes avanzados</p>
         </div>
 
-<<<<<<< Updated upstream
-        <h3 class="about-values-title reveal-child" data-reveal="1">
-            ⭐ Lo que nos hace diferentes
-        </h3>
-
-        <div class="about-values-grid">
-            <div class="about-value-card reveal-child" data-reveal="2">
-                <h4 style="color:#2c3e50; font-size:1.3rem; margin-top:0;">🏁 Aprendizaje progresivo</h4>
-                <p style="color:#555; line-height:1.5;">
-                    Cada juego tiene tres niveles de dificultad: <strong>fácil</strong>,
-                    <strong>medio</strong> y <strong>difícil</strong>. Los niños avanzan a su ritmo.
-                </p>
-            </div>
-
-            <div class="about-value-card reveal-child" data-reveal="3">
-                <h4 style="color:#2c3e50; font-size:1.3rem; margin-top:0;">🧠 Basado en currículo</h4>
-                <p style="color:#555; line-height:1.5;">
-                    Actividades que fortalecen <strong>secuencias, clasificación, lógica, patrones
-                    y resolución de problemas</strong>.
-=======
         <div class="help-grid">
             <div class="help-card reveal-child" data-reveal="2">
                 <div class="help-card-ico">🎯</div>
@@ -2191,54 +1158,25 @@
                 <h3 class="help-card-title">Áreas avanzadas</h3>
                 <p class="help-card-desc">
                     Filtra por matemáticas, programación, ciencias, humanidades o retos finales.
->>>>>>> Stashed changes
                 </p>
             </div>
 
-            <div class="about-value-card reveal-child" data-reveal="4">
-                <h4 style="color:#2c3e50; font-size:1.3rem; margin-top:0;">💡 Sin distracciones</h4>
-                <p style="color:#555; line-height:1.5;">
-                    Sin anuncios, sin registro obligatorio, sin compras.
-                    Solo tú, Rugged y las ganas de aprender.
+            <div class="help-card reveal-child" data-reveal="4">
+                <div class="help-card-ico">⭐</div>
+                <h3 class="help-card-title">Dificultad progresiva</h3>
+                <p class="help-card-desc">
+                    Empieza por los juegos <strong>fáciles</strong> y avanza hacia los <strong>difíciles</strong>.
                 </p>
             </div>
 
-            <div class="about-value-card reveal-child" data-reveal="5">
-                <h4 style="color:#2c3e50; font-size:1.3rem; margin-top:0;">📱 Multiplataforma</h4>
-                <p style="color:#555; line-height:1.5;">
-                    Funciona en <strong>tablet, computadora y celular</strong>.
-                    Perfecto para el aula, la casa o el camino.
-                </p>
-            </div>
-
-            <div class="about-value-card reveal-child" data-reveal="6">
-                <h4 style="color:#2c3e50; font-size:1.3rem; margin-top:0;">🔊 Sonido y voz</h4>
-                <p style="color:#555; line-height:1.5;">
-                    Efectos sonoros temáticos de carreras, retroalimentación
-                    auditiva y música dinámica interactiva.
-                </p>
-            </div>
-
-            <div class="about-value-card reveal-child" data-reveal="7">
-                <h4 style="color:#2c3e50; font-size:1.3rem; margin-top:0;">❤️ Hecho con cariño</h4>
-                <p style="color:#555; line-height:1.5;">
-                    Diseñado por educadores y desarrolladores pensando
-                    siempre en <strong>los más pequeños</strong>.
+            <div class="help-card reveal-child" data-reveal="5">
+                <div class="help-card-ico">🔊</div>
+                <h3 class="help-card-title">Activa el sonido</h3>
+                <p class="help-card-desc">
+                    Usa el botón de la esquina superior para activar los sonidos educativos.
                 </p>
             </div>
         </div>
-
-        <div class="about-cta reveal-child" data-reveal="1">
-            <h3 style="font-size:2rem; margin:0 0 15px 0;">¿Listo para empezar la carrera?</h3>
-            <p class="about-cta-desc">Elige tu primer desafío y demuestra que eres el campeón del aprendizaje.</p>
-            <a href="#juegos" class="btn btn-hero-primaria" data-scroll="#juegos" style="display:inline-flex;">
-                <span class="btn-glow"></span>
-                <span class="btn-icon">🏁</span>
-                <span class="btn-label">VER LOS 20 JUEGOS</span>
-                <span class="btn-arrow">›</span>
-            </a>
-        </div>
-
     </div>
 </section>
 
@@ -2246,144 +1184,114 @@
 <!-- ============================================================
      PIE DE PÁGINA
      ============================================================ -->
-<footer class="site-footer footer-primaria">
+<footer class="site-footer footer-secundaria">
     <div class="footer-inner">
 
         <div class="footer-brand">
-            <span class="footer-brand-ico">🏎️</span>
-            <span class="footer-brand-txt">AVENTURAS DE RUGGED</span>
+            <span class="footer-brand-ico">🤖</span>
+            <span class="footer-brand-txt">AVENTURAS DE LUDIO</span>
         </div>
 
-        <p class="footer-msg">Aprende a toda velocidad, descubre y supera nuevos desafíos.</p>
+        <p class="footer-msg">Programa tu futuro, descubre y domina los desafíos digitales.</p>
 
         <nav class="footer-nav" aria-label="Navegación del pie">
             <a href="index.html" class="footer-nav-link">🏠 Inicio</a>
             <span class="footer-dot">•</span>
             <a href="#juegos" class="footer-nav-link">🎮 Juegos</a>
             <span class="footer-dot">•</span>
-            <a href="#ayuda" class="footer-nav-link">💡 Nosotros</a>
+            <a href="#ayuda" class="footer-nav-link">💡 Ayuda</a>
             <span class="footer-dot">•</span>
-            <a href="beebot.html" class="footer-nav-link">🐝 Inicial</a>
+            <a href="inicial.html" class="footer-nav-link">🐝 Inicial</a>
             <span class="footer-dot">•</span>
-            <a href="secundaria.html" class="footer-nav-link">🤖 Secundaria</a>
+            <a href="primaria.html" class="footer-nav-link">🏎️ Primaria</a>
         </nav>
 
         <p class="footer-copy">
-            © <span id="year"></span> Aventura Educativa — Nivel Primaria · Rugged 🏎️
+            © <span id="year"></span> Aventura Educativa — Nivel Secundaria · Ludio 🤖
         </p>
     </div>
 </footer>
 
-<!-- Visor de juegos: pestaña lateral sin zona invisible sobre los controles -->
+<!-- ============================================================
+     SISTEMA DE PANTALLA COMPLETA CENTRALIZADO
+     ============================================================ -->
+<style>
+    #visor-juego {
+        position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+        background: #000; z-index: 9999999; display: none; flex-direction: column;
+    }
+    #visor-juego.activo { display: flex; }
+    
+    #frame-juego { width: 100%; height: 100%; border: none; background: #fff; display: block; }
+    
+    .hover-zone-cerrar {
+        position: absolute;
+        top: max(15px, env(safe-area-inset-top)); 
+        right: 0;
+        width: 150px; height: 80px;
+        z-index: 10000000;
+        background: transparent;
+    }
+
+    .btn-cerrar-juego {
+        position: absolute; 
+        top: max(15px, env(safe-area-inset-top)); 
+        right: -250px; 
+        z-index: 10000001; 
+        background: #e74c3c; color: white; border: 3px solid #c0392b;
+        padding: 10px 20px; border-radius: 15px; font-family: 'Fredoka', sans-serif;
+        font-size: 16px; font-weight: bold; cursor: pointer; box-shadow: 0 5px 0 #c0392b;
+        opacity: 0;
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    
+    .btn-cerrar-juego:active { transform: translateY(4px); box-shadow: none; }
+
+    .hover-zone-cerrar:hover ~ .btn-cerrar-juego,
+    .btn-cerrar-juego:hover {
+        right: max(15px, env(safe-area-inset-right));
+        opacity: 1;
+    }
+</style>
+
 <div id="visor-juego">
-  <iframe id="frame-juego" src="" allowfullscreen title="Juego educativo"></iframe>
-  <button type="button" class="visor-exit-tab" id="visorExitTab" aria-controls="visorExitPanel" aria-expanded="false" aria-label="Opciones del juego" title="Opciones del juego; arrastra para mover">‹</button>
-  <div class="visor-exit-panel" id="visorExitPanel" role="dialog" aria-label="Opciones del juego" hidden>
-    <p>¿Quieres salir o seguir jugando?</p>
-    <div class="visor-exit-actions">
-      <button type="button" id="visorContinue">Seguir jugando</button>
-      <button type="button" id="visorFullscreen">⛶ Pantalla completa</button>
-      <button type="button" id="visorConfirmExit">Salir del juego</button>
-    </div>
-  </div>
+    <div class="hover-zone-cerrar"></div>
+    <button class="btn-cerrar-juego" onclick="cerrarJuego()">❌ Volver al Portal</button>
+    <iframe id="frame-juego" src="" allowfullscreen></iframe>
 </div>
 
-<!-- ============================================================
-     SCRIPT PRINCIPAL Y MANEJO DE AUDIO DE FONDO
-     ============================================================ -->
 <script>
-<<<<<<< Updated upstream
-    const bgAudio = document.getElementById('bgm');
-    const soundToggle = document.getElementById('soundToggle');
-    let isMuted = true; 
-=======
     document.querySelectorAll('.game-card-link').forEach(enlace => {
         enlace.addEventListener('click', function(e) {
             if (this.closest('.disabled')) {
                 e.preventDefault();
                 return;
             }
->>>>>>> Stashed changes
 
-    soundToggle.addEventListener('click', () => {
-        isMuted = !isMuted;
-        if(isMuted) {
-            bgAudio.pause();
-            soundToggle.innerHTML = '<span class="sound-icon sound-off">🔇</span>';
-        } else {
-            bgAudio.volume = 0.3; 
-            bgAudio.play().catch(e => console.log('El navegador requiere interacción manual previa.'));
-            soundToggle.innerHTML = '<span class="sound-icon sound-on">🔊</span>';
-        }
+            e.preventDefault(); 
+            const urlJuego = this.getAttribute('href');
+            const visor = document.getElementById('visor-juego');
+            document.getElementById('frame-juego').src = urlJuego;
+            
+            visor.classList.add('activo');
+            
+            if (visor.requestFullscreen) { visor.requestFullscreen(); } 
+            else if (visor.webkitRequestFullscreen) { visor.webkitRequestFullscreen(); }
+        });
     });
 
-    (function() {
-      const visor=document.getElementById('visor-juego');
-      const frame=document.getElementById('frame-juego');
-      const tab=document.getElementById('visorExitTab');
-      const panel=document.getElementById('visorExitPanel');
-      let dragging=false, moved=false, startY=0, startTop=0;
-      function showPanel(show) {
-        panel.hidden=!show;
-        tab.setAttribute('aria-expanded',String(show));
-        if(show) document.getElementById('visorContinue').focus();
-      }
-      tab.addEventListener('pointerdown',e=>{
-        dragging=true;moved=false;startY=e.clientY;
-        startTop=tab.getBoundingClientRect().top-visor.getBoundingClientRect().top;
-        tab.setPointerCapture(e.pointerId);
-      });
-      tab.addEventListener('pointermove',e=>{
-        if(!dragging)return;
-        const dy=e.clientY-startY;
-        if(Math.abs(dy)>7)moved=true;
-        if(moved)tab.style.top=Math.max(0,Math.min(visor.clientHeight-tab.offsetHeight,startTop+dy))+'px';
-      });
-      tab.addEventListener('pointerup',()=>{dragging=false;});
-      tab.addEventListener('pointercancel',()=>{dragging=false;});
-      tab.addEventListener('click',e=>{
-        if(moved){e.preventDefault();moved=false;return;}
-        showPanel(panel.hidden);
-      });
-      document.getElementById('visorContinue').addEventListener('click',()=>showPanel(false));
-      document.getElementById('visorFullscreen').addEventListener('click',()=>{
-        showPanel(false);
-        if(!document.fullscreenElement && !document.webkitFullscreenElement){
-          if(visor.requestFullscreen)visor.requestFullscreen().catch(()=>{});
-          else if(visor.webkitRequestFullscreen)visor.webkitRequestFullscreen();
+    function cerrarJuego() {
+        const visor = document.getElementById('visor-juego');
+        if (document.fullscreenElement || document.webkitFullscreenElement) { 
+            if(document.exitFullscreen) document.exitFullscreen();
+            else if(document.webkitExitFullscreen) document.webkitExitFullscreen();
         }
-      });
-      document.getElementById('visorConfirmExit').addEventListener('click',()=>window.cerrarJuego());
-      document.querySelectorAll('.game-card-link').forEach(link=>{
-        link.addEventListener('click',e=>{
-          if(link.closest('.disabled, .is-coming-soon')){e.preventDefault();return;}
-          const url=link.getAttribute('href');
-          if(!url || url==='#')return;
-          e.preventDefault();
-          frame.src=url;visor.classList.add('activo');showPanel(false);
-          if(visor.requestFullscreen)visor.requestFullscreen().catch(()=>{});
-          else if(visor.webkitRequestFullscreen)visor.webkitRequestFullscreen();
-        });
-      });
-      window.cerrarJuego=function(){
-        visor.classList.remove('activo');showPanel(false);frame.src='';
-        if(document.fullscreenElement || document.webkitFullscreenElement){
-          if(document.exitFullscreen)document.exitFullscreen().catch(()=>{});
-          else if(document.webkitExitFullscreen)document.webkitExitFullscreen();
-        }
-      };
-      document.addEventListener('keydown',e=>{
-        if(e.key==='Escape' && visor.classList.contains('activo') &&
-           !document.fullscreenElement && !document.webkitFullscreenElement){
-          e.preventDefault();showPanel(panel.hidden);
-        }
-      });
-      // Al elegir un archivo el navegador puede salir de fullscreen.
-      // Nunca cerrar el juego por fullscreenchange.
-    })();
+        visor.classList.remove('activo');
+        document.getElementById('frame-juego').src = ""; 
+    }
 </script>
 
-<script src="js/rayet.js"></script>
+<script src="js/ludio.js"></script>
 
 </body>
 </html>
