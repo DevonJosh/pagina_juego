@@ -11,6 +11,12 @@
   --cyan:#00f5ff;--blue:#477cff;--purple:#a855f7;--pink:#ff29d9;
   --green:#39ff88;--yellow:#ffe45c;--red:#ff416c;--bg:#020611;
   --accent:#39ff88;--panel:#071126;--muted:#8491b2;
+  --world-bg-a:#101a3c;
+  --world-bg-b:#030713;
+  --world-orb-a:rgba(0,245,255,.10);
+  --world-orb-b:rgba(168,85,247,.08);
+  --world-glow:rgba(0,245,255,.18);
+
 }
 html,body{width:100%;min-height:100%;font-family:Poppins,sans-serif;background:#020611;color:white}
 body{overflow-x:hidden}
@@ -37,8 +43,8 @@ header{display:flex;align-items:center;justify-content:space-between;gap:18px;ma
 .levels{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:11px}.level{padding:10px 4px;border-radius:12px;border:1px solid rgba(255,255,255,.08);background:#09132a;color:white;cursor:pointer;transition:.18s}
 .level:hover{transform:translateY(-2px)}.level strong{display:block;font:700 16px Orbitron}.level small{font-size:9px;color:#7582a3}.level.active{border-color:var(--accent);color:var(--accent);box-shadow:0 0 18px color-mix(in srgb,var(--accent) 25%,transparent)}.level.done small{color:var(--yellow)}
 .note{font-size:11px;color:#687596;line-height:1.65;margin-top:17px}
-.game-card{padding:1px;background:linear-gradient(130deg,rgba(0,245,255,.5),rgba(168,85,247,.15),rgba(255,41,217,.45))}
-.inner{position:relative;overflow:hidden;border-radius:23px;background:radial-gradient(circle at 50% 45%,#101a3c,#030713 76%);min-height:650px}
+.game-card{padding:1px;background:linear-gradient(130deg,rgba(0,245,255,.5),rgba(168,85,247,.15),rgba(255,41,217,.45));box-shadow:0 20px 70px rgba(0,0,0,.35),0 0 30px var(--world-glow)}
+.inner{position:relative;overflow:hidden;border-radius:23px;background:radial-gradient(circle at 18% 22%,var(--world-orb-a),transparent 30%),radial-gradient(circle at 82% 75%,var(--world-orb-b),transparent 30%),radial-gradient(circle at 50% 45%,var(--world-bg-a),var(--world-bg-b) 76%);min-height:650px}
 .game-top{position:absolute;z-index:15;top:16px;left:18px;right:18px;display:flex;justify-content:space-between;gap:12px;pointer-events:none}
 .badge{width:max-content;padding:8px 13px;border:1px solid rgba(255,255,255,.1);border-radius:30px;background:rgba(0,0,0,.38);backdrop-filter:blur(10px);font:700 10px Orbitron;color:white}
 .badge b{color:var(--accent)}.difficulty{color:#aab4d0}.controls{pointer-events:auto;display:flex;gap:7px}.icon{width:41px;height:38px;border:1px solid rgba(255,255,255,.12);border-radius:10px;color:white;background:rgba(2,8,25,.78);cursor:pointer}
@@ -53,7 +59,650 @@ canvas{display:block;width:100%;height:650px;touch-action:none}
 .warning{animation:pulse .75s infinite}.warning strong{color:var(--yellow)}.danger{animation:pulse .45s infinite}.danger strong{color:var(--red)}
 @keyframes pulse{50%{transform:scale(1.035)}}
 @media(max-width:900px){.shell{grid-template-columns:220px minmax(0,1fr)}.sidebar{padding:13px}canvas{height:600px}.inner{min-height:600px}}
-@media(max-width:700px){.app{padding:9px}header{align-items:flex-start}.brand small{display:none}.stat,.timebox{min-width:55px;padding:6px}.stat small,.timebox small{font-size:7px}.stat strong,.timebox strong{font-size:10px}.shell{display:flex;flex-direction:column}.worlds{grid-template-columns:repeat(4,1fr)}.world{display:block;text-align:center;padding:9px 3px}.world strong{font-size:10px}.world small{display:none}.levels{grid-template-columns:repeat(6,1fr)}.level{padding:7px 2px}.note{display:none}.inner{min-height:540px}canvas{height:540px}.tip{font-size:8px}.progress{width:150px}.badge{font-size:8px}}
+@media(max-width:700px){.app{padding:9px}header{align-items:flex-start}.brand small{display:none}.stat,.timebox{min-width:55px;padding:6px}.stat small,.timebox small{font-size:7px}.stat strong,.timebox strong{font-size:10px}.shell{display:flex;flex-direction:column}.worlds{grid-template-columns:repeat(3,1fr)}.world{display:block;text-align:center;padding:9px 3px}.world strong{font-size:10px}.world small{display:none}.levels{grid-template-columns:repeat(6,1fr)}.level{padding:7px 2px}.note{display:none}.inner{min-height:540px}canvas{height:540px}.tip{font-size:8px}.progress{width:150px}.badge{font-size:8px}}
+
+/* =========================================================
+   RESPONSIVE MEJORADO: PC / TABLET / CELULAR
+   ========================================================= */
+
+/* Variables de tamaño adaptable */
+:root{
+  --app-gap:18px;
+  --panel-radius:24px;
+}
+
+/* Evita scroll horizontal accidental */
+html,body{
+  max-width:100%;
+  overflow-x:hidden;
+}
+
+/* El contenedor principal se adapta al alto real disponible */
+.app{
+  min-height:100dvh;
+  width:100%;
+  max-width:1500px;
+  margin:0 auto;
+}
+
+/* El tablero nunca rebasa el ancho */
+.game-card,
+.inner,
+canvas{
+  max-width:100%;
+}
+
+/* Escritorio grande */
+@media (min-width:1101px){
+  .app{
+    padding:18px 22px;
+  }
+
+  header{
+    margin-bottom:14px;
+  }
+
+  .shell{
+    grid-template-columns:280px minmax(0,1fr);
+    gap:18px;
+    align-items:stretch;
+  }
+
+  .sidebar{
+    position:sticky;
+    top:18px;
+    align-self:start;
+  }
+
+  .inner{
+    min-height:clamp(580px,72vh,780px);
+  }
+
+  canvas{
+    height:clamp(580px,72vh,780px);
+  }
+}
+
+/* Tablet horizontal */
+@media (min-width:701px) and (max-width:1100px) and (orientation:landscape){
+  .app{
+    padding:10px 12px;
+  }
+
+  header{
+    margin-bottom:10px;
+  }
+
+  .brand h1{
+    font-size:22px;
+  }
+
+  .stats{
+    gap:5px;
+  }
+
+  .stat,.timebox{
+    min-width:64px;
+    padding:6px 8px;
+  }
+
+  .shell{
+    grid-template-columns:220px minmax(0,1fr);
+    gap:12px;
+  }
+
+  .sidebar{
+    padding:12px;
+  }
+
+  .world{
+    padding:9px 8px;
+  }
+
+  .world .symbol{
+    font-size:21px;
+  }
+
+  .world strong{
+    font-size:12px;
+  }
+
+  .levels{
+    gap:6px;
+  }
+
+  .level{
+    padding:8px 2px;
+  }
+
+  .inner{
+    min-height:calc(100dvh - 105px);
+  }
+
+  canvas{
+    height:calc(100dvh - 105px);
+    min-height:430px;
+  }
+
+  .tip{
+    bottom:10px;
+  }
+}
+
+/* Tablet vertical */
+@media (min-width:701px) and (max-width:1100px) and (orientation:portrait){
+  .app{
+    padding:12px;
+  }
+
+  header{
+    margin-bottom:12px;
+  }
+
+  .shell{
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+  }
+
+  .sidebar{
+    padding:15px;
+  }
+
+  .worlds{
+    display:grid;
+    grid-template-columns:repeat(6,minmax(0,1fr));
+    gap:7px;
+    margin:10px 0 15px;
+  }
+
+  .world{
+    display:block;
+    text-align:center;
+    padding:10px 4px;
+  }
+
+  .world .symbol{
+    display:block;
+    font-size:22px;
+    margin-bottom:3px;
+  }
+
+  .world strong{
+    font-size:10px;
+  }
+
+  .world small{
+    display:none;
+  }
+
+  .levels{
+    grid-template-columns:repeat(6,minmax(0,1fr));
+    gap:7px;
+  }
+
+  .level{
+    padding:8px 2px;
+  }
+
+  .note{
+    display:none;
+  }
+
+  .inner{
+    min-height:min(68dvh,720px);
+  }
+
+  canvas{
+    height:min(68dvh,720px);
+    min-height:500px;
+  }
+}
+
+/* Celular vertical */
+@media (max-width:700px) and (orientation:portrait){
+  .app{
+    padding:8px;
+  }
+
+  header{
+    align-items:flex-start;
+    margin-bottom:8px;
+    gap:6px;
+  }
+
+  .brand h1{
+    font-size:16px;
+    letter-spacing:1px;
+  }
+
+  .brand small{
+    display:none;
+  }
+
+  .stats{
+    gap:3px;
+    flex-wrap:nowrap;
+  }
+
+  .stat,.timebox{
+    min-width:47px;
+    padding:5px 5px;
+    border-radius:9px;
+  }
+
+  .stat small,.timebox small{
+    font-size:6.5px;
+  }
+
+  .stat strong,.timebox strong{
+    font-size:8.5px;
+  }
+
+  .shell{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+
+  .sidebar{
+    padding:11px;
+    border-radius:18px;
+  }
+
+  .eyebrow{
+    font-size:8px;
+    letter-spacing:1.5px;
+  }
+
+  .worlds{
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:6px;
+    margin:8px 0 12px;
+  }
+
+  .world{
+    display:block;
+    text-align:center;
+    padding:8px 2px;
+    border-radius:12px;
+  }
+
+  .world .symbol{
+    display:block;
+    font-size:19px;
+    margin-bottom:2px;
+  }
+
+  .world strong{
+    font-size:9px;
+  }
+
+  .world small{
+    display:none;
+  }
+
+  .levels{
+    grid-template-columns:repeat(6,minmax(0,1fr));
+    gap:5px;
+    margin-top:7px;
+  }
+
+  .level{
+    padding:7px 1px;
+    border-radius:10px;
+  }
+
+  .level strong{
+    font-size:13px;
+  }
+
+  .level small{
+    font-size:7px;
+  }
+
+  .note{
+    display:none;
+  }
+
+  .inner{
+    min-height:62dvh;
+    border-radius:18px;
+  }
+
+  canvas{
+    height:62dvh;
+    min-height:430px;
+    max-height:650px;
+  }
+
+  .game-top{
+    top:10px;
+    left:10px;
+    right:10px;
+    gap:6px;
+    align-items:flex-start;
+  }
+
+  .badge{
+    max-width:calc(100% - 138px);
+    white-space:normal;
+    line-height:1.35;
+    font-size:7px;
+    padding:7px 9px;
+  }
+
+  .controls{
+    gap:4px;
+  }
+
+  .icon{
+    width:36px;
+    height:34px;
+    border-radius:9px;
+  }
+
+  .progress{
+    left:10px;
+    top:52px;
+    width:150px;
+  }
+
+  .tip{
+    bottom:10px;
+    max-width:90%;
+    white-space:normal;
+    text-align:center;
+    font-size:7px;
+    line-height:1.35;
+    padding:6px 9px;
+  }
+
+  .modal{
+    padding:22px 16px;
+  }
+
+  .modal p{
+    font-size:12px;
+  }
+}
+
+/* Celular horizontal: mundos/niveles compactos y tablero visible sin scroll exagerado */
+@media (max-width:900px) and (orientation:landscape){
+  .app{
+    padding:6px 8px;
+  }
+
+  header{
+    margin-bottom:6px;
+  }
+
+  .brand h1{
+    font-size:15px;
+  }
+
+  .brand small{
+    display:none;
+  }
+
+  .stat,.timebox{
+    min-width:48px;
+    padding:4px 5px;
+  }
+
+  .stat small,.timebox small{
+    font-size:6px;
+  }
+
+  .stat strong,.timebox strong{
+    font-size:8px;
+  }
+
+  .shell{
+    display:grid;
+    grid-template-columns:190px minmax(0,1fr);
+    gap:8px;
+  }
+
+  .sidebar{
+    padding:9px;
+    border-radius:16px;
+  }
+
+  .eyebrow{
+    font-size:7px;
+  }
+
+  .worlds{
+    grid-template-columns:repeat(2,1fr);
+    gap:4px;
+    margin:6px 0 8px;
+  }
+
+  .world{
+    padding:6px 3px;
+    display:flex;
+    text-align:left;
+    gap:6px;
+  }
+
+  .world .symbol{
+    font-size:16px;
+  }
+
+  .world strong{
+    font-size:8px;
+  }
+
+  .world small{
+    display:none;
+  }
+
+  .levels{
+    grid-template-columns:repeat(3,1fr);
+    gap:4px;
+    margin-top:5px;
+  }
+
+  .level{
+    padding:5px 2px;
+  }
+
+  .level strong{
+    font-size:11px;
+  }
+
+  .level small{
+    font-size:6px;
+  }
+
+  .note{
+    display:none;
+  }
+
+  .inner{
+    min-height:calc(100dvh - 65px);
+  }
+
+  canvas{
+    height:calc(100dvh - 65px);
+    min-height:320px;
+  }
+
+  .game-top{
+    top:8px;
+    left:8px;
+    right:8px;
+  }
+
+  .badge{
+    font-size:6.5px;
+    padding:6px 8px;
+  }
+
+  .icon{
+    width:32px;
+    height:30px;
+  }
+
+  .progress{
+    left:8px;
+    top:45px;
+    width:125px;
+  }
+
+  .tip{
+    bottom:7px;
+    font-size:6.5px;
+    padding:5px 8px;
+  }
+}
+
+/* Pantallas muy pequeñas */
+@media (max-width:380px) and (orientation:portrait){
+  .app{
+    padding:5px;
+  }
+
+  .worlds{
+    grid-template-columns:repeat(3,1fr);
+  }
+
+  .world{
+    padding:7px 1px;
+  }
+
+  .world strong{
+    font-size:8px;
+  }
+
+  .levels{
+    gap:3px;
+  }
+
+  .level strong{
+    font-size:11px;
+  }
+
+  canvas{
+    min-height:400px;
+  }
+}
+
+
+/* =========================================================
+   FIX V10 — ESCENARIO SIN ESPACIOS VACÍOS
+   El panel del juego ya no se estira por la altura del menú.
+   Canvas, escenario y marco siempre coinciden.
+   ========================================================= */
+
+.shell{
+  align-items:start !important;
+}
+
+.game-card{
+  align-self:start !important;
+  width:100%;
+  min-height:0 !important;
+  overflow:hidden;
+}
+
+.inner{
+  width:100%;
+  min-height:0 !important;
+  height:clamp(560px,72dvh,760px);
+}
+
+canvas{
+  width:100% !important;
+  height:100% !important;
+  min-height:0 !important;
+  max-height:none !important;
+}
+
+/* PC panorámico */
+@media (min-width:1101px){
+  .shell{
+    align-items:start !important;
+  }
+
+  .game-card{
+    align-self:start !important;
+  }
+
+  .inner{
+    height:clamp(560px,72dvh,760px);
+  }
+
+  canvas{
+    height:100% !important;
+  }
+}
+
+/* Tablet horizontal */
+@media (min-width:701px) and (max-width:1100px) and (orientation:landscape){
+  .inner{
+    height:calc(100dvh - 105px);
+    min-height:430px !important;
+    max-height:680px;
+  }
+
+  canvas{
+    height:100% !important;
+    min-height:0 !important;
+  }
+}
+
+/* Tablet vertical */
+@media (min-width:701px) and (max-width:1100px) and (orientation:portrait){
+  .inner{
+    height:min(68dvh,720px);
+    min-height:500px !important;
+  }
+
+  canvas{
+    height:100% !important;
+    min-height:0 !important;
+  }
+}
+
+/* Celular vertical */
+@media (max-width:700px) and (orientation:portrait){
+  .inner{
+    height:62dvh;
+    min-height:430px !important;
+    max-height:650px;
+  }
+
+  canvas{
+    height:100% !important;
+    min-height:0 !important;
+    max-height:none !important;
+  }
+}
+
+/* Celular horizontal */
+@media (max-width:900px) and (orientation:landscape){
+  .inner{
+    height:calc(100dvh - 65px);
+    min-height:320px !important;
+    max-height:none;
+  }
+
+  canvas{
+    height:100% !important;
+    min-height:0 !important;
+  }
+}
+
+/* Pantallas muy pequeñas */
+@media (max-width:380px) and (orientation:portrait){
+  .inner{
+    min-height:400px !important;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -95,7 +744,7 @@ canvas{display:block;width:100%;height:650px;touch-action:none}
   <div class="overlay show" id="overlay">
     <div class="modal">
       <h2 id="modalTitle">CONNECT DOTS</h2>
-      <p id="modalText">Elige un mundo y un nivel. Conecta todas las líneas sin repetir ninguna. Cada error te quitará una vida y unos segundos.</p>
+      <p id="modalText">Elige un universo y un nivel. Cada universo ahora tiene su propio escenario decorativo dentro del tablero. Conecta todas las líneas sin repetir ninguna. Cada error te quita una vida y unos segundos.</p>
       <div class="actions" id="modalActions"><button class="btn primary" id="playBtn">COMENZAR</button></div>
     </div>
   </div>
@@ -108,81 +757,62 @@ canvas{display:block;width:100%;height:650px;touch-action:none}
 'use strict';
 
 const WORLDS=[
- {name:'JARDÍN',symbol:'✿',color:'#39ff88',desc:'Primeros trazos',difficulty:'EXPLORADOR'},
- {name:'OCÉANO',symbol:'≈',color:'#00cfff',desc:'Nuevas corrientes',difficulty:'AVENTURERO'},
- {name:'COSMOS',symbol:'✦',color:'#a855f7',desc:'Órbitas y enigmas',difficulty:'EXPERTO'},
- {name:'FANTASÍA',symbol:'♜',color:'#ff9b45',desc:'Grandes desafíos',difficulty:'MAESTRO'}
+ {name:'JARDÍN',symbol:'✿',color:'#39ff88',desc:'Primeros trazos',difficulty:'EXPLORADOR',
+  bgA:'#173a24',bgB:'#04110a',orbA:'rgba(57,255,136,.16)',orbB:'rgba(180,255,205,.09)',glow:'rgba(57,255,136,.22)'},
+ {name:'OCÉANO',symbol:'≈',color:'#00cfff',desc:'Nuevas corrientes',difficulty:'AVENTURERO',
+  bgA:'#0d2d46',bgB:'#03101b',orbA:'rgba(0,207,255,.18)',orbB:'rgba(120,220,255,.08)',glow:'rgba(0,207,255,.22)'},
+ {name:'COSMOS',symbol:'✦',color:'#a855f7',desc:'Órbitas y enigmas',difficulty:'EXPERTO',
+  bgA:'#241347',bgB:'#070310',orbA:'rgba(168,85,247,.18)',orbB:'rgba(255,80,220,.07)',glow:'rgba(168,85,247,.24)'},
+ {name:'FANTASÍA',symbol:'♜',color:'#ff9b45',desc:'Grandes desafíos',difficulty:'MAESTRO',
+  bgA:'#3a1b2d',bgB:'#10050b',orbA:'rgba(255,155,69,.16)',orbB:'rgba(255,105,180,.08)',glow:'rgba(255,155,69,.24)'},
+ {name:'HALLOWEEN',symbol:'🎃',color:'#ff7a1a',desc:'Reto escalofriante',difficulty:'FESTIVO',
+  bgA:'#2b1235',bgB:'#0e0715',orbA:'rgba(255,122,26,.20)',orbB:'rgba(183,88,255,.08)',glow:'rgba(255,122,26,.26)'},
+ {name:'NAVIDAD',symbol:'🎄',color:'#6ee7b7',desc:'Magia invernal',difficulty:'FESTIVO',
+  bgA:'#12372c',bgB:'#06100c',orbA:'rgba(110,231,183,.18)',orbB:'rgba(255,80,80,.08)',glow:'rgba(110,231,183,.24)'}
 ];
 
 const raw=[
-
-
-
 ['Una hoja',[[160,250],[210,160],[300,105],[405,130],[455,220],[410,310],[300,350],[205,320],[160,250]]],
 ['Una semilla',[[300,90],[390,125],[445,205],[425,295],[355,355],[255,355],[180,300],[155,210],[205,130],[300,90]]],
+['Un hongo',[[150,240],[175,155],[240,95],[340,95],[425,155],[455,240],[340,240],[352,355],[248,355],[260,240],[150,240]]],
+['Una mariposa',[[300,225],[245,165],[180,115],[120,135],[95,195],[125,250],[190,275],[145,330],[205,365],[265,320],[300,275],[335,320],[395,365],[455,330],[410,275],[475,250],[505,195],[480,135],[420,115],[355,165],[300,225]]],
+['Un árbol',[[300,75],[405,165],[365,170],[445,270],[330,270],[330,370],[270,370],[270,270],[155,270],[235,170],[195,165],[300,75]]],
 ['Una flor',[[300,210],[250,155],[265,90],[330,90],[350,155],[300,210],[375,175],[435,215],[410,275],[350,270],[300,210],[325,305],[300,370],[245,340],[255,270],[300,210]]],
-['Una mariposa',[
-[300,225],
-[245,165],
-[180,115],
-[120,135],
-[95,195],
-[125,250],
-[190,275],
-[145,330],
-[205,365],
-[265,320],
-[300,275],
-[335,320],
-[395,365],
-[455,330],
-[410,275],
-[475,250],
-[505,195],
-[480,135],
-[420,115],
-[355,165],
-[300,225]
-]],
-['Un árbol',[[300,70],[380,145],[355,145],[420,220],[385,220],[450,290],[335,290],[335,375],[265,375],[265,290],[150,290],[215,220],[180,220],[245,145],[220,145],[300,70]]],
-['Un hongo',[[145,235],[165,165],[225,110],[300,90],[375,110],[435,165],[455,235],[340,235],[350,355],[250,355],[260,235],[145,235]]],
 
-['Un pez',[[160,220],[260,130],[400,150],[455,225],[390,300],[260,315],[160,220],[90,140],[90,305]]],
+['Un pez',[[160,220],[260,130],[400,150],[455,225],[390,300],[260,315],[160,220],[90,140],[90,305],[160,220]]],
+['Una estrella de mar',[[300,60],[345,180],[475,165],[385,260],[425,385],[300,315],[175,385],[215,260],[125,165],[255,180],[300,60]]],
+['Una concha',[[280,340],[130,240],[130,170],[200,100],[300,80],[400,100],[470,170],[470,240],[320,340],[280,340]]],
+['Una medusa',[[150,235],[160,150],[220,90],[300,70],[380,90],[440,150],[450,235],[380,235],[395,330],[350,380],[325,320],[340,235],[270,235],[280,330],[235,375],[210,310],[225,235],[150,235]]],
+['Una tortuga',[[190,170],[250,130],[350,130],[410,170],[465,150],[480,220],[420,240],[410,295],[455,350],[390,365],[355,305],[245,305],[210,365],[145,350],[190,295],[180,240],[120,220],[135,150],[190,170]]],
+['Un barco',[[120,270],[470,270],[400,345],[190,345],[120,270],[290,270],[290,85],[150,245],[290,245],[290,270],[420,245],[315,115],[315,270],[120,270]]],
 
-['Un barco',[[120,270],[470,270],[400,345],[190,345],[120,270],[290,270],[290,85],[150,245],[290,245],[290,270],[420,245],[315,115],[315,270]]],
-
-['Una concha',[[280,340],[130,240],[130,170],[200,100],[300,80],[400,100],[470,170],[470,240],[320,340]]],
-
-['Una medusa',[[150,235],[160,150],[220,90],[300,70],[380,90],[440,150],[450,235],[380,235],[395,330],[350,380],[325,320],[340,235],[270,235],[280,330],[235,375],[210,310],[225,235]]],
-
-['Una tortuga',[[190,170],[250,130],[350,130],[410,170],[465,150],[480,220],[420,240],[410,295],[455,350],[390,365],[355,305],[245,305],[210,365],[145,350],[190,295],[180,240],[120,220],[135,150]]],
-
-['Una estrella de mar',[[300,60],[345,180],[475,165],[385,260],[425,385],[300,315],[175,385],[215,260],[125,165],[255,180]]],
-
-['Una estrella',[[300,60],[345,180],[470,180],[370,255],[405,370],[300,300],[195,370],[230,255],[130,180],[255,180]]],
-
-['Un cohete',[[300,65],[365,160],[365,260],[425,330],[365,320],[335,380],[300,345],[265,380],[235,320],[175,330],[235,260],[235,160]]],
-
+['Una estrella',[[300,60],[345,180],[470,180],[370,255],[405,370],[300,300],[195,370],[230,255],[130,180],[255,180],[300,60]]],
+['Un cohete',[[300,65],[365,160],[365,260],[425,330],[365,320],[335,380],[300,345],[265,380],[235,320],[175,330],[235,260],[235,160],[300,65]]],
 ['Un satélite',[[255,180],[345,180],[345,270],[255,270],[255,180],[145,140],[100,245],[255,270],[345,270],[455,310],[500,205],[345,180]]],
-
 ['Un planeta',[[180,215],[205,135],[300,100],[395,135],[420,215],[395,300],[300,335],[205,300],[180,215],[90,270],[110,320],[300,270],[510,180],[490,130],[420,215]]],
-
-['Un ovni',[[100,245],[200,195],[230,130],[300,100],[370,130],[400,195],[500,245],[400,295],[200,295],[100,245],[200,245],[200,295],[300,245],[400,295],[400,245]]],
-
+['Un ovni',[[100,245],[200,195],[230,130],[300,100],[370,130],[400,195],[500,245],[400,295],[200,295],[100,245],[200,245],[200,295],[300,245],[400,295],[400,245],[100,245]]],
 ['Un robot',[[200,105],[400,105],[400,240],[350,240],[350,365],[250,365],[250,240],[200,240],[200,105],[150,160],[125,270],[170,290],[200,240],[200,105],[300,70],[400,105],[400,240],[430,290],[475,270],[450,160],[400,105]]],
 
-['Una corona',[[140,150],[225,235],[300,110],[375,235],[460,150],[425,335],[175,335]]],
-
+['Una corona',[[140,150],[225,235],[300,110],[375,235],[460,150],[425,335],[175,335],[140,150]]],
 ['Un diamante',[[180,115],[420,115],[480,195],[300,375],[120,195],[180,115],[300,195],[420,115],[480,195],[300,195],[120,195],[300,375],[300,195]]],
-
 ['Una casa',[[120,210],[300,70],[480,210],[420,210],[420,360],[180,360],[180,210],[120,210],[300,210],[300,70],[480,210],[300,210]]],
+['Un castillo',[[130,350],[130,130],[175,130],[175,180],[220,180],[220,130],[265,130],[265,230],[335,230],[335,130],[380,130],[380,180],[425,180],[425,130],[470,130],[470,350],[330,350],[330,280],[270,280],[270,350],[130,350]]],
+['Un dragón',[[105,270],[195,220],[160,120],[275,185],[350,115],[335,210],[430,170],[495,225],[450,255],[480,295],[370,280],[330,350],[230,335],[170,365],[190,295],[105,270]]],
+['Un corazón mágico',[[300,370],[120,220],[115,150],[165,100],[235,105],[300,160],[365,105],[435,100],[485,150],[480,220],[300,370]]],
 
-['Un castillo',[[130,350],[130,130],[175,130],[175,180],[220,180],[220,130],[265,130],[265,230],[335,230],[335,130],[380,130],[380,180],[425,180],[425,130],[470,130],[470,350],[330,350],[330,280],[270,280],[270,350]]],
+['Una calabaza',[[300,95],[370,115],[430,170],[455,245],[430,320],[370,375],[300,395],[230,375],[170,320],[145,245],[170,170],[230,115],[300,95],[315,55],[300,35],[285,55],[300,95]]],
+['Un fantasma',[[225,105],[375,105],[425,175],[425,330],[385,300],[345,345],[300,305],[255,345],[215,300],[175,330],[175,175],[225,105]]],
+['Un murciélago',[[120,230],[170,165],[235,175],[300,120],[365,175],[430,165],[480,230],[425,250],[445,295],[380,275],[300,320],[220,275],[155,295],[175,250],[120,230]]],
+['Un sombrero de bruja',[[165,305],[435,305],[365,250],[330,145],[300,95],[270,145],[235,250],[165,305]]],
+['Un gato negro',[[180,360],[165,285],[185,215],[225,155],[275,125],[320,135],[355,170],[370,120],[405,100],[395,155],[425,200],[455,245],[430,305],[375,340],[305,355],[245,395],[225,365],[180,360]]],
+['Un dulce envuelto',[[170,240],[235,180],[365,180],[430,240],[365,300],[235,300],[170,240],[115,195],[115,285],[170,240],[430,240],[485,195],[485,285],[430,240]]],
 
-['Un dragón',[[105,270],[195,220],[160,120],[275,185],[350,115],[335,210],[430,170],[495,225],[450,255],[480,295],[370,280],[330,350],[230,335],[170,365],[190,295]]],
-
-['Un corazón mágico',[[300,370],[120,220],[115,150],[165,100],[235,105],[300,160],[365,105],[435,100],[485,150],[480,220]]]
-
+['Un árbol navideño',[[300,70],[385,165],[340,165],[420,255],[365,255],[450,370],[150,370],[235,255],[180,255],[260,165],[215,165],[300,70],[300,430],[300,370]]],
+['Un regalo',[[180,150],[420,150],[420,360],[180,360],[180,150],[300,150],[300,360],[180,255],[420,255],[240,150],[300,95],[360,150]]],
+['Una campana',[[220,120],[380,120],[420,225],[398,325],[202,325],[180,225],[220,120],[300,355],[300,390]]],
+['Un bastón dulce',[[380,105],[345,95],[290,100],[248,135],[230,185],[248,230],[292,260],[345,265],[382,300],[382,350],[350,388],[298,400],[240,385],[195,350],[185,315]]],
+['Una bota navideña',[[355,105],[300,105],[255,150],[250,255],[225,330],[170,330],[160,385],[260,405],[350,395],[380,345],[330,320],[305,260],[305,165],[355,105]]],
+['Un muñeco de nieve',[[300,95],[260,135],[260,190],[300,225],[340,190],[340,135],[300,95],[300,225],[240,275],[225,355],[300,415],[375,355],[360,275],[300,225]]]
 ];
 
 function makeLevel(entry,index){
@@ -201,21 +831,10 @@ function makeLevel(entry,index){
 
   const chain=entry[1].map(getId);
 
-  // Dibujamos todas las conexiones del trazo original.
   for(let i=0;i<chain.length-1;i++){
     const a=chain[i];
     const b=chain[i+1];
     if(a!==b) edges.push([a,b]);
-  }
-
-  // Si la figura quedó abierta, la cerramos uniendo el último punto con el primero.
-  // Así evitamos figuras "sin cerrar" como en Océano/Fantasía.
-  if(chain.length > 2){
-    const first = chain[0];
-    const last = chain[chain.length-1];
-    if(first !== last){
-      edges.push([last, first]);
-    }
   }
 
   return {name:entry[0],points,edges};
@@ -233,7 +852,15 @@ function tone(freq=620,d=.08,type='sine'){
  try{audioCtx??=new(window.AudioContext||window.webkitAudioContext)();audioCtx.resume();const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type=type;o.frequency.value=freq;o.connect(g);g.connect(audioCtx.destination);g.gain.setValueAtTime(.07,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+d);o.start();o.stop(audioCtx.currentTime+d)}catch{}
 }
 function worldIndex(){return Math.floor(selected/6)}
-function setAccent(){document.documentElement.style.setProperty('--accent',WORLDS[worldIndex()].color)}
+function setAccent(){
+  const w=WORLDS[worldIndex()];
+  document.documentElement.style.setProperty('--accent',w.color);
+  document.documentElement.style.setProperty('--world-bg-a',w.bgA);
+  document.documentElement.style.setProperty('--world-bg-b',w.bgB);
+  document.documentElement.style.setProperty('--world-orb-a',w.orbA);
+  document.documentElement.style.setProperty('--world-orb-b',w.orbB);
+  document.documentElement.style.setProperty('--world-glow',w.glow);
+}
 function buildMenus(){
  const wi=worldIndex();setAccent();
  $('worlds').innerHTML=WORLDS.map((w,i)=>{
@@ -244,9 +871,29 @@ function buildMenus(){
  $('worldLabel').textContent=WORLDS[wi].name;$('levelLabel').textContent=String(selected%6+1).padStart(2,'0');$('difficulty').textContent=WORLDS[wi].difficulty;
 }
 function resize(){
- const r=canvas.getBoundingClientRect();W=r.width;H=r.height;dpr=Math.min(devicePixelRatio||1,2);canvas.width=W*dpr;canvas.height=H*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);createGeometry();
+ const r=arena.getBoundingClientRect();
+ W=Math.max(1,r.width);
+ H=Math.max(1,r.height);
+
+ dpr=Math.min(devicePixelRatio||1,2);
+
+ canvas.width=Math.round(W*dpr);
+ canvas.height=Math.round(H*dpr);
+
+ canvas.style.width=W+'px';
+ canvas.style.height=H+'px';
+
+ ctx.setTransform(dpr,0,0,dpr,0,0);
+
+ createGeometry();
 }
-window.addEventListener('resize',resize);
+window.addEventListener('resize',()=>{
+ clearTimeout(window.__connectDotsResizeTimer);
+ window.__connectDotsResizeTimer=setTimeout(resize,80);
+});
+window.addEventListener('orientationchange',()=>{
+  setTimeout(resize,250);
+});
 
 function createGeometry(){
  const data=LEVELS[selected]; if(!data||!W||!H)return;
@@ -339,7 +986,7 @@ function finish(){
       Bonus: <strong style="color:#ffe45c">+${bonus}</strong><br>
       Puntuación total: <strong>${score}</strong>`,
      `<button class="btn" id="againBtn">REPETIR</button>
-      <button class="btn primary" id="nextBtn">${selected===23?'VOLVER AL JARDÍN':'SIGUIENTE NIVEL'}</button>`
+      <button class="btn primary" id="nextBtn">${selected===LEVELS.length-1?'VOLVER AL JARDÍN':'SIGUIENTE NIVEL'}</button>`
    );
 
    $('againBtn').onclick=()=>resetLevel(false);
@@ -385,6 +1032,368 @@ $('restart').onclick=()=>resetLevel(false);$('pause').onclick=togglePause;$('sou
 $('worlds').onclick=e=>{const b=e.target.closest('[data-world]');if(!b)return;selected=Number(b.dataset.world)*6;buildMenus();createGeometry();showOverlay(WORLDS[worldIndex()].name,`Has elegido el universo <strong style="color:var(--accent)">${WORLDS[worldIndex()].name}</strong>.<br>Selecciona un nivel o empieza por el primero.`,`<button class="btn primary" id="worldPlay">JUGAR NIVEL 1</button>`);$('worldPlay').onclick=()=>resetLevel(false)};
 $('levels').onclick=e=>{const b=e.target.closest('[data-level]');if(!b)return;selected=Number(b.dataset.level);buildMenus();createGeometry();showOverlay(`NIVEL ${selected%6+1}`,`Figura oculta del universo <strong style="color:var(--accent)">${WORLDS[worldIndex()].name}</strong>.<br>${WORLDS[worldIndex()].difficulty} · ${LEVELS[selected].edges.length} líneas.`,`<button class="btn primary" id="levelPlay">COMENZAR</button>`);$('levelPlay').onclick=()=>resetLevel(false)};
 $('playBtn').onclick=()=>resetLevel(true);
+
+
+function drawHill(x,y,w,h,color,alpha=.18){
+ ctx.save();
+ ctx.globalAlpha=alpha;
+ ctx.fillStyle=color;
+ ctx.beginPath();
+ ctx.moveTo(x-w/2,y);
+ ctx.quadraticCurveTo(x,y-h,x+w/2,y);
+ ctx.lineTo(x+w/2,H+30);
+ ctx.lineTo(x-w/2,H+30);
+ ctx.closePath();
+ ctx.fill();
+ ctx.restore();
+}
+
+function drawStar(x,y,r,color,alpha=.9){
+ ctx.save();
+ ctx.globalAlpha=alpha;
+ ctx.fillStyle=color;
+ ctx.shadowBlur=10;
+ ctx.shadowColor=color;
+ ctx.beginPath();
+ ctx.arc(x,y,r,0,Math.PI*2);
+ ctx.fill();
+ ctx.restore();
+}
+
+function drawSnowflake(x,y,s,color,alpha=.65){
+ ctx.save();
+ ctx.translate(x,y);
+ ctx.strokeStyle=color;
+ ctx.globalAlpha=alpha;
+ ctx.lineWidth=1.3;
+ for(let i=0;i<6;i++){
+   ctx.rotate(Math.PI/3);
+   ctx.beginPath();
+   ctx.moveTo(0,-s);
+   ctx.lineTo(0,s);
+   ctx.stroke();
+   ctx.beginPath();
+   ctx.moveTo(0,-s*.55);
+   ctx.lineTo(s*.24,-s*.3);
+   ctx.moveTo(0,-s*.55);
+   ctx.lineTo(-s*.24,-s*.3);
+   ctx.moveTo(0,s*.55);
+   ctx.lineTo(s*.24,s*.3);
+   ctx.moveTo(0,s*.55);
+   ctx.lineTo(-s*.24,s*.3);
+   ctx.stroke();
+ }
+ ctx.restore();
+}
+
+function drawSceneBackground(){
+ const wi=worldIndex();
+
+ // capa suave general
+ ctx.save();
+ const overlay=ctx.createLinearGradient(0,0,0,H);
+ overlay.addColorStop(0,'rgba(255,255,255,.015)');
+ overlay.addColorStop(.6,'rgba(255,255,255,0)');
+ overlay.addColorStop(1,'rgba(0,0,0,.10)');
+ ctx.fillStyle=overlay;
+ ctx.fillRect(0,0,W,H);
+ ctx.restore();
+
+ if(wi===0){
+   // JARDÍN
+   drawHill(W*.18,H*.81,W*.52,H*.14,'#35d46f',.17);
+   drawHill(W*.55,H*.86,W*.90,H*.22,'#1b7f45',.16);
+   drawHill(W*.84,H*.82,W*.52,H*.14,'#2bc769',.14);
+
+   for(let i=0;i<10;i++){
+     const x=W*(.08+i*.09);
+     const stemTop=H*(.79-.018*(i%2));
+     ctx.save();
+     ctx.strokeStyle='rgba(110,255,160,.24)';
+     ctx.lineWidth=2;
+     ctx.beginPath();
+     ctx.moveTo(x,H*.92);
+     ctx.quadraticCurveTo(x+6,H*.86,x,stemTop);
+     ctx.stroke();
+     ctx.restore();
+
+     const petalColors=['rgba(255,200,80,.34)','rgba(255,120,170,.30)','rgba(180,140,255,.30)','rgba(120,220,255,.30)'];
+     const c=petalColors[i%petalColors.length];
+     for(let p=0;p<5;p++){
+       const ang=(Math.PI*2/5)*p;
+       ctx.save();
+       ctx.translate(x,stemTop);
+       ctx.rotate(ang);
+       ctx.fillStyle=c;
+       ctx.beginPath();
+       ctx.ellipse(0,-7.5,3.8,7.4,0,0,Math.PI*2);
+       ctx.fill();
+       ctx.restore();
+     }
+     ctx.save();
+     ctx.fillStyle='rgba(255,245,160,.42)';
+     ctx.beginPath();
+     ctx.arc(x,stemTop,3.2,0,Math.PI*2);
+     ctx.fill();
+     ctx.restore();
+   }
+
+   for(let i=0;i<14;i++){
+     const x=W*(.04+i*.07);
+     const y=H*(.16+((i*31)%25)/100);
+     ctx.save();
+     ctx.fillStyle='rgba(170,255,200,.10)';
+     ctx.beginPath();
+     ctx.ellipse(x,y,8,4,Math.PI/5,0,Math.PI*2);
+     ctx.fill();
+     ctx.restore();
+   }
+ }
+
+ if(wi===1){
+   // OCÉANO
+   for(let i=0;i<5;i++){
+     const y=H*(.16+i*.105);
+     ctx.save();
+     ctx.strokeStyle='rgba(110,220,255,.12)';
+     ctx.lineWidth=3;
+     ctx.beginPath();
+     for(let x=0;x<=W+10;x+=18){
+       const yy=y+Math.sin((x/68)+(i*.85))*7;
+       if(x===0) ctx.moveTo(x,yy); else ctx.lineTo(x,yy);
+     }
+     ctx.stroke();
+     ctx.restore();
+   }
+
+   for(let i=0;i<26;i++){
+     const x=W*(.05+((i*37)%90)/100);
+     const y=H*(.12+((i*17)%60)/100);
+     ctx.save();
+     ctx.strokeStyle='rgba(190,245,255,.16)';
+     ctx.lineWidth=1.1;
+     ctx.beginPath();
+     ctx.arc(x,y,2+(i%4),0,Math.PI*2);
+     ctx.stroke();
+     ctx.restore();
+   }
+
+   // coral / seaweed
+   for(let i=0;i<7;i++){
+     const x=W*(.10+i*.13);
+     ctx.save();
+     ctx.strokeStyle=i%2===0?'rgba(255,130,180,.20)':'rgba(90,255,180,.18)';
+     ctx.lineWidth=3;
+     ctx.beginPath();
+     ctx.moveTo(x,H*.93);
+     ctx.bezierCurveTo(x-10,H*.84,x+16,H*.78,x,H*.70);
+     ctx.stroke();
+     ctx.restore();
+
+     ctx.save();
+     ctx.fillStyle='rgba(255,150,190,.15)';
+     ctx.beginPath();
+     ctx.arc(x+10,H*.84,8,0,Math.PI*2);
+     ctx.arc(x-8,H*.81,6,0,Math.PI*2);
+     ctx.fill();
+     ctx.restore();
+   }
+
+   drawHill(W*.50,H*.93,W*.96,H*.14,'#0f7d77',.12);
+ }
+
+ if(wi===2){
+   // COSMOS
+   for(let i=0;i<48;i++){
+     const x=W*((i*53%100)/100);
+     const y=H*((i*29%90)/100);
+     drawStar(x,y,(i%3)+1,['#c7b5ff','#ffffff','#85d8ff'][i%3],.65);
+   }
+
+   // planets
+   ctx.save();
+   ctx.fillStyle='rgba(170,110,255,.18)';
+   ctx.beginPath();
+   ctx.arc(W*.18,H*.26,34,0,Math.PI*2);
+   ctx.fill();
+   ctx.strokeStyle='rgba(220,180,255,.24)';
+   ctx.lineWidth=3;
+   ctx.beginPath();
+   ctx.ellipse(W*.18,H*.26,52,14,-.25,0,Math.PI*2);
+   ctx.stroke();
+   ctx.restore();
+
+   ctx.save();
+   ctx.fillStyle='rgba(110,220,255,.14)';
+   ctx.beginPath();
+   ctx.arc(W*.82,H*.72,26,0,Math.PI*2);
+   ctx.fill();
+   ctx.restore();
+
+   for(let i=0;i<3;i++){
+     ctx.save();
+     ctx.strokeStyle='rgba(255,255,255,.08)';
+     ctx.lineWidth=1.6;
+     ctx.beginPath();
+     ctx.arc(W*.50,H*.50,110+i*35,Math.PI*.15,Math.PI*1.45);
+     ctx.stroke();
+     ctx.restore();
+   }
+ }
+
+ if(wi===3){
+   // FANTASÍA
+   drawHill(W*.25,H*.84,W*.52,H*.16,'#4b3d8d',.16);
+   drawHill(W*.56,H*.90,W*.98,H*.24,'#2a2158',.18);
+   drawHill(W*.82,H*.82,W*.56,H*.15,'#6a54bc',.10);
+
+   // castle silhouette
+   ctx.save();
+   ctx.fillStyle='rgba(255,195,120,.10)';
+   ctx.beginPath();
+   ctx.moveTo(W*.65,H*.80);
+   ctx.lineTo(W*.65,H*.60);
+   ctx.lineTo(W*.69,H*.60);
+   ctx.lineTo(W*.69,H*.66);
+   ctx.lineTo(W*.73,H*.66);
+   ctx.lineTo(W*.73,H*.54);
+   ctx.lineTo(W*.77,H*.54);
+   ctx.lineTo(W*.77,H*.66);
+   ctx.lineTo(W*.81,H*.66);
+   ctx.lineTo(W*.81,H*.60);
+   ctx.lineTo(W*.85,H*.60);
+   ctx.lineTo(W*.85,H*.80);
+   ctx.closePath();
+   ctx.fill();
+   ctx.restore();
+
+   // crystals
+   for(let i=0;i<6;i++){
+     const x=W*(.12+i*.11);
+     const y=H*(.83-(i%2)*.02);
+     ctx.save();
+     ctx.fillStyle=i%2===0?'rgba(120,245,255,.16)':'rgba(210,140,255,.16)';
+     ctx.beginPath();
+     ctx.moveTo(x,y-18);
+     ctx.lineTo(x+10,y);
+     ctx.lineTo(x,y+18);
+     ctx.lineTo(x-10,y);
+     ctx.closePath();
+     ctx.fill();
+     ctx.restore();
+   }
+ }
+
+ if(wi===4){
+   // HALLOWEEN
+   ctx.save();
+   ctx.fillStyle='rgba(255,230,130,.12)';
+   ctx.beginPath();
+   ctx.arc(W*.82,H*.20,42,0,Math.PI*2);
+   ctx.fill();
+   ctx.restore();
+
+   drawHill(W*.50,H*.90,W*.96,H*.22,'#261530',.24);
+
+   // gravestones
+   for(let i=0;i<5;i++){
+     const x=W*(.10+i*.14);
+     const y=H*.85;
+     ctx.save();
+     ctx.fillStyle='rgba(190,190,220,.12)';
+     ctx.beginPath();
+     ctx.moveTo(x-10,y+16);
+     ctx.lineTo(x-10,y-8);
+     ctx.quadraticCurveTo(x-10,y-24,x,y-24);
+     ctx.quadraticCurveTo(x+10,y-24,x+10,y-8);
+     ctx.lineTo(x+10,y+16);
+     ctx.closePath();
+     ctx.fill();
+     ctx.restore();
+   }
+
+   // bats
+   for(let i=0;i<4;i++){
+     const x=W*(.18+i*.16);
+     const y=H*(.20+(i%2)*.06);
+     ctx.save();
+     ctx.strokeStyle='rgba(255,140,50,.22)';
+     ctx.lineWidth=2;
+     ctx.beginPath();
+     ctx.moveTo(x-14,y);
+     ctx.quadraticCurveTo(x-7,y-8,x,y);
+     ctx.quadraticCurveTo(x+7,y-8,x+14,y);
+     ctx.stroke();
+     ctx.restore();
+   }
+
+   // pumpkins
+   for(let i=0;i<4;i++){
+     const x=W*(.62+i*.08);
+     const y=H*(.87-(i%2)*.02);
+     ctx.save();
+     ctx.fillStyle='rgba(255,120,30,.18)';
+     ctx.beginPath();
+     ctx.ellipse(x,y,12,10,0,0,Math.PI*2);
+     ctx.fill();
+     ctx.fillStyle='rgba(110,255,140,.16)';
+     ctx.fillRect(x-1.5,y-13,3,5);
+     ctx.restore();
+   }
+ }
+
+ if(wi===5){
+   // NAVIDAD
+   drawHill(W*.22,H*.84,W*.55,H*.13,'#d7f6ff',.15);
+   drawHill(W*.78,H*.86,W*.64,H*.15,'#d7f6ff',.12);
+   drawHill(W*.50,H*.92,W*.100,H*.20,'#ebfbff',.18);
+
+   // pine trees
+   for(let i=0;i<6;i++){
+     const x=W*(.10+i*.13);
+     const y=H*(.84-(i%2)*.02);
+     ctx.save();
+     ctx.fillStyle='rgba(120,255,190,.14)';
+     ctx.beginPath();
+     ctx.moveTo(x,y-40);
+     ctx.lineTo(x-18,y-10);
+     ctx.lineTo(x-8,y-10);
+     ctx.lineTo(x-24,y+14);
+     ctx.lineTo(x+24,y+14);
+     ctx.lineTo(x+8,y-10);
+     ctx.lineTo(x+18,y-10);
+     ctx.closePath();
+     ctx.fill();
+     ctx.fillStyle='rgba(255,180,180,.16)';
+     ctx.fillRect(x-2,y+14,4,12);
+     ctx.restore();
+   }
+
+   // snowflakes
+   for(let i=0;i<12;i++){
+     const x=W*(.08+((i*17)%84)/100);
+     const y=H*(.14+((i*23)%42)/100);
+     drawSnowflake(x,y,5+(i%3), 'rgba(220,250,255,.40)', .5)
+   }
+
+   // gifts
+   for(let i=0;i<3;i++){
+     const x=W*(.70+i*.07);
+     const y=H*(.88-(i%2)*.02);
+     ctx.save();
+     ctx.fillStyle=i%2===0?'rgba(255,100,120,.18)':'rgba(110,231,183,.18)';
+     ctx.fillRect(x-11,y-10,22,20);
+     ctx.strokeStyle='rgba(255,255,255,.18)';
+     ctx.lineWidth=1;
+     ctx.strokeRect(x-11,y-10,22,20);
+     ctx.beginPath();
+     ctx.moveTo(x,y-10); ctx.lineTo(x,y+10);
+     ctx.moveTo(x-11,y); ctx.lineTo(x+11,y);
+     ctx.stroke();
+     ctx.restore();
+   }
+ }
+}
 
 function drawReference(){
  ctx.save();
@@ -493,6 +1502,7 @@ function drawNodes(time){
 function draw(time=0){
  ctx.clearRect(0,0,W,H);
 
+ drawSceneBackground();
  drawReference();
  drawUsedEdges();
  drawNodes(time);
@@ -527,6 +1537,14 @@ function draw(time=0){
  floatTexts=floatTexts.filter(t=>t.life>0);
 
  requestAnimationFrame(draw);
+}
+
+
+if(window.visualViewport){
+  window.visualViewport.addEventListener('resize',()=>{
+    clearTimeout(window.__connectDotsViewportTimer);
+    window.__connectDotsViewportTimer=setTimeout(resize,100);
+  });
 }
 
 buildMenus();resize();draw();
