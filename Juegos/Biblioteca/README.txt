@@ -23,3 +23,12 @@ CAMBIOS INTEGRADOS
 Si el navegador bloquea el sonido al cargar, haz clic o toca la página para habilitar la música. También están los controles de audio.
 Se recomienda jugar en horizontal para leer mejor las dos hojas.
 Si reemplazas una versión anterior, recarga con Ctrl+F5.
+
+ACTUALIZACIÓN DE ACTIVIDADES Y SONIDOS
+- Las cuatro cartas de ordenar están alineadas y numeradas del 1 al 4.
+- Se conservan la pista y las instrucciones; se añaden Comprobar y Saltar para ordenar.
+- La actividad de parejas muestra cartas más grandes y retira el texto inferior.
+- Errores con sacudida y señal sonora breve; parejas correctas con una pequeña animación.
+- Efectos de botones y actividades generados con JavaScript. Las flechas conservan únicamente el sonido de pasar la hoja.
+- Se deja de utilizar actividad.mp3, que duraba unos 90 segundos, como sonido de acierto.
+- Se elimina el fondo rectangular de la hoja animada y se ocultan los sobrantes blancos del exterior de las páginas sin modificar las ilustraciones originales.

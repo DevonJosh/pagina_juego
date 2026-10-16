@@ -2470,3 +2470,15 @@ body.portal-primaria.rugged-game-open #soundToggle.rugged-sound-button { display
   top:calc(var(--header-h) + 12px); right:14px; bottom:auto; left:auto;
  }
 }
+
+/* Base definida de circuito: sin desenfoque ni halo bajo Rugged. */
+.portal-primaria .hero-character .platform-road {
+ filter:none; backdrop-filter:none; animation:none;
+ background:linear-gradient(180deg,#41465f,#282d45);
+ border:3px solid #ffb776; height:42px; border-radius:50%;
+ box-shadow:0 5px 0 #9c5638,0 8px 0 #22253a;
+ opacity:1; transform:translateX(-50%) perspective(360px) rotateX(57deg);
+}
+.portal-primaria .hero-character .rayet-shadow,
+.portal-primaria .hero-character .rayet-aura { display:none; }
+.portal-primaria .rayet-stage .robot-img { filter:none; }
