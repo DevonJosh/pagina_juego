@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="description" content="Aventuras de Rugged — Portal de 20 minijuegos educativos para el nivel Primaria">
-    <meta name="theme-color" content="#ff8c42">
+    <meta name="description" content="Aventuras de Rugged — Portal de juegos educativos organizados por cursos para el nivel Primaria">
+    <meta name="theme-color" content="#11122c">
     <title>🏎️ Aventuras de Rugged | Primaria</title>
 
     <!-- Tipografías -->
@@ -16,245 +16,10 @@
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/rayet.css">
 
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏎️</text></svg>">
+    <link rel="icon" type="image/png" href="assets/robots/rayet.png">
 
     <!-- CSS PARA MINIATURAS DINÁMICAS Y CORRECCIONES VISUALES -->
-    <style>
-        /* ============================================================
-           CORRECCIONES ESTRUCTURALES Y TEXTOS FLOTANTES
-           ============================================================ */
-        body, html { overflow-x: hidden; }
-
-        .game-card-thumb {
-            position: relative;
-            overflow: hidden;
-            display: block;
-            line-height: 0;
-        }
-
-        .dynamic-thumb {
-            position: absolute;
-            top: 0; left: 0;
-            width: 400%; 
-            height: 400%;
-            transform: scale(0.25); 
-            transform-origin: top left;
-            pointer-events: none; 
-            border: none;
-            z-index: 1;
-            background-color: transparent;
-        }
-
-        .game-thumb-bg { z-index: 2; }
-        .game-number, .game-difficulty, .game-badge-new, .game-badge-featured { z-index: 3; }
-
-        .bubble, .about-rayet-bubble {
-            max-width: 95%;
-            word-wrap: break-word;
-            position: relative;
-            z-index: 10;
-        }
-
-        .game-title { margin: 12px 0 6px 0; line-height: 1.2; }
-        .game-desc { margin: 0 0 12px 0; line-height: 1.4; }
-
-        .hero-text .portal-hero-subtitle {
-            background-color: rgba(255, 255, 255, 0.95);
-            color: #1a2530 !important;
-            padding: 10px 25px;
-            border-radius: 30px;
-            display: inline-block;
-            font-weight: 700;
-            margin-top: 10px;
-            margin-bottom: 25px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-        }
-
-        .hero-stats {
-            background-color: rgba(26, 37, 48, 0.85);
-            padding: 15px 30px;
-            border-radius: 20px;
-            display: inline-flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 30px;
-            margin-bottom: 30px;
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            border: 2px solid rgba(255, 255, 255, 0.15);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.25);
-        }
-
-        .hero-stat {
-            color: #ffffff !important;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .hero-stat-num {
-            display: block;
-            font-size: 1.8rem;
-            font-weight: 900;
-            color: #ffaa00; 
-            line-height: 1;
-            margin-bottom: 6px;
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.6);
-        }
-
-        .hero-stat-lbl {
-            display: block;
-            font-size: 0.9rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            opacity: 0.9;
-        }
-
-        /* ============================================================
-           MEJORAS DE UI Y NUEVO ESTADO "PRÓXIMAMENTE"
-           ============================================================ */
-
-        /* Overlay Próximamente para juegos Placeholder */
-        .placeholder-overlay {
-            position: absolute;
-            inset: 0;
-            background: rgba(44, 62, 80, 0.85); /* Azul oscuro semi transparente */
-            z-index: 5;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
-        }
-
-        .placeholder-text {
-            color: #ffaa00;
-            font-family: 'Fredoka', sans-serif;
-            font-weight: 900;
-            font-size: 1.5rem;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            text-shadow: 2px 2px 0px rgba(0,0,0,0.5);
-            transform: rotate(-10deg);
-            border: 4px solid #ffaa00;
-            padding: 8px 15px;
-            border-radius: 12px;
-            background: rgba(0,0,0,0.4);
-        }
-
-        /* Tarjeta deshabilitada */
-        .game-card.disabled {
-            cursor: not-allowed;
-            opacity: 0.85;
-            filter: grayscale(40%);
-        }
-        
-        .game-card.disabled .game-card-link {
-            pointer-events: none; /* Desactiva el clic por completo */
-        }
-
-        /* Resto de UI */
-        .scroll-hint {
-            position: absolute;
-            bottom: 30px !important;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 50;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            color: #fff;
-            background-color: rgba(26, 37, 48, 0.85);
-            padding: 12px 25px;
-            border-radius: 25px;
-            backdrop-filter: blur(6px);
-            -webkit-backdrop-filter: blur(6px);
-            border: 2px solid rgba(255, 255, 255, 0.15);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
-        }
-
-        .scroll-txt {
-            font-size: 0.85rem;
-            font-weight: 700;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            margin-bottom: 8px;
-            opacity: 0.95;
-        }
-
-        .hero-actions { margin-bottom: 60px; }
-
-        .about-section {
-            background: linear-gradient(180deg, #eef2f5 0%, #ffffff 100%);
-            padding: 80px 20px;
-            color: #2c3e50;
-        }
-
-        .about-inner { max-width: 1100px; margin: 0 auto; }
-        .about-header { text-align: center; margin-bottom: 50px; }
-
-        .about-mission {
-            display: flex;
-            align-items: center;
-            gap: 40px;
-            background: #fff;
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.05);
-            margin-bottom: 60px;
-        }
-
-        .about-mission-text { flex: 1; font-size: 1.1rem; line-height: 1.6; }
-
-        .about-mission-visual {
-            flex: 0 0 320px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-end;
-            position: relative;
-        }
-
-        .about-rayet-img-wrap { width: 100%; display: flex; justify-content: center; }
-        .about-rayet-img { max-width: 250px; height: auto; display: block; }
-
-        @media (max-width: 768px) {
-            .about-mission { flex-direction: column; text-align: center; padding: 30px 20px; }
-            .about-mission-visual { flex: 0 0 auto; }
-        }
-
-        .about-values-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 25px;
-            margin-bottom: 60px;
-        }
-
-        .about-value-card {
-            background: #fff;
-            padding: 30px 25px;
-            border-radius: 15px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.06);
-            border-top: 5px solid #ffaa00;
-            transition: transform 0.2s;
-        }
-
-        .about-value-card:hover { transform: translateY(-5px); }
-        .about-values-title { text-align: center; font-size: 2rem; margin-bottom: 40px; }
-
-        .about-cta {
-            text-align: center;
-            background: #1a2530;
-            color: #fff;
-            padding: 50px 20px;
-            border-radius: 20px;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
-        }
-
-        .about-cta-desc { margin-bottom: 30px; font-size: 1.1rem; opacity: 0.9; }
-    </style>
+    
 </head>
 <body class="world-portal portal-primaria">
 
@@ -268,8 +33,12 @@
 <!-- ============================================================
      BOTÓN FLOTANTE: SONIDO
      ============================================================ -->
-<button id="soundToggle" class="sound-toggle" aria-label="Activar o desactivar sonido" title="Sonido">
-    <span class="sound-icon sound-off">🔇</span>
+<button id="soundToggle" class="sound-toggle rugged-sound-button" type="button" aria-label="Silenciar sonido" aria-pressed="true" title="Silenciar sonido">
+    <svg class="rugged-sound-glyph" viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M11 5 6 9H3v6h3l5 4z"/>
+        <g class="rugged-sound-waves"><path d="M15 8a6 6 0 0 1 0 8M18 5a10 10 0 0 1 0 14"/></g>
+        <g class="rugged-sound-cross"><path d="m16 9 5 6m0-6-5 6"/></g>
+    </svg>
 </button>
 
 
@@ -282,7 +51,7 @@
         <a href="index.html" class="brand brand-primaria" aria-label="Volver a la plataforma principal">
             <div class="brand-logo brand-logo-primaria" aria-hidden="true">
                 <span class="brand-logo-glow"></span>
-                <span class="brand-logo-emoji">🏎️</span>
+                <img class="brand-rugged-img" src="assets/robots/rayet.png" alt="">
             </div>
             <div class="brand-text">
                 <h1 class="brand-name">AVENTURAS DE RUGGED</h1>
@@ -290,7 +59,7 @@
             </div>
         </a>
 
-        <nav class="main-nav" aria-label="Navegación del portal">
+        <nav id="portalNavigation" class="main-nav" aria-label="Navegación del portal">
             <span class="nav-indicator" aria-hidden="true"></span>
 
             <a href="index.html" class="nav-btn nav-inicio" data-nav="inicio">
@@ -315,7 +84,7 @@
             </a>
         </nav>
 
-        <button class="menu-toggle" id="menuToggle" aria-label="Abrir menú" aria-expanded="false">
+        <button class="menu-toggle" id="menuToggle" aria-controls="portalNavigation" aria-label="Abrir menú" aria-expanded="false">
             <span></span><span></span><span></span>
         </button>
     </div>
@@ -328,44 +97,37 @@
      ============================================================ -->
 <section id="hero" class="portal-hero hero-primaria">
 
-    <!-- Fondo en capas -->
-    <div class="portal-hero-bg" aria-hidden="true">
-        <div class="layer layer-sky">
-            <div class="sun sun-primaria"><span class="sun-rays"></span></div>
-            <div class="cloud cloud-1"></div>
-            <div class="cloud cloud-2"></div>
-            <div class="cloud cloud-3"></div>
-            <div class="speed-lines"></div>
-        </div>
-        <div class="layer layer-mountains">
-            <div class="city-skyline-back"></div>
-            <div class="city-skyline-front"></div>
-        </div>
-        <div class="layer layer-trees">
-            <div class="road-sign sign-1"></div>
-            <div class="road-sign sign-2"></div>
-            <div class="traffic-light tl-1">
-                <span class="tl-red"></span>
-                <span class="tl-yellow"></span>
-                <span class="tl-green"></span>
-            </div>
-            <div class="urban-tree ut-1"></div>
-            <div class="urban-tree ut-2"></div>
-        </div>
-        <div class="layer layer-deco">
-            <div class="checkered-flag flag-1"></div>
-            <div class="checkered-flag flag-2"></div>
-            <div class="speed-particle sp-1">💨</div>
-            <div class="speed-particle sp-2">💨</div>
-            <div class="speed-particle sp-3">⚡</div>
-        </div>
-        <div class="layer layer-ground">
-            <div class="sidewalk"></div>
-            <div class="road">
-                <div class="road-lines"></div>
-            </div>
-            <div class="starting-line"></div>
-        </div>
+    <div class="rugged-world racing-city-world" aria-hidden="true">
+      <svg class="racing-city" viewBox="0 105 1440 745" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg">
+       <defs>
+        <linearGradient id="citySky" x2="0" y2="1"><stop stop-color="#171b46"/><stop offset=".5" stop-color="#494075"/><stop offset="1" stop-color="#e39776"/></linearGradient>
+        <radialGradient id="citySun"><stop stop-color="#ffe3a3"/><stop offset="1" stop-color="#ffae79"/></radialGradient>
+        <linearGradient id="cityRoad" x2="0" y2="1"><stop stop-color="#454660"/><stop offset="1" stop-color="#20233d"/></linearGradient>
+        <linearGradient id="cityShade" x2="1" y2="0"><stop stop-color="#15162f" stop-opacity="0"/><stop offset=".65" stop-color="#11122c" stop-opacity=".18"/><stop offset="1" stop-color="#11122c" stop-opacity=".65"/></linearGradient>
+        <pattern id="cityCurb" width="40" height="40" patternUnits="userSpaceOnUse" patternTransform="rotate(-20)"><rect width="40" height="40" fill="#fff0d1"/><rect width="20" height="40" fill="#f18b58"/></pattern>
+        <pattern id="cityCheck" width="24" height="24" patternUnits="userSpaceOnUse"><rect width="24" height="24" fill="#fff3df"/><path d="M0 0h12v12H0zM12 12h12v12H12z" fill="#34334f"/></pattern>
+       </defs>
+       <rect width="1440" height="850" fill="url(#citySky)"/>
+       <circle cx="290" cy="360" r="115" fill="#ffb179" opacity=".08"/><circle cx="290" cy="360" r="85" fill="url(#citySun)"/>
+       <g fill="#e7dcff" opacity=".65"><circle cx="90" cy="170" r="2"/><circle cx="420" cy="145" r="2"/><circle cx="760" cy="180" r="2"/><circle cx="1200" cy="130" r="2"/><circle cx="1330" cy="260" r="2"/></g>
+       <g class="city-cloud cloud-a" fill="#e0c8ed" opacity=".12"><rect x="100" y="235" width="155" height="24" rx="12"/><rect x="130" y="220" width="90" height="30" rx="15"/></g>
+       <g class="city-cloud cloud-b" fill="#e0c8ed" opacity=".1"><rect x="930" y="215" width="200" height="22" rx="11"/><rect x="980" y="201" width="100" height="28" rx="14"/></g>
+       <path d="M0 540Q120 420 250 500T500 480T770 500T1050 470T1440 500V700H0Z" fill="#393d66"/>
+       <g class="city-buildings"><g><rect x="0" y="440" width="110" height="190" rx="10" fill="#39356b" stroke="#b8b3e6" stroke-opacity=".18"/><rect x="15" y="462" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.2"/><rect x="39" y="462" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="63" y="462" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="87" y="462" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="15" y="490" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="39" y="490" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="63" y="490" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="87" y="490" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.2"/><rect x="15" y="518" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="39" y="518" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="63" y="518" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.2"/><rect x="87" y="518" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="15" y="546" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="39" y="546" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.2"/><rect x="63" y="546" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="87" y="546" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="15" y="574" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.2"/><rect x="39" y="574" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="63" y="574" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="87" y="574" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><path d="M8 440H102" stroke="#ffbb7e" stroke-opacity=".65" stroke-width="3"/></g><g><rect x="118" y="380" width="80" height="250" rx="10" fill="#414176" stroke="#b8b3e6" stroke-opacity=".18"/><rect x="133" y="402" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="157" y="402" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="181" y="402" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="133" y="430" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="157" y="430" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="181" y="430" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.2"/><rect x="133" y="458" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="157" y="458" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.2"/><rect x="181" y="458" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="133" y="486" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.2"/><rect x="157" y="486" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="181" y="486" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="133" y="514" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="157" y="514" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="181" y="514" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="133" y="542" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="157" y="542" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="181" y="542" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.2"/><rect x="133" y="570" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="157" y="570" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.2"/><rect x="181" y="570" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="133" y="598" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.2"/><rect x="157" y="598" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="181" y="598" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><path d="M126 380H190" stroke="#ffbb7e" stroke-opacity=".65" stroke-width="3"/></g><g><rect x="210" y="460" width="125" height="170" rx="10" fill="#4b3f77" stroke="#b8b3e6" stroke-opacity=".18"/><rect x="225" y="482" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="249" y="482" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="273" y="482" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.2"/><rect x="297" y="482" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="321" y="482" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="225" y="510" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="249" y="510" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.2"/><rect x="273" y="510" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="297" y="510" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="321" y="510" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="225" y="538" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.2"/><rect x="249" y="538" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="273" y="538" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="297" y="538" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="321" y="538" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.2"/><rect x="225" y="566" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="249" y="566" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="273" y="566" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="297" y="566" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.2"/><rect x="321" y="566" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="225" y="594" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="249" y="594" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="273" y="594" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.2"/><rect x="297" y="594" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="321" y="594" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><path d="M218 460H327" stroke="#ffbb7e" stroke-opacity=".65" stroke-width="3"/></g><g><rect x="345" y="340" width="100" height="290" rx="10" fill="#3c497a" stroke="#b8b3e6" stroke-opacity=".18"/><rect x="360" y="362" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="384" y="362" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.2"/><rect x="408" y="362" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="432" y="362" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="360" y="390" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.2"/><rect x="384" y="390" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="408" y="390" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="432" y="390" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="360" y="418" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="384" y="418" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="408" y="418" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="432" y="418" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.2"/><rect x="360" y="446" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="384" y="446" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="408" y="446" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.2"/><rect x="432" y="446" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="360" y="474" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="384" y="474" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.2"/><rect x="408" y="474" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="432" y="474" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="360" y="502" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.2"/><rect x="384" y="502" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="408" y="502" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="432" y="502" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="360" y="530" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="384" y="530" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="408" y="530" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="432" y="530" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.2"/><rect x="360" y="558" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="384" y="558" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="408" y="558" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.2"/><rect x="432" y="558" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="360" y="586" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="384" y="586" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.2"/><rect x="408" y="586" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="432" y="586" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><path d="M353 340H437" stroke="#ffbb7e" stroke-opacity=".65" stroke-width="3"/></g><g><rect x="455" y="400" width="90" height="230" rx="10" fill="#454575" stroke="#b8b3e6" stroke-opacity=".18"/><rect x="470" y="422" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.2"/><rect x="494" y="422" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="518" y="422" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="470" y="450" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="494" y="450" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="518" y="450" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="470" y="478" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="494" y="478" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="518" y="478" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.2"/><rect x="470" y="506" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="494" y="506" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.2"/><rect x="518" y="506" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="470" y="534" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.2"/><rect x="494" y="534" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="518" y="534" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="470" y="562" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="494" y="562" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="518" y="562" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="470" y="590" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="494" y="590" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="518" y="590" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.2"/><path d="M463 400H537" stroke="#ffbb7e" stroke-opacity=".65" stroke-width="3"/></g><g><rect x="555" y="320" width="115" height="310" rx="10" fill="#3b416e" stroke="#b8b3e6" stroke-opacity=".18"/><rect x="570" y="342" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="594" y="342" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="618" y="342" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="642" y="342" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.2"/><rect x="570" y="370" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="594" y="370" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="618" y="370" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.2"/><rect x="642" y="370" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="570" y="398" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="594" y="398" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.2"/><rect x="618" y="398" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="642" y="398" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="570" y="426" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.2"/><rect x="594" y="426" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="618" y="426" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="642" y="426" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="570" y="454" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="594" y="454" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="618" y="454" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="642" y="454" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.2"/><rect x="570" y="482" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="594" y="482" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="618" y="482" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.2"/><rect x="642" y="482" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="570" y="510" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="594" y="510" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.2"/><rect x="618" y="510" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="642" y="510" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="570" y="538" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.2"/><rect x="594" y="538" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="618" y="538" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="642" y="538" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="570" y="566" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="594" y="566" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="618" y="566" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="642" y="566" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.2"/><rect x="570" y="594" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="594" y="594" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="618" y="594" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.2"/><rect x="642" y="594" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><path d="M563 320H662" stroke="#ffbb7e" stroke-opacity=".65" stroke-width="3"/></g><g><rect x="682" y="450" width="80" height="180" rx="10" fill="#424779" stroke="#b8b3e6" stroke-opacity=".18"/><rect x="697" y="472" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="721" y="472" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="745" y="472" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.2"/><rect x="697" y="500" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="721" y="500" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.2"/><rect x="745" y="500" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="697" y="528" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.2"/><rect x="721" y="528" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="745" y="528" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="697" y="556" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="721" y="556" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="745" y="556" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="697" y="584" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="721" y="584" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="745" y="584" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.2"/><path d="M690 450H754" stroke="#ffbb7e" stroke-opacity=".65" stroke-width="3"/></g><g><rect x="775" y="365" width="105" height="265" rx="10" fill="#3b416d" stroke="#b8b3e6" stroke-opacity=".18"/><rect x="790" y="387" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="814" y="387" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.2"/><rect x="838" y="387" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="862" y="387" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="790" y="415" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.2"/><rect x="814" y="415" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="838" y="415" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="862" y="415" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="790" y="443" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="814" y="443" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="838" y="443" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="862" y="443" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.2"/><rect x="790" y="471" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="814" y="471" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="838" y="471" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.2"/><rect x="862" y="471" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="790" y="499" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="814" y="499" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.2"/><rect x="838" y="499" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="862" y="499" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="790" y="527" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.2"/><rect x="814" y="527" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="838" y="527" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="862" y="527" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="790" y="555" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="814" y="555" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="838" y="555" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="862" y="555" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.2"/><rect x="790" y="583" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="814" y="583" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="838" y="583" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.2"/><rect x="862" y="583" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><path d="M783 365H872" stroke="#ffbb7e" stroke-opacity=".65" stroke-width="3"/></g><g><rect x="892" y="420" width="120" height="210" rx="10" fill="#4b3a70" stroke="#b8b3e6" stroke-opacity=".18"/><rect x="907" y="442" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.2"/><rect x="931" y="442" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="955" y="442" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="979" y="442" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="907" y="470" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="931" y="470" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="955" y="470" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="979" y="470" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.2"/><rect x="907" y="498" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="931" y="498" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="955" y="498" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.2"/><rect x="979" y="498" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="907" y="526" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="931" y="526" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.2"/><rect x="955" y="526" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="979" y="526" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="907" y="554" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.2"/><rect x="931" y="554" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="955" y="554" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="979" y="554" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="907" y="582" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="931" y="582" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="955" y="582" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="979" y="582" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.2"/><path d="M900 420H1004" stroke="#ffbb7e" stroke-opacity=".65" stroke-width="3"/></g><g><rect x="1025" y="345" width="90" height="285" rx="10" fill="#3c416d" stroke="#b8b3e6" stroke-opacity=".18"/><rect x="1040" y="367" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="1064" y="367" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="1088" y="367" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="1040" y="395" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="1064" y="395" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="1088" y="395" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.2"/><rect x="1040" y="423" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="1064" y="423" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.2"/><rect x="1088" y="423" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="1040" y="451" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.2"/><rect x="1064" y="451" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="1088" y="451" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="1040" y="479" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="1064" y="479" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="1088" y="479" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="1040" y="507" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="1064" y="507" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="1088" y="507" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.2"/><rect x="1040" y="535" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="1064" y="535" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.2"/><rect x="1088" y="535" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="1040" y="563" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.2"/><rect x="1064" y="563" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="1088" y="563" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="1040" y="591" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="1064" y="591" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="1088" y="591" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><path d="M1033 345H1107" stroke="#ffbb7e" stroke-opacity=".65" stroke-width="3"/></g><g><rect x="1127" y="385" width="115" height="245" rx="10" fill="#454675" stroke="#b8b3e6" stroke-opacity=".18"/><rect x="1142" y="407" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="1166" y="407" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="1190" y="407" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.2"/><rect x="1214" y="407" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="1142" y="435" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="1166" y="435" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.2"/><rect x="1190" y="435" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="1214" y="435" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="1142" y="463" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.2"/><rect x="1166" y="463" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="1190" y="463" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="1214" y="463" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="1142" y="491" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="1166" y="491" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="1190" y="491" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="1214" y="491" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.2"/><rect x="1142" y="519" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="1166" y="519" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="1190" y="519" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.2"/><rect x="1214" y="519" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="1142" y="547" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="1166" y="547" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.2"/><rect x="1190" y="547" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="1214" y="547" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="1142" y="575" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.2"/><rect x="1166" y="575" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="1190" y="575" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="1214" y="575" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><path d="M1135 385H1234" stroke="#ffbb7e" stroke-opacity=".65" stroke-width="3"/></g><g><rect x="1252" y="435" width="95" height="195" rx="10" fill="#3b3b70" stroke="#b8b3e6" stroke-opacity=".18"/><rect x="1267" y="457" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="1291" y="457" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.2"/><rect x="1315" y="457" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="1267" y="485" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.2"/><rect x="1291" y="485" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="1315" y="485" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="1267" y="513" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="1291" y="513" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="1315" y="513" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="1267" y="541" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="1291" y="541" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="1315" y="541" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.2"/><rect x="1267" y="569" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="1291" y="569" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.2"/><rect x="1315" y="569" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="1267" y="597" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.2"/><rect x="1291" y="597" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="1315" y="597" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><path d="M1260 435H1339" stroke="#ffbb7e" stroke-opacity=".65" stroke-width="3"/></g><g><rect x="1355" y="350" width="100" height="280" rx="10" fill="#3d4573" stroke="#b8b3e6" stroke-opacity=".18"/><rect x="1370" y="372" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.2"/><rect x="1394" y="372" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="1418" y="372" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="1442" y="372" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="1370" y="400" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="1394" y="400" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="1418" y="400" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="1442" y="400" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.2"/><rect x="1370" y="428" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="1394" y="428" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="1418" y="428" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.2"/><rect x="1442" y="428" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="1370" y="456" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="1394" y="456" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.2"/><rect x="1418" y="456" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="1442" y="456" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="1370" y="484" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.2"/><rect x="1394" y="484" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="1418" y="484" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="1442" y="484" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="1370" y="512" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="1394" y="512" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="1418" y="512" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="1442" y="512" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.2"/><rect x="1370" y="540" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="1394" y="540" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="1418" y="540" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.2"/><rect x="1442" y="540" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="1370" y="568" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="1394" y="568" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.2"/><rect x="1418" y="568" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="1442" y="568" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="1370" y="596" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.2"/><rect x="1394" y="596" width="10" height="13" rx="3" fill="#81dfd1" opacity="0.65"/><rect x="1418" y="596" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><rect x="1442" y="596" width="10" height="13" rx="3" fill="#ffcf8c" opacity="0.65"/><path d="M1363 350H1447" stroke="#ffbb7e" stroke-opacity=".65" stroke-width="3"/></g></g>
+       <path d="M0 630Q200 590 440 630T900 620T1440 630V850H0Z" fill="#384e63"/>
+       <g fill="#72b8a6"><path d="m50 560-30 62h60z"/><path d="m700 545-35 78h70z"/><path d="m1270 555-33 68h66z"/></g>
+       <g stroke="#a1c2bd" stroke-width="6"><path d="M70 655V540q0-15 18-15h20M1350 640V540q0-15-18-15h-20"/></g>
+       <g fill="#ffdb9b"><rect x="99" y="520" width="20" height="10" rx="5"/><rect x="1304" y="520" width="20" height="10" rx="5"/></g>
+       <path d="M-100 800C220 540 510 900 860 680S1250 625 1530 730" fill="none" stroke="#20243c" stroke-width="156"/>
+       <path d="M-100 800C220 540 510 900 860 680S1250 625 1530 730" fill="none" stroke="url(#cityCurb)" stroke-width="140"/>
+       <path d="M-100 800C220 540 510 900 860 680S1250 625 1530 730" fill="none" stroke="url(#cityRoad)" stroke-width="119"/>
+       <path class="race-lane-dashes" d="M-100 800C220 540 510 900 860 680S1250 625 1530 730" fill="none" stroke="#ffdc94" stroke-width="4" stroke-dasharray="32 30" opacity=".8"/>
+       <path d="M96 671 120 685 71 777 47 764Z" fill="url(#cityCheck)"/>
+       <g class="city-flag" transform="translate(570 580)"><path d="M0 65V0" stroke="#f6dbbb" stroke-width="5"/><path d="M2 0q30-12 64 0v42q-34-12-64 0z" fill="url(#cityCheck)"/></g>
+       <g class="city-race-car car-orange"><ellipse cx="0" cy="7" rx="26" ry="13" fill="#11152f" opacity=".6"/><rect x="-25" y="-15" width="50" height="27" rx="10" fill="#ff9d5f"/><rect x="-7" y="-12" width="17" height="19" rx="5" fill="#383b63"/><rect x="-20" y="-19" width="12" height="7" rx="3" fill="#171a32"/><rect x="-20" y="9" width="12" height="7" rx="3" fill="#171a32"/><rect x="13" y="-19" width="10" height="7" rx="3" fill="#171a32"/><rect x="13" y="9" width="10" height="7" rx="3" fill="#171a32"/></g>
+       <rect width="1440" height="850" fill="url(#cityShade)"/>
+      </svg>
+      <div class="race-track-caption"><span>🏁</span> CIRCUITO RUGGED <b>APRENDE · EXPLORA · ACELERA</b></div>
     </div>
 
     <!-- Contenido hero -->
@@ -388,6 +150,8 @@
                 </div>
             </div>
             <div class="character-platform platform-road" aria-hidden="true"></div>
+            <div class="robot-chip chip-top" aria-hidden="true">🏁 MODO CARRERA</div>
+            <div class="robot-chip chip-bottom" aria-hidden="true"><span></span> RUGGED EN LÍNEA</div>
         </div>
 
         <!-- Texto (lado derecho) -->
@@ -403,25 +167,25 @@
                 <span class="portal-hero-title-line portal-hero-title-accent">RUGGED</span>
             </h2>
 
-            <div class="bubble bubble-primaria">
-                <span class="bubble-tail"></span>
-                <p class="bubble-text">
-                    ¡Piloto, enciende motores! 🏎️ ¿A qué desafío te enfrentas hoy?
+            <div class="rugged-dialogue">
+                <span class="rugged-dialogue-tail"></span>
+                <p class="rugged-dialogue-text">
+                    ¡Hola, explorador! Soy Rugged. ¿Qué descubrimos hoy?
                 </p>
             </div>
 
             <p class="portal-hero-subtitle">
-                ¡Elige un juego y acelera tu aprendizaje!
+                Pequeños retos. Grandes descubrimientos. Elige tu próxima aventura y aprende jugando.
             </p>
 
             <div class="hero-stats" aria-label="Resumen del portal">
                 <div class="hero-stat">
-                    <span class="hero-stat-num">20</span>
-                    <span class="hero-stat-lbl">Juegos</span>
+                    <span class="hero-stat-num">8</span>
+                    <span class="hero-stat-lbl">Disponibles</span>
                 </div>
                 <div class="hero-stat">
-                    <span class="hero-stat-num">5</span>
-                    <span class="hero-stat-lbl">Categorías</span>
+                    <span class="hero-stat-num">6</span>
+                    <span class="hero-stat-lbl">Cursos</span>
                 </div>
                 <div class="hero-stat">
                     <span class="hero-stat-num">∞</span>
@@ -433,7 +197,7 @@
                 <a href="#juegos" class="btn btn-hero-primaria" data-scroll="#juegos">
                     <span class="btn-glow"></span>
                     <span class="btn-icon">🏁</span>
-                    <span class="btn-label">ARRANCAR AVENTURA</span>
+                    <span class="btn-label">EXPLORAR JUEGOS</span>
                     <span class="btn-arrow">›</span>
                 </a>
             </div>
@@ -442,7 +206,7 @@
 
     <!-- Indicador de scroll -->
     <div class="scroll-hint" aria-hidden="true">
-        <span class="scroll-txt">Desliza para acelerar</span>
+        <span class="scroll-txt">Tu próxima misión está abajo</span>
         <div class="scroll-mouse"><span class="scroll-wheel"></span></div>
     </div>
 </section>
@@ -472,74 +236,25 @@
         <div class="games-header reveal-child" data-reveal="1">
             <h2 class="section-title">
                 <span class="section-title-ico">🏁</span>
-                <span class="section-title-txt">ELIGE TU DESAFÍO</span>
+                <span class="section-title-txt">TU ZONA DE AVENTURAS</span>
             </h2>
             <p class="section-subtitle">
-                20 desafíos de pensamiento computacional te esperan. ¡Elige uno y empieza a resolver!
+                Elige un curso y encuentra tu próxima aventura. Un juego puede trabajar habilidades de más de un curso.
             </p>
         </div>
 
         <!-- Filtros -->
-        <div class="filters filters-primaria reveal-child" data-reveal="2" role="tablist" aria-label="Filtrar juegos por categoría">
-            <button class="filter-btn is-active" data-filter="all" role="tab" aria-selected="true">
-                <span class="filter-ico">🏁</span>
-                <span class="filter-txt">Todos</span>
-                <span class="filter-count" data-count="all">20</span>
-            </button>
-
-            <button class="filter-btn" data-filter="resolucion" role="tab" aria-selected="false">
-                <span class="filter-ico">🧠</span>
-                <span class="filter-txt">Resolución</span>
-                <span class="filter-count" data-count="resolucion">4</span>
-            </button>
-
-            <button class="filter-btn" data-filter="secuencias" role="tab" aria-selected="false">
-                <span class="filter-ico">🔁</span>
-                <span class="filter-txt">Secuencias</span>
-                <span class="filter-count" data-count="secuencias">4</span>
-            </button>
-
-            <button class="filter-btn" data-filter="clasificacion" role="tab" aria-selected="false">
-                <span class="filter-ico">🗂️</span>
-                <span class="filter-txt">Clasificación</span>
-                <span class="filter-count" data-count="clasificacion">4</span>
-            </button>
-
-            <button class="filter-btn" data-filter="logica" role="tab" aria-selected="false">
-                <span class="filter-ico">🧩</span>
-                <span class="filter-txt">Lógica y patrones</span>
-                <span class="filter-count" data-count="logica">5</span>
-            </button>
-
-            <button class="filter-btn" data-filter="retos" role="tab" aria-selected="false">
-                <span class="filter-ico">🏆</span>
-                <span class="filter-txt">Retos integradores</span>
-                <span class="filter-count" data-count="retos">3</span>
-            </button>
-        </div>
-
-
-        <!-- ══════════════════════════════════════════════════════════════
-             SECCIÓN 1 · MATEMÁTICAS
-             ══════════════════════════════════════════════════════════════ -->
-        <section class="games-section games-section-resolucion" data-section="resolucion" aria-labelledby="sec-resolucion-title">
-
-            <header class="games-section-head">
-                <div class="games-section-ico games-section-ico-matematicas">🔢</div>
-                <div class="games-section-info">
-                    <h3 class="games-section-title" id="sec-resolucion-title">Resolución de problemas</h3>
-                    <p class="games-section-desc">Analiza situaciones, elige estrategias y encuentra soluciones paso a paso</p>
-                </div>
-                <span class="games-section-count">
-                    <span class="games-section-count-num">4</span>
-                    <span class="games-section-count-txt">juegos</span>
-                </span>
-            </header>
-
-            <div class="games-grid" aria-live="polite">
-
-                <!-- 01 · Peña Embrujada (Activo) -->
-                <article class="game-card" data-category="resolucion" data-difficulty="facil">
+        <div class="filters filters-primaria reveal-child" data-reveal="2" role="tablist" aria-label="Filtrar juegos por curso">
+<button class="filter-btn is-active" data-filter="all" role="tab" aria-selected="true"><span class="filter-ico">🏁</span><span class="filter-txt">Todos</span><span class="filter-count" data-count="all">19</span></button>
+<button class="filter-btn" data-filter="matematica" role="tab" aria-selected="false"><span class="filter-ico">🔢</span><span class="filter-txt">Matemática</span><span class="filter-count" data-count="matematica">9</span></button>
+<button class="filter-btn" data-filter="comunicacion" role="tab" aria-selected="false"><span class="filter-ico">📖</span><span class="filter-txt">Comunicación</span><span class="filter-count" data-count="comunicacion">4</span></button>
+<button class="filter-btn" data-filter="psicomotricidad" role="tab" aria-selected="false"><span class="filter-ico">👣</span><span class="filter-txt">Psicomotricidad</span><span class="filter-count" data-count="psicomotricidad">3</span></button>
+<button class="filter-btn" data-filter="ciencia-ambiente" role="tab" aria-selected="false"><span class="filter-ico">🌱</span><span class="filter-txt">Ciencia y Ambiente</span><span class="filter-count" data-count="ciencia-ambiente">5</span></button>
+<button class="filter-btn" data-filter="personal-social" role="tab" aria-selected="false"><span class="filter-ico">🚦</span><span class="filter-txt">Personal Social</span><span class="filter-count" data-count="personal-social">1</span></button>
+<button class="filter-btn" data-filter="tecnologia" role="tab" aria-selected="false"><span class="filter-ico">🤖</span><span class="filter-txt">Tecnología y Computación</span><span class="filter-count" data-count="tecnologia">1</span></button>
+<button class="filter-btn" data-filter="integrados" role="tab" aria-selected="false"><span class="filter-ico">🏆</span><span class="filter-txt">Retos integrados</span><span class="filter-count" data-count="integrados">2</span></button>
+</div>
+<section class="games-section games-section-matematica" data-section="matematica" aria-labelledby="sec-matematica-title"><header class="games-section-head"><div class="games-section-ico">🔢</div><div class="games-section-info"><h3 class="games-section-title" id="sec-matematica-title">Matemática</h3><p class="games-section-desc">Números, patrones, lógica y resolución de problemas.</p></div><span class="games-section-count"><span class="games-section-count-num">8</span><span class="games-section-count-txt">juegos</span></span></header><div class="games-grid" aria-live="polite"><article class="game-card" data-category="matematica" data-courses="matematica" data-difficulty="facil">
                     <a href="Juegos/Pena_Embrujada.html" class="game-card-link" target="_blank" rel="noopener noreferrer" aria-label="Abrir juego Carrera de Sumas">
                         <div class="game-card-thumb thumb-matematicas has-image">
                             <iframe src="Juegos/Pena_Embrujada.html" title="Carrera de Sumas" class="dynamic-thumb" loading="lazy" scrolling="no" tabindex="-1" sandbox="allow-same-origin allow-scripts"></iframe>
@@ -552,7 +267,7 @@
                         </div>
                         <div class="game-card-body">
                             <div class="game-card-top">
-                                <span class="game-category-tag tag-matematicas">🧠 Resolución de problemas</span>
+                                <span class="game-category-tag">🔢 Matemática</span>
                                 <span class="game-age">6-8 años</span>
                             </div>
                             <h3 class="game-title">Peña Embrujada</h3>
@@ -572,17 +287,15 @@
                         </div>
                     </a>
                 </article>
-
-                <!-- 02 · Multiplica Rápido (Placeholder) -->
-                <article class="game-card disabled game-card-new" data-category="resolucion" data-difficulty="medio">
-                    <a href="#" class="game-card-link" aria-label="Juego no disponible">
+<article class="game-card disabled game-card-new" data-category="matematica" data-courses="matematica" data-difficulty="medio">
+                    <div class="game-card-link">
                         <div class="game-card-thumb thumb-matematicas">
-                            <div class="placeholder-overlay">
+                            <div class="placeholder-overlay"><span class="coming-icon" aria-hidden="true">🚀</span>
                                 <span class="placeholder-text">Próximamente</span>
                             </div>
                             <span class="game-thumb-bg"></span>
                             <span class="game-number">02</span>
-                            <span class="game-badge-new">NUEVO</span>
+                            
                             <div class="game-difficulty difficulty-medio">
                                 <span class="diff-dot"></span>
                                 <span class="diff-txt">Matemáticas</span>
@@ -590,7 +303,7 @@
                         </div>
                         <div class="game-card-body">
                             <div class="game-card-top">
-                                <span class="game-category-tag tag-matematicas">🧠 Resolución de problemas</span>
+                                <span class="game-category-tag">🔢 Matemática</span>
                                 <span class="game-age">8-10 años</span>
                             </div>
                             <h3 class="game-title">Multiplica Rápido</h3>
@@ -603,19 +316,17 @@
                                 </span>
                             </div>
                         </div>
-                    </a>
+                    </div>
                 </article>
-
-                <!-- 03 · Fracciones en Pista (Placeholder) -->
-                <article class="game-card disabled game-card-new" data-category="resolucion" data-difficulty="medio">
-                    <a href="#" class="game-card-link" aria-label="Juego no disponible">
+<article class="game-card disabled game-card-new" data-category="matematica" data-courses="matematica" data-difficulty="medio">
+                    <div class="game-card-link">
                         <div class="game-card-thumb thumb-matematicas">
-                            <div class="placeholder-overlay">
+                            <div class="placeholder-overlay"><span class="coming-icon" aria-hidden="true">🚀</span>
                                 <span class="placeholder-text">Próximamente</span>
                             </div>
                             <span class="game-thumb-bg"></span>
                             <span class="game-number">03</span>
-                            <span class="game-badge-new">NUEVO</span>
+                            
                             <div class="game-difficulty difficulty-medio">
                                 <span class="diff-dot"></span>
                                 <span class="diff-txt">Matemáticas</span>
@@ -623,7 +334,7 @@
                         </div>
                         <div class="game-card-body">
                             <div class="game-card-top">
-                                <span class="game-category-tag tag-matematicas">🧠 Resolución de problemas</span>
+                                <span class="game-category-tag">🔢 Matemática</span>
                                 <span class="game-age">9-11 años</span>
                             </div>
                             <h3 class="game-title">Fracciones en Pista</h3>
@@ -636,19 +347,17 @@
                                 </span>
                             </div>
                         </div>
-                    </a>
+                    </div>
                 </article>
-
-                <!-- 04 · Problemas de Velocidad (Placeholder) -->
-                <article class="game-card disabled game-card-new" data-category="resolucion" data-difficulty="dificil">
-                    <a href="#" class="game-card-link" aria-label="Juego no disponible">
+<article class="game-card disabled game-card-new" data-category="matematica" data-courses="matematica" data-difficulty="dificil">
+                    <div class="game-card-link">
                         <div class="game-card-thumb thumb-matematicas">
-                            <div class="placeholder-overlay">
+                            <div class="placeholder-overlay"><span class="coming-icon" aria-hidden="true">🚀</span>
                                 <span class="placeholder-text">Próximamente</span>
                             </div>
                             <span class="game-thumb-bg"></span>
                             <span class="game-number">04</span>
-                            <span class="game-badge-new">NUEVO</span>
+                            
                             <div class="game-difficulty difficulty-dificil">
                                 <span class="diff-dot"></span>
                                 <span class="diff-txt">Matemáticas</span>
@@ -656,7 +365,7 @@
                         </div>
                         <div class="game-card-body">
                             <div class="game-card-top">
-                                <span class="game-category-tag tag-matematicas">🧠 Resolución de problemas</span>
+                                <span class="game-category-tag">🔢 Matemática</span>
                                 <span class="game-age">10-11 años</span>
                             </div>
                             <h3 class="game-title">Problemas de Velocidad</h3>
@@ -669,345 +378,12 @@
                                 </span>
                             </div>
                         </div>
-                    </a>
+                    </div>
                 </article>
-
-            </div>
-        </section>
-
-
-        <!-- ══════════════════════════════════════════════════════════════
-             SECCIÓN 2 · LENGUAJE
-             ══════════════════════════════════════════════════════════════ -->
-        <section class="games-section games-section-secuencias" data-section="secuencias" aria-labelledby="sec-secuencias-title">
-
-            <header class="games-section-head">
-                <div class="games-section-ico games-section-ico-lenguaje">📖</div>
-                <div class="games-section-info">
-                    <h3 class="games-section-title" id="sec-secuencias-title">Secuencias y comprensión</h3>
-                    <p class="games-section-desc">Ordena información, reconoce pasos y comprende relaciones entre elementos</p>
-                </div>
-                <span class="games-section-count">
-                    <span class="games-section-count-num">4</span>
-                    <span class="games-section-count-txt">juegos</span>
-                </span>
-            </header>
-
-            <div class="games-grid" aria-live="polite">
-
-                <!-- 05 · El Semáforo Travieso (Activo) -->
-                <article class="game-card" data-category="secuencias" data-difficulty="facil">
-                    <a href="Juegos/semaforo2/semaforo.html" class="game-card-link" target="_blank" rel="noopener noreferrer" aria-label="Abrir juego El Semáforo Travieso">
-                        <div class="game-card-thumb thumb-educacion-vial has-image">
-                            <img src="Juegos/semaforo2/assetsInicio/fondo/fondo-personalizado.png" alt="Vista previa de El Semáforo Travieso" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;">
-                            <span class="game-thumb-bg"></span>
-                            <span class="game-number">05</span>
-                            <div class="game-difficulty difficulty-facil">
-                                <span class="diff-dot"></span>
-                                <span class="diff-txt">Educación vial</span>
-                            </div>
-                        </div>
-                        <div class="game-card-body">
-                            <div class="game-card-top">
-                                <span class="game-category-tag tag-educacion-vial">🔁 Secuencias y comprensión</span>
-                                <span class="game-age">6-10 años</span>
-                            </div>
-                            <h3 class="game-title">El Semáforo Travieso</h3>
-                            <p class="game-desc">Explora la ciudad, observa los semáforos y aprende a cruzar las calles de forma segura.</p>
-                            <div class="game-card-bottom">
-                                <span class="game-rating" aria-label="Dificultad 1 de 3">
-                                    <span class="star is-filled">★</span>
-                                    <span class="star">★</span>
-                                    <span class="star">★</span>
-                                </span>
-                                <span class="game-play">
-                                    <span class="game-play-ico">▶</span>
-                                    <span class="game-play-txt">Jugar</span>
-                                </span>
-                            </div>
-                        </div>
-                    </a>
-                </article>
-
-                <!-- 06 · Sinónimos y Antónimos (Placeholder) -->
-                <article class="game-card disabled game-card-new" data-category="secuencias" data-difficulty="facil">
-                    <a href="#" class="game-card-link" aria-label="Juego no disponible">
-                        <div class="game-card-thumb thumb-lenguaje">
-                            <div class="placeholder-overlay"><span class="placeholder-text">Próximamente</span></div>
-                            <span class="game-thumb-bg"></span>
-                            <span class="game-number">06</span>
-                            <span class="game-badge-new">NUEVO</span>
-                            <div class="game-difficulty difficulty-facil">
-                                <span class="diff-dot"></span>
-                                <span class="diff-txt">Lenguaje</span>
-                            </div>
-                        </div>
-                        <div class="game-card-body">
-                            <div class="game-card-top">
-                                <span class="game-category-tag tag-lenguaje">🔁 Secuencias y comprensión</span>
-                                <span class="game-age">7-9 años</span>
-                            </div>
-                            <h3 class="game-title">Sinónimos y Antónimos</h3>
-                            <p class="game-desc">Une las palabras con su sinónimo o antónimo correcto en cada curva.</p>
-                            <div class="game-card-bottom">
-                                <span class="game-rating" aria-label="Dificultad 1 de 3">
-                                    <span class="star is-filled">★</span>
-                                    <span class="star">★</span>
-                                    <span class="star">★</span>
-                                </span>
-                            </div>
-                        </div>
-                    </a>
-                </article>
-
-                <!-- 07 · Constructor de Oraciones (Placeholder) -->
-                <article class="game-card disabled game-card-new" data-category="secuencias" data-difficulty="medio">
-                    <a href="#" class="game-card-link" aria-label="Juego no disponible">
-                        <div class="game-card-thumb thumb-lenguaje">
-                            <div class="placeholder-overlay"><span class="placeholder-text">Próximamente</span></div>
-                            <span class="game-thumb-bg"></span>
-                            <span class="game-number">07</span>
-                            <span class="game-badge-new">NUEVO</span>
-                            <div class="game-difficulty difficulty-medio">
-                                <span class="diff-dot"></span>
-                                <span class="diff-txt">Lenguaje</span>
-                            </div>
-                        </div>
-                        <div class="game-card-body">
-                            <div class="game-card-top">
-                                <span class="game-category-tag tag-lenguaje">🔁 Secuencias y comprensión</span>
-                                <span class="game-age">8-10 años</span>
-                            </div>
-                            <h3 class="game-title">Constructor de Oraciones</h3>
-                            <p class="game-desc">Ordena las palabras correctamente para formar oraciones completas.</p>
-                            <div class="game-card-bottom">
-                                <span class="game-rating" aria-label="Dificultad 2 de 3">
-                                    <span class="star is-filled">★</span>
-                                    <span class="star is-filled">★</span>
-                                    <span class="star">★</span>
-                                </span>
-                            </div>
-                        </div>
-                    </a>
-                </article>
-
-                <!-- 08 · Comprensión Lectora (Placeholder) -->
-                <article class="game-card disabled game-card-new" data-category="secuencias" data-difficulty="dificil">
-                    <a href="#" class="game-card-link" aria-label="Juego no disponible">
-                        <div class="game-card-thumb thumb-lenguaje">
-                            <div class="placeholder-overlay"><span class="placeholder-text">Próximamente</span></div>
-                            <span class="game-thumb-bg"></span>
-                            <span class="game-number">08</span>
-                            <span class="game-badge-new">NUEVO</span>
-                            <div class="game-difficulty difficulty-dificil">
-                                <span class="diff-dot"></span>
-                                <span class="diff-txt">Lenguaje</span>
-                            </div>
-                        </div>
-                        <div class="game-card-body">
-                            <div class="game-card-top">
-                                <span class="game-category-tag tag-lenguaje">🔁 Secuencias y comprensión</span>
-                                <span class="game-age">9-11 años</span>
-                            </div>
-                            <h3 class="game-title">Comprensión Lectora</h3>
-                            <p class="game-desc">Lee historias cortas y responde preguntas para desbloquear el siguiente nivel.</p>
-                            <div class="game-card-bottom">
-                                <span class="game-rating" aria-label="Dificultad 3 de 3">
-                                    <span class="star is-filled">★</span>
-                                    <span class="star is-filled">★</span>
-                                    <span class="star is-filled">★</span>
-                                </span>
-                            </div>
-                        </div>
-                    </a>
-                </article>
-
-            </div>
-        </section>
-
-
-        <!-- ══════════════════════════════════════════════════════════════
-             SECCIÓN 3 · CIENCIAS
-             ══════════════════════════════════════════════════════════════ -->
-        <section class="games-section games-section-clasificacion" data-section="clasificacion" aria-labelledby="sec-clasificacion-title">
-
-            <header class="games-section-head">
-                <div class="games-section-ico games-section-ico-ciencias">🔬</div>
-                <div class="games-section-info">
-                    <h3 class="games-section-title" id="sec-clasificacion-title">Clasificación y análisis</h3>
-                    <p class="games-section-desc">Observa características, compara elementos y organízalos según sus propiedades</p>
-                </div>
-                <span class="games-section-count">
-                    <span class="games-section-count-num">4</span>
-                    <span class="games-section-count-txt">juegos</span>
-                </span>
-            </header>
-
-            <div class="games-grid" aria-live="polite">
-
-                <!-- 09 · EcomoCamion (Activo - usa recolector_basura.html) -->
-                <article class="game-card" data-category="clasificacion" data-difficulty="facil">
-                    <a href="Juegos/recolector_basura.html" class="game-card-link" target="_blank" rel="noopener noreferrer" aria-label="Abrir juego EcoCamion">
-                        <div class="game-card-thumb thumb-ciencias has-image">
-                            <iframe src="Juegos/recolector_basura.html" title="EcoCamion" class="dynamic-thumb" loading="lazy" scrolling="no" tabindex="-1" sandbox="allow-same-origin allow-scripts"></iframe>
-                            <span class="game-thumb-bg"></span>
-                            <span class="game-number">09</span>
-                            <div class="game-difficulty difficulty-facil">
-                                <span class="diff-dot"></span>
-                                <span class="diff-txt">Ciencias</span>
-                            </div>
-                        </div>
-                        <div class="game-card-body">
-                            <div class="game-card-top">
-                                <span class="game-category-tag tag-ciencias">🗂️ Clasificación y análisis</span>
-                                <span class="game-age">6-9 años</span>
-                            </div>
-                            <h3 class="game-title">EcoCamion</h3>
-                            <p class="game-desc">Recolecta y clasifica los residuos en el contenedor correcto para cuidar el medio ambiente.</p>
-                            <div class="game-card-bottom">
-                                <span class="game-rating" aria-label="Dificultad 1 de 3">
-                                    <span class="star is-filled">★</span>
-                                    <span class="star">★</span>
-                                    <span class="star">★</span>
-                                </span>
-                                <span class="game-play">
-                                    <span class="game-play-ico">▶</span>
-                                    <span class="game-play-txt">Jugar</span>
-                                </span>
-                            </div>
-                        </div>
-                    </a>
-                </article>
-
-                <!-- 10 · Explorador de Animales (Activo) -->
-                <article class="game-card game-card-new" data-category="clasificacion" data-difficulty="facil">
-                    <a href="Juegos/explorador_animales.html" class="game-card-link" target="_blank" rel="noopener noreferrer" aria-label="Abrir juego Explorador de Animales">
-                        <div class="game-card-thumb thumb-ciencias has-image">
-                            <iframe src="Juegos/explorador_animales.html" title="Explorador de Animales" class="dynamic-thumb" loading="lazy" scrolling="no" tabindex="-1" sandbox="allow-same-origin allow-scripts"></iframe>
-                            <span class="game-thumb-bg"></span>
-                            <span class="game-number">10</span>
-                            <span class="game-badge-new">NUEVO</span>
-                            <div class="game-difficulty difficulty-facil">
-                                <span class="diff-dot"></span>
-                                <span class="diff-txt">Ciencias</span>
-                            </div>
-                        </div>
-                        <div class="game-card-body">
-                            <div class="game-card-top">
-                                <span class="game-category-tag tag-ciencias">🗂️ Clasificación y análisis</span>
-                                <span class="game-age">6-9 años</span>
-                            </div>
-                            <h3 class="game-title">Explorador de Animales</h3>
-                            <p class="game-desc">Observa y clasifica cada animal en su hábitat correcto para descubrir dónde vive cada uno.</p>
-                            <div class="game-card-bottom">
-                                <span class="game-rating" aria-label="Dificultad 1 de 3">
-                                    <span class="star is-filled">★</span>
-                                    <span class="star">★</span>
-                                    <span class="star">★</span>
-                                </span>
-                                <span class="game-play">
-                                    <span class="game-play-ico">▶</span>
-                                    <span class="game-play-txt">Jugar</span>
-                                </span>
-                            </div>
-                        </div>
-                    </a>
-                </article>
-
-                <!-- 11 · Genetica (Activo) -->
-                <article class="game-card game-card-new" data-category="clasificacion" data-difficulty="medio">
-                    <a href="Juegos/genetica.html" class="game-card-link" target="_blank" rel="noopener noreferrer" aria-label="Abrir juego Ecosistemas">
-                        <div class="game-card-thumb thumb-ciencias has-image">
-                            <iframe src="Juegos/genetica.html" title="Genética" class="dynamic-thumb" loading="lazy" scrolling="no" tabindex="-1" sandbox="allow-same-origin allow-scripts"></iframe>
-                            <span class="game-thumb-bg"></span>
-                            <span class="game-number">11</span>
-                            <span class="game-badge-new">NUEVO</span>
-                            <div class="game-difficulty difficulty-medio">
-                                <span class="diff-dot"></span>
-                                <span class="diff-txt">Ciencias</span>
-                            </div>
-                        </div>
-                        <div class="game-card-body">
-                            <div class="game-card-top">
-                                <span class="game-category-tag tag-ciencias">🗂️ Clasificación y análisis</span>
-                                <span class="game-age">8-10 años</span>
-                            </div>
-                            <h3 class="game-title">Ecosistemas</h3>
-                            <p class="game-desc">Clasifica animales y plantas según su hábitat natural.</p>
-                            <div class="game-card-bottom">
-                                <span class="game-rating" aria-label="Dificultad 2 de 3">
-                                    <span class="star is-filled">★</span>
-                                    <span class="star is-filled">★</span>
-                                    <span class="star">★</span>
-                                </span>
-                                <span class="game-play">
-                                    <span class="game-play-ico">▶</span>
-                                    <span class="game-play-txt">Jugar</span>
-                                </span>
-                            </div>
-                        </div>
-                    </a>
-                </article>
-
-                <!-- 12 · Estados del Agua (Placeholder) -->
-                <article class="game-card disabled game-card-new" data-category="clasificacion" data-difficulty="medio">
-                    <a href="#" class="game-card-link" aria-label="Juego no disponible">
-                        <div class="game-card-thumb thumb-ciencias">
-                            <div class="placeholder-overlay"><span class="placeholder-text">Próximamente</span></div>
-                            <span class="game-thumb-bg"></span>
-                            <span class="game-number">12</span>
-                            <span class="game-badge-new">NUEVO</span>
-                            <div class="game-difficulty difficulty-medio">
-                                <span class="diff-dot"></span>
-                                <span class="diff-txt">Ciencias</span>
-                            </div>
-                        </div>
-                        <div class="game-card-body">
-                            <div class="game-card-top">
-                                <span class="game-category-tag tag-ciencias">🗂️ Clasificación y análisis</span>
-                                <span class="game-age">8-10 años</span>
-                            </div>
-                            <h3 class="game-title">Estados del Agua</h3>
-                            <p class="game-desc">Descubre cómo el agua cambia de estado con la temperatura.</p>
-                            <div class="game-card-bottom">
-                                <span class="game-rating" aria-label="Dificultad 2 de 3">
-                                    <span class="star is-filled">★</span>
-                                    <span class="star is-filled">★</span>
-                                    <span class="star">★</span>
-                                </span>
-                            </div>
-                        </div>
-                    </a>
-                </article>
-
-            </div>
-        </section>
-
-
-        <!-- ══════════════════════════════════════════════════════════════
-             SECCIÓN 4 · LÓGICA
-             ══════════════════════════════════════════════════════════════ -->
-        <section class="games-section games-section-logica" data-section="logica" aria-labelledby="sec-logica-title">
-
-            <header class="games-section-head">
-                <div class="games-section-ico games-section-ico-logica">🧩</div>
-                <div class="games-section-info">
-                    <h3 class="games-section-title" id="sec-logica-title">Lógica y patrones</h3>
-                    <p class="games-section-desc">Descubre reglas, identifica patrones y fortalece el razonamiento lógico</p>
-                </div>
-                <span class="games-section-count">
-                    <span class="games-section-count-num">5</span>
-                    <span class="games-section-count-txt">juegos</span>
-                </span>
-            </header>
-
-            <div class="games-grid" aria-live="polite">
-
-                <!-- 13 · Sudoku Junior (Placeholder) -->
-                <article class="game-card disabled" data-category="logica" data-difficulty="medio">
-                    <a href="#" class="game-card-link" aria-label="Juego no disponible">
+<article class="game-card disabled" data-category="matematica" data-courses="matematica" data-difficulty="medio">
+                    <div class="game-card-link">
                         <div class="game-card-thumb thumb-logica">
-                            <div class="placeholder-overlay"><span class="placeholder-text">Próximamente</span></div>
+                            <div class="placeholder-overlay"><span class="coming-icon" aria-hidden="true">🚀</span><span class="placeholder-text">Próximamente</span></div>
                             <span class="game-thumb-bg"></span>
                             <span class="game-number">13</span>
                             <div class="game-difficulty difficulty-medio">
@@ -1017,7 +393,7 @@
                         </div>
                         <div class="game-card-body">
                             <div class="game-card-top">
-                                <span class="game-category-tag tag-logica">🧩 Lógica y patrones</span>
+                                <span class="game-category-tag">🔢 Matemática</span>
                                 <span class="game-age">8-10 años</span>
                             </div>
                             <h3 class="game-title">Sudoku Junior</h3>
@@ -1030,11 +406,9 @@
                                 </span>
                             </div>
                         </div>
-                    </a>
+                    </div>
                 </article>
-
-                <!-- 14 · Patrones -->
-                <article class="game-card game-card-new" data-category="logica" data-difficulty="facil">
+<article class="game-card game-card-new" data-category="matematica" data-courses="matematica" data-difficulty="facil">
                     <a href="Juegos/p.secuencia.html" class="game-card-link" target="_blank" rel="noopener noreferrer" aria-label="Abrir juego Patrones">
                         <div class="game-card-thumb thumb-logica has-image">
                             <iframe src="Juegos/p.secuencia.html" title="Patrones" class="dynamic-thumb" loading="lazy" scrolling="no" tabindex="-1" sandbox="allow-same-origin allow-scripts"></iframe>
@@ -1048,7 +422,7 @@
                         </div>
                         <div class="game-card-body">
                             <div class="game-card-top">
-                                <span class="game-category-tag tag-logica">🧩 Lógica y patrones</span>
+                                <span class="game-category-tag">🔢 Matemática</span>
                                 <span class="game-age">6-9 años</span>
                             </div>
                             <h3 class="game-title">Patrones</h3>
@@ -1067,9 +441,7 @@
                         </div>
                     </a>
                 </article>
-
-                <!-- 15 · Connect.Dots (Activo) -->
-                <article class="game-card game-card-new" data-category="logica" data-difficulty="medio">
+<article class="game-card game-card-new" data-category="matematica" data-courses="matematica psicomotricidad" data-difficulty="medio">
                     <a href="Juegos/connect.dots.html" class="game-card-link" target="_blank" rel="noopener noreferrer" aria-label="Abrir juego Connect.Dots">
                         <div class="game-card-thumb thumb-logica has-image">
                             <iframe src="Juegos/connect.dots.html" title="Connect.Dots" class="dynamic-thumb" loading="lazy" scrolling="no" tabindex="-1" sandbox="allow-same-origin allow-scripts"></iframe>
@@ -1083,7 +455,7 @@
                         </div>
                         <div class="game-card-body">
                             <div class="game-card-top">
-                                <span class="game-category-tag tag-logica">🧩 Lógica y patrones</span>
+                                <span class="game-category-tag">🔢 Matemática</span>
                                 <span class="game-age">8-10 años</span>
                             </div>
                             <h3 class="game-title">Connect.dots</h3>
@@ -1103,15 +475,13 @@
                         </div>
                     </a>
                 </article>
-
-                <!-- 16 · Código Secreto (Placeholder) -->
-                <article class="game-card disabled game-card-new" data-category="logica" data-difficulty="medio">
-                    <a href="#" class="game-card-link" aria-label="Juego no disponible">
+<article class="game-card disabled game-card-new" data-category="matematica" data-courses="matematica" data-difficulty="medio">
+                    <div class="game-card-link">
                         <div class="game-card-thumb thumb-logica">
-                            <div class="placeholder-overlay"><span class="placeholder-text">Próximamente</span></div>
+                            <div class="placeholder-overlay"><span class="coming-icon" aria-hidden="true">🚀</span><span class="placeholder-text">Próximamente</span></div>
                             <span class="game-thumb-bg"></span>
                             <span class="game-number">16</span>
-                            <span class="game-badge-new">NUEVO</span>
+                            
                             <div class="game-difficulty difficulty-medio">
                                 <span class="diff-dot"></span>
                                 <span class="diff-txt">Lógica</span>
@@ -1119,7 +489,7 @@
                         </div>
                         <div class="game-card-body">
                             <div class="game-card-top">
-                                <span class="game-category-tag tag-logica">🧩 Lógica y patrones</span>
+                                <span class="game-category-tag">🔢 Matemática</span>
                                 <span class="game-age">8-10 años</span>
                             </div>
                             <h3 class="game-title">Código Secreto</h3>
@@ -1132,29 +502,86 @@
                                 </span>
                             </div>
                         </div>
-                    </a>
-                </article>
-
-                <!-- 17 · Programación Básica (Placeholder) -->
-                <article class="game-card disabled game-card-new" data-category="logica" data-difficulty="dificil">
-                    <a href="#" class="game-card-link" aria-label="Juego no disponible">
-                        <div class="game-card-thumb thumb-logica">
-                            <div class="placeholder-overlay"><span class="placeholder-text">Próximamente</span></div>
+                    </div>
+                </article></div></section>
+<section class="games-section games-section-comunicacion" data-section="comunicacion" aria-labelledby="sec-comunicacion-title"><header class="games-section-head"><div class="games-section-ico">📖</div><div class="games-section-info"><h3 class="games-section-title" id="sec-comunicacion-title">Comunicación</h3><p class="games-section-desc">Cuentos, lectura, comprensión y expresión.</p></div><span class="games-section-count"><span class="games-section-count-num">3</span><span class="games-section-count-txt">juegos</span></span></header><div class="games-grid" aria-live="polite"><article class="game-card game-card-new" data-category="comunicacion" data-courses="comunicacion" data-difficulty="facil">
+                    <a href="Juegos/Biblioteca/Biblioteca.html" class="game-card-link" aria-label="Abrir Biblioteca de cuentos">
+                        <div class="game-card-thumb thumb-lenguaje has-image">
+                            <iframe src="Juegos/Biblioteca/Biblioteca.html" title="Vista previa de Biblioteca de cuentos" class="dynamic-thumb" loading="lazy" scrolling="no" tabindex="-1" aria-hidden="true" sandbox="allow-same-origin allow-scripts"></iframe>
                             <span class="game-thumb-bg"></span>
-                            <span class="game-number">17</span>
+                            <span class="game-number">06</span>
                             <span class="game-badge-new">NUEVO</span>
-                            <div class="game-difficulty difficulty-dificil">
+                            <div class="game-difficulty difficulty-facil">
                                 <span class="diff-dot"></span>
-                                <span class="diff-txt">Programación</span>
+                                <span class="diff-txt">Cuentos interactivos</span>
                             </div>
                         </div>
                         <div class="game-card-body">
                             <div class="game-card-top">
-                                <span class="game-category-tag tag-logica">🧩 Lógica y patrones</span>
+                                <span class="game-category-tag">📖 Comunicación</span>
+                                <span class="game-age">6-11 años</span>
+                            </div>
+                            <h3 class="game-title">Biblioteca de cuentos</h3>
+                            <p class="game-desc">Explora cuentos, escucha sus historias y completa actividades para comprender y ordenar lo que sucede.</p>
+                            <div class="game-card-bottom">
+                                <span class="game-rating" aria-label="Dificultad 1 de 3">
+                                    <span class="star is-filled">★</span>
+                                    <span class="star">★</span>
+                                    <span class="star">★</span>
+                                </span>
+                                <span class="game-play"><span class="game-play-ico">▶</span><span class="game-play-txt">Explorar</span></span>
+                            </div>
+                        </div>
+                    </a>
+                </article>
+<article class="game-card disabled game-card-new" data-category="comunicacion" data-courses="comunicacion" data-difficulty="medio">
+                    <div class="game-card-link">
+                        <div class="game-card-thumb thumb-lenguaje">
+                            <div class="placeholder-overlay"><span class="coming-icon" aria-hidden="true">🚀</span><span class="placeholder-text">Próximamente</span></div>
+                            <span class="game-thumb-bg"></span>
+                            <span class="game-number">07</span>
+                            
+                            <div class="game-difficulty difficulty-medio">
+                                <span class="diff-dot"></span>
+                                <span class="diff-txt">Lenguaje</span>
+                            </div>
+                        </div>
+                        <div class="game-card-body">
+                            <div class="game-card-top">
+                                <span class="game-category-tag">📖 Comunicación</span>
+                                <span class="game-age">8-10 años</span>
+                            </div>
+                            <h3 class="game-title">Constructor de Oraciones</h3>
+                            <p class="game-desc">Ordena las palabras correctamente para formar oraciones completas.</p>
+                            <div class="game-card-bottom">
+                                <span class="game-rating" aria-label="Dificultad 2 de 3">
+                                    <span class="star is-filled">★</span>
+                                    <span class="star is-filled">★</span>
+                                    <span class="star">★</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+<article class="game-card disabled game-card-new" data-category="comunicacion" data-courses="comunicacion" data-difficulty="dificil">
+                    <div class="game-card-link">
+                        <div class="game-card-thumb thumb-lenguaje">
+                            <div class="placeholder-overlay"><span class="coming-icon" aria-hidden="true">🚀</span><span class="placeholder-text">Próximamente</span></div>
+                            <span class="game-thumb-bg"></span>
+                            <span class="game-number">08</span>
+                            
+                            <div class="game-difficulty difficulty-dificil">
+                                <span class="diff-dot"></span>
+                                <span class="diff-txt">Lenguaje</span>
+                            </div>
+                        </div>
+                        <div class="game-card-body">
+                            <div class="game-card-top">
+                                <span class="game-category-tag">📖 Comunicación</span>
                                 <span class="game-age">9-11 años</span>
                             </div>
-                            <h3 class="game-title">Programación Básica</h3>
-                            <p class="game-desc">Aprende a programar los movimientos de Rugged con bloques simples.</p>
+                            <h3 class="game-title">Comprensión Lectora</h3>
+                            <p class="game-desc">Lee historias cortas y responde preguntas para desbloquear el siguiente nivel.</p>
                             <div class="game-card-bottom">
                                 <span class="game-rating" aria-label="Dificultad 3 de 3">
                                     <span class="star is-filled">★</span>
@@ -1163,52 +590,26 @@
                                 </span>
                             </div>
                         </div>
-                    </a>
-                </article>
-
-            </div>
-        </section>
-
-
-        <!-- ══════════════════════════════════════════════════════════════
-             SECCIÓN 5 · RETOS ESPECIALES
-             ══════════════════════════════════════════════════════════════ -->
-        <section class="games-section games-section-retos" data-section="retos" aria-labelledby="sec-retos-title">
-
-            <header class="games-section-head">
-                <div class="games-section-ico games-section-ico-retos">🏆</div>
-                <div class="games-section-info">
-                    <h3 class="games-section-title" id="sec-retos-title">Desafíos integradores</h3>
-                    <p class="games-section-desc">Combina distintas habilidades de pensamiento computacional en un mismo reto</p>
-                </div>
-                <span class="games-section-count">
-                    <span class="games-section-count-num">3</span>
-                    <span class="games-section-count-txt">juegos</span>
-                </span>
-            </header>
-
-            <div class="games-grid" aria-live="polite">
-
-                <!-- 18 · Peña Embrujada (Activo) -->
-                <article class="game-card" data-category="resolucion" data-difficulty="facil">
-                    <a href="Juegos/Pena_Embrujada.html" class="game-card-link" target="_blank" rel="noopener noreferrer" aria-label="Abrir juego Carrera de Sumas">
-                        <div class="game-card-thumb thumb-matematicas has-image">
-                            <iframe src="Juegos/Pena_Embrujada.html" title="Carrera de Sumas" class="dynamic-thumb" loading="lazy" scrolling="no" tabindex="-1" sandbox="allow-same-origin allow-scripts"></iframe>
+                    </div>
+                </article></div></section>
+<section class="games-section games-section-ciencia-ambiente" data-section="ciencia-ambiente" aria-labelledby="sec-ciencia-ambiente-title"><header class="games-section-head"><div class="games-section-ico">🌱</div><div class="games-section-info"><h3 class="games-section-title" id="sec-ciencia-ambiente-title">Ciencia y Ambiente</h3><p class="games-section-desc">Seres vivos, naturaleza y cuidado del entorno.</p></div><span class="games-section-count"><span class="games-section-count-num">4</span><span class="games-section-count-txt">juegos</span></span></header><div class="games-grid" aria-live="polite"><article class="game-card" data-category="ciencia-ambiente" data-courses="ciencia-ambiente" data-difficulty="facil">
+                    <a href="Juegos/recolector_basura.html" class="game-card-link" target="_blank" rel="noopener noreferrer" aria-label="Abrir juego EcoCamion">
+                        <div class="game-card-thumb thumb-ciencias has-image">
+                            <iframe src="Juegos/recolector_basura.html" title="EcoCamion" class="dynamic-thumb" loading="lazy" scrolling="no" tabindex="-1" sandbox="allow-same-origin allow-scripts"></iframe>
                             <span class="game-thumb-bg"></span>
-                            <span class="game-number">01</span>
+                            <span class="game-number">09</span>
                             <div class="game-difficulty difficulty-facil">
                                 <span class="diff-dot"></span>
-                                <span class="diff-txt">Matemáticas</span>
+                                <span class="diff-txt">Ciencias</span>
                             </div>
                         </div>
                         <div class="game-card-body">
                             <div class="game-card-top">
-                                <span class="game-category-tag tag-matematicas">🧠 Resolución de problemas</span>
-                                <span class="game-age">6-8 años</span>
+                                <span class="game-category-tag">🌱 Ciencia y Ambiente</span>
+                                <span class="game-age">6-9 años</span>
                             </div>
-                            <h3 class="game-title">Peña Embrujada</h3>
-                            <p class="game-desc">🎃🎶 Peña Embrujada une Halloween y la música criolla peruana.
-                                                 ¡Atrapa fantasmas, resuelve sumas y desafía tu memoria!</p>
+                            <h3 class="game-title">EcoCamion</h3>
+                            <p class="game-desc">Recolecta y clasifica los residuos en el contenedor correcto para cuidar el medio ambiente.</p>
                             <div class="game-card-bottom">
                                 <span class="game-rating" aria-label="Dificultad 1 de 3">
                                     <span class="star is-filled">★</span>
@@ -1223,15 +624,169 @@
                         </div>
                     </a>
                 </article>
-
-                <!-- 19 · Maratón del Saber (Placeholder) -->
-                <article class="game-card disabled game-card-new" data-category="retos" data-difficulty="dificil">
-                    <a href="#" class="game-card-link" aria-label="Juego no disponible">
+<article class="game-card game-card-new" data-category="ciencia-ambiente" data-courses="ciencia-ambiente" data-difficulty="facil">
+                    <a href="Juegos/explorador_animales.html" class="game-card-link" target="_blank" rel="noopener noreferrer" aria-label="Abrir juego Explorador de Animales">
+                        <div class="game-card-thumb thumb-ciencias has-image">
+                            <iframe src="Juegos/explorador_animales.html" title="Explorador de Animales" class="dynamic-thumb" loading="lazy" scrolling="no" tabindex="-1" sandbox="allow-same-origin allow-scripts"></iframe>
+                            <span class="game-thumb-bg"></span>
+                            <span class="game-number">10</span>
+                            <span class="game-badge-new">NUEVO</span>
+                            <div class="game-difficulty difficulty-facil">
+                                <span class="diff-dot"></span>
+                                <span class="diff-txt">Ciencias</span>
+                            </div>
+                        </div>
+                        <div class="game-card-body">
+                            <div class="game-card-top">
+                                <span class="game-category-tag">🌱 Ciencia y Ambiente</span>
+                                <span class="game-age">6-9 años</span>
+                            </div>
+                            <h3 class="game-title">Explorador de Animales</h3>
+                            <p class="game-desc">Observa y clasifica cada animal en su hábitat correcto para descubrir dónde vive cada uno.</p>
+                            <div class="game-card-bottom">
+                                <span class="game-rating" aria-label="Dificultad 1 de 3">
+                                    <span class="star is-filled">★</span>
+                                    <span class="star">★</span>
+                                    <span class="star">★</span>
+                                </span>
+                                <span class="game-play">
+                                    <span class="game-play-ico">▶</span>
+                                    <span class="game-play-txt">Jugar</span>
+                                </span>
+                            </div>
+                        </div>
+                    </a>
+                </article>
+<article class="game-card game-card-new" data-category="ciencia-ambiente" data-courses="ciencia-ambiente" data-difficulty="medio">
+                    <a href="Juegos/genetica.html" class="game-card-link" target="_blank" rel="noopener noreferrer" aria-label="Abrir juego Ecosistemas">
+                        <div class="game-card-thumb thumb-ciencias has-image">
+                            <iframe src="Juegos/genetica.html" title="Genética" class="dynamic-thumb" loading="lazy" scrolling="no" tabindex="-1" sandbox="allow-same-origin allow-scripts"></iframe>
+                            <span class="game-thumb-bg"></span>
+                            <span class="game-number">11</span>
+                            <span class="game-badge-new">NUEVO</span>
+                            <div class="game-difficulty difficulty-medio">
+                                <span class="diff-dot"></span>
+                                <span class="diff-txt">Ciencias</span>
+                            </div>
+                        </div>
+                        <div class="game-card-body">
+                            <div class="game-card-top">
+                                <span class="game-category-tag">🌱 Ciencia y Ambiente</span>
+                                <span class="game-age">8-10 años</span>
+                            </div>
+                            <h3 class="game-title">Ecosistemas</h3>
+                            <p class="game-desc">Clasifica animales y plantas según su hábitat natural.</p>
+                            <div class="game-card-bottom">
+                                <span class="game-rating" aria-label="Dificultad 2 de 3">
+                                    <span class="star is-filled">★</span>
+                                    <span class="star is-filled">★</span>
+                                    <span class="star">★</span>
+                                </span>
+                                <span class="game-play">
+                                    <span class="game-play-ico">▶</span>
+                                    <span class="game-play-txt">Jugar</span>
+                                </span>
+                            </div>
+                        </div>
+                    </a>
+                </article>
+<article class="game-card disabled game-card-new" data-category="ciencia-ambiente" data-courses="ciencia-ambiente" data-difficulty="medio">
+                    <div class="game-card-link">
+                        <div class="game-card-thumb thumb-ciencias">
+                            <div class="placeholder-overlay"><span class="coming-icon" aria-hidden="true">🚀</span><span class="placeholder-text">Próximamente</span></div>
+                            <span class="game-thumb-bg"></span>
+                            <span class="game-number">12</span>
+                            
+                            <div class="game-difficulty difficulty-medio">
+                                <span class="diff-dot"></span>
+                                <span class="diff-txt">Ciencias</span>
+                            </div>
+                        </div>
+                        <div class="game-card-body">
+                            <div class="game-card-top">
+                                <span class="game-category-tag">🌱 Ciencia y Ambiente</span>
+                                <span class="game-age">8-10 años</span>
+                            </div>
+                            <h3 class="game-title">Estados del Agua</h3>
+                            <p class="game-desc">Descubre cómo el agua cambia de estado con la temperatura.</p>
+                            <div class="game-card-bottom">
+                                <span class="game-rating" aria-label="Dificultad 2 de 3">
+                                    <span class="star is-filled">★</span>
+                                    <span class="star is-filled">★</span>
+                                    <span class="star">★</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </article></div></section>
+<section class="games-section games-section-personal-social" data-section="personal-social" aria-labelledby="sec-personal-social-title"><header class="games-section-head"><div class="games-section-ico">🚦</div><div class="games-section-info"><h3 class="games-section-title" id="sec-personal-social-title">Personal Social</h3><p class="games-section-desc">Convivencia, seguridad y cuidado de nuestra comunidad.</p></div><span class="games-section-count"><span class="games-section-count-num">1</span><span class="games-section-count-txt">juegos</span></span></header><div class="games-grid" aria-live="polite"><article class="game-card" data-category="personal-social" data-courses="personal-social psicomotricidad" data-difficulty="facil">
+                    <a href="Juegos/semaforo2/semaforo.html" class="game-card-link" target="_blank" rel="noopener noreferrer" aria-label="Abrir juego El Semáforo Travieso">
+                        <div class="game-card-thumb thumb-educacion-vial has-image">
+                            <img src="Juegos/semaforo2/assetsInicio/fondo/fondo-personalizado.png" alt="Vista previa de El Semáforo Travieso" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;">
+                            <span class="game-thumb-bg"></span>
+                            <span class="game-number">05</span>
+                            <div class="game-difficulty difficulty-facil">
+                                <span class="diff-dot"></span>
+                                <span class="diff-txt">Educación vial</span>
+                            </div>
+                        </div>
+                        <div class="game-card-body">
+                            <div class="game-card-top">
+                                <span class="game-category-tag">🚦 Personal Social</span>
+                                <span class="game-age">6-10 años</span>
+                            </div>
+                            <h3 class="game-title">El Semáforo Travieso</h3>
+                            <p class="game-desc">Explora la ciudad, observa los semáforos y aprende a cruzar las calles de forma segura.</p>
+                            <div class="game-card-bottom">
+                                <span class="game-rating" aria-label="Dificultad 1 de 3">
+                                    <span class="star is-filled">★</span>
+                                    <span class="star">★</span>
+                                    <span class="star">★</span>
+                                </span>
+                                <span class="game-play">
+                                    <span class="game-play-ico">▶</span>
+                                    <span class="game-play-txt">Jugar</span>
+                                </span>
+                            </div>
+                        </div>
+                    </a>
+                </article></div></section>
+<section class="games-section games-section-tecnologia" data-section="tecnologia" aria-labelledby="sec-tecnologia-title"><header class="games-section-head"><div class="games-section-ico">🤖</div><div class="games-section-info"><h3 class="games-section-title" id="sec-tecnologia-title">Tecnología y Computación</h3><p class="games-section-desc">Programación, secuencias de instrucciones y pensamiento computacional.</p></div><span class="games-section-count"><span class="games-section-count-num">1</span><span class="games-section-count-txt">juegos</span></span></header><div class="games-grid" aria-live="polite"><article class="game-card disabled game-card-new" data-category="tecnologia" data-courses="tecnologia psicomotricidad" data-difficulty="dificil">
+                    <div class="game-card-link">
+                        <div class="game-card-thumb thumb-logica">
+                            <div class="placeholder-overlay"><span class="coming-icon" aria-hidden="true">🚀</span><span class="placeholder-text">Próximamente</span></div>
+                            <span class="game-thumb-bg"></span>
+                            <span class="game-number">17</span>
+                            
+                            <div class="game-difficulty difficulty-dificil">
+                                <span class="diff-dot"></span>
+                                <span class="diff-txt">Programación</span>
+                            </div>
+                        </div>
+                        <div class="game-card-body">
+                            <div class="game-card-top">
+                                <span class="game-category-tag">🤖 Tecnología y Computación</span>
+                                <span class="game-age">9-11 años</span>
+                            </div>
+                            <h3 class="game-title">Programación Básica</h3>
+                            <p class="game-desc">Aprende a programar los movimientos de Rugged con bloques simples.</p>
+                            <div class="game-card-bottom">
+                                <span class="game-rating" aria-label="Dificultad 3 de 3">
+                                    <span class="star is-filled">★</span>
+                                    <span class="star is-filled">★</span>
+                                    <span class="star is-filled">★</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </article></div></section>
+<section class="games-section games-section-integrados" data-section="integrados" aria-labelledby="sec-integrados-title"><header class="games-section-head"><div class="games-section-ico">🏆</div><div class="games-section-info"><h3 class="games-section-title" id="sec-integrados-title">Retos integrados</h3><p class="games-section-desc">Desafíos que combinan varios cursos.</p></div><span class="games-section-count"><span class="games-section-count-num">2</span><span class="games-section-count-txt">juegos</span></span></header><div class="games-grid" aria-live="polite"><article class="game-card disabled game-card-new" data-category="integrados" data-courses="integrados matematica comunicacion ciencia-ambiente" data-difficulty="dificil">
+                    <div class="game-card-link">
                         <div class="game-card-thumb thumb-retos">
-                            <div class="placeholder-overlay"><span class="placeholder-text">Próximamente</span></div>
+                            <div class="placeholder-overlay"><span class="coming-icon" aria-hidden="true">🚀</span><span class="placeholder-text">Próximamente</span></div>
                             <span class="game-thumb-bg"></span>
                             <span class="game-number">19</span>
-                            <span class="game-badge-new">NUEVO</span>
+                            
                             <div class="game-difficulty difficulty-dificil">
                                 <span class="diff-dot"></span>
                                 <span class="diff-txt">Integrado</span>
@@ -1239,7 +794,7 @@
                         </div>
                         <div class="game-card-body">
                             <div class="game-card-top">
-                                <span class="game-category-tag tag-retos">🏆 Desafío integrador</span>
+                                <span class="game-category-tag">🏆 Retos integrados</span>
                                 <span class="game-age">10-11 años</span>
                             </div>
                             <h3 class="game-title">Maratón del Saber</h3>
@@ -1252,14 +807,12 @@
                                 </span>
                             </div>
                         </div>
-                    </a>
+                    </div>
                 </article>
-
-                <!-- 20 · Campeonato Final (Placeholder) -->
-                <article class="game-card disabled game-card-featured" data-category="retos" data-difficulty="dificil">
-                    <a href="#" class="game-card-link" aria-label="Juego no disponible">
+<article class="game-card disabled game-card-featured" data-category="integrados" data-courses="integrados" data-difficulty="dificil">
+                    <div class="game-card-link">
                         <div class="game-card-thumb thumb-retos">
-                            <div class="placeholder-overlay"><span class="placeholder-text">Próximamente</span></div>
+                            <div class="placeholder-overlay"><span class="coming-icon" aria-hidden="true">🚀</span><span class="placeholder-text">Próximamente</span></div>
                             <span class="game-thumb-bg"></span>
                             <span class="game-number">20</span>
                             <div class="game-badge-featured">👑 CAMPEONATO</div>
@@ -1270,7 +823,7 @@
                         </div>
                         <div class="game-card-body">
                             <div class="game-card-top">
-                                <span class="game-category-tag tag-retos">🏆 Desafío integrador</span>
+                                <span class="game-category-tag">🏆 Retos integrados</span>
                                 <span class="game-age">11+ años</span>
                             </div>
                             <h3 class="game-title">Campeonato Final</h3>
@@ -1283,17 +836,9 @@
                                 </span>
                             </div>
                         </div>
-                    </a>
-                </article>
-
-            </div>
-        </section>
-
-
-        <!-- ============================================
-             MENSAJE CUANDO NO HAY RESULTADOS
-             ============================================ -->
-        <div class="games-empty" id="gamesEmpty" hidden>
+                    </div>
+                </article></div></section>
+<div class="games-empty" id="gamesEmpty" hidden>
             <span class="games-empty-ico">🔍</span>
             <p class="games-empty-txt">No hay juegos en esta categoría todavía.</p>
             <button class="btn btn-show-all" data-filter="all">
@@ -1314,7 +859,7 @@
 
         <header class="about-header reveal-child" data-reveal="1">
             <h2 class="about-values-title">
-                Aprender nunca fue tan <span style="color:#ffaa00;">veloz</span>
+                Tu curiosidad <span class="about-highlight">no tiene límites</span>
             </h2>
             <p style="font-size:1.2rem; opacity:0.8;">
                 Aventuras de Rugged es un portal educativo gratuito que combina juego,
@@ -1332,14 +877,13 @@
                 </p>
                 <p>
                     Creemos que aprender matemáticas, lenguaje, ciencias y lógica puede
-                    ser tan divertido como ganar un Gran Premio. Cada juego está diseñado
-                    por educadores y probado con estudiantes reales.
+                    ser tan divertido como ganar un Gran Premio. Cada desafío invita a explorar, practicar y aprender de los errores.
                 </p>
             </div>
 
             <div class="about-mission-visual">
                 <div class="about-rayet-bubble">
-                    <span class="about-bubble-tail"></span>
+                    <span class="about-rugged-dialogue-tail"></span>
                     <p>¡Yo te acompaño en cada desafío! 🏎️</p>
                 </div>
                 <div class="about-rayet-img-wrap">
@@ -1408,7 +952,7 @@
             <a href="#juegos" class="btn btn-hero-primaria" data-scroll="#juegos" style="display:inline-flex;">
                 <span class="btn-glow"></span>
                 <span class="btn-icon">🏁</span>
-                <span class="btn-label">VER LOS 20 JUEGOS</span>
+                <span class="btn-label">VER LOS JUEGOS</span>
                 <span class="btn-arrow">›</span>
             </a>
         </div>
@@ -1424,7 +968,7 @@
     <div class="footer-inner">
 
         <div class="footer-brand">
-            <span class="footer-brand-ico">🏎️</span>
+            <img class="footer-rugged-img" src="assets/robots/rayet.png" alt="">
             <span class="footer-brand-txt">AVENTURAS DE RUGGED</span>
         </div>
 
@@ -1466,22 +1010,6 @@
      SCRIPT PRINCIPAL Y MANEJO DE AUDIO DE FONDO
      ============================================================ -->
 <script>
-    const bgAudio = document.getElementById('bgm');
-    const soundToggle = document.getElementById('soundToggle');
-    let isMuted = true; 
-
-    soundToggle.addEventListener('click', () => {
-        isMuted = !isMuted;
-        if(isMuted) {
-            bgAudio.pause();
-            soundToggle.innerHTML = '<span class="sound-icon sound-off">🔇</span>';
-        } else {
-            bgAudio.volume = 0.3; 
-            bgAudio.play().catch(e => console.log('El navegador requiere interacción manual previa.'));
-            soundToggle.innerHTML = '<span class="sound-icon sound-on">🔊</span>';
-        }
-    });
-
     (function() {
       const visor=document.getElementById('visor-juego');
       const frame=document.getElementById('frame-juego');
@@ -1525,6 +1053,7 @@
           const url=link.getAttribute('href');
           if(!url || url==='#')return;
           e.preventDefault();
+          window.dispatchEvent(new Event('rugged:game-open'));
           frame.src=url;visor.classList.add('activo');showPanel(false);
           if(visor.requestFullscreen)visor.requestFullscreen().catch(()=>{});
           else if(visor.webkitRequestFullscreen)visor.webkitRequestFullscreen();
@@ -1532,6 +1061,7 @@
       });
       window.cerrarJuego=function(){
         visor.classList.remove('activo');showPanel(false);frame.src='';
+        window.dispatchEvent(new Event('rugged:game-close'));
         if(document.fullscreenElement || document.webkitFullscreenElement){
           if(document.exitFullscreen)document.exitFullscreen().catch(()=>{});
           else if(document.webkitExitFullscreen)document.webkitExitFullscreen();

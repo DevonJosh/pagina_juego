@@ -71,7 +71,7 @@ const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)
    - horn: bocina al hacer click en el robot
    ============================================================ */
 const Sound = (() => {
-    let enabled = store.get('ray_sound_enabled', true);
+    let enabled = store.get('rugged_audio_enabled', true);
     let audioCtx = null;
 
     function getContext() {
@@ -171,9 +171,14 @@ const Sound = (() => {
 
     return {
         isEnabled: () => enabled,
+        setEnabled(value) {
+            enabled = Boolean(value);
+            store.set('rugged_audio_enabled', enabled);
+            return enabled;
+        },
         toggle() {
             enabled = !enabled;
-            store.set('ray_sound_enabled', enabled);
+            store.set('rugged_audio_enabled', enabled);
             return enabled;
         },
         click,
@@ -192,15 +197,57 @@ const Sound = (() => {
    ============================================================ */
 (function initSoundToggle() {
     const btn = $('#soundToggle');
+    const music = $('#bgm');
     if (!btn) return;
-
-    if (!Sound.isEnabled()) btn.classList.add('is-muted');
-
+    let inGame = Boolean($('#visor-juego')?.classList.contains('activo'));
+    let waitingForGesture = false;
+    function render() {
+        const on = Sound.isEnabled();
+        btn.setAttribute('aria-pressed', String(on));
+        btn.setAttribute('aria-label', on ? 'Silenciar sonido' : 'Activar sonido');
+        btn.title = on ? 'Silenciar sonido' : 'Activar sonido';
+        btn.classList.toggle('is-muted', !on);
+    }
+    function syncMusic() {
+        render();
+        if (!music) return;
+        if (!Sound.isEnabled() || inGame) {
+            waitingForGesture = false;
+            music.pause();
+            return;
+        }
+        if (!music.paused) return;
+        music.volume = .3;
+        const attempt = music.play();
+        if (attempt?.catch) attempt.catch(error => {
+            // El audio sigue habilitado aunque el navegador exija un primer toque.
+            waitingForGesture = error.name === 'NotAllowedError' && Sound.isEnabled() && !inGame;
+        });
+    }
     btn.addEventListener('click', () => {
-        const isNowOn = Sound.toggle();
-        btn.classList.toggle('is-muted', !isNowOn);
-        if (isNowOn) Sound.tone(880, 0.12, 'sine', 0.12);
+        const on = Sound.toggle();
+        syncMusic();
+        if (on) Sound.tone(880, .12, 'sine', .12);
     });
+    window.addEventListener('rugged:game-open', () => {
+        inGame = true;
+        document.body.classList.add('rugged-game-open');
+        syncMusic();
+    });
+    window.addEventListener('rugged:game-close', () => {
+        inGame = false;
+        document.body.classList.remove('rugged-game-open');
+        syncMusic();
+    });
+    function unlock(event) {
+        if (!waitingForGesture || inGame || !Sound.isEnabled()) return;
+        // El botón de sonido conserva el control sobre su propio clic.
+        if (event.target.closest?.('#soundToggle, .game-card-link')) return;
+        syncMusic();
+    }
+    document.addEventListener('pointerdown', unlock);
+    document.addEventListener('keydown', unlock);
+    syncMusic();
 })();
 
 
@@ -229,7 +276,7 @@ const Sound = (() => {
         }
 
         // Auto-ocultar al bajar, mostrar al subir
-        if (y > 400 && y > lastScrollY + 10) {
+        if (!header.classList.contains('menu-is-open') && y > 400 && y > lastScrollY + 10) {
             header.style.transform = 'translateY(-140%)';
         } else if (y < lastScrollY - 10 || y < 400) {
             header.style.transform = 'translateY(0)';
@@ -261,6 +308,8 @@ const Sound = (() => {
 
     function close() {
         mainNav.classList.remove('is-open');
+        $('#siteHeader')?.classList.remove('menu-is-open');
+        toggleBtn.setAttribute('aria-label', 'Abrir menú');
         toggleBtn.setAttribute('aria-expanded', 'false');
     }
 
@@ -268,6 +317,9 @@ const Sound = (() => {
         e.stopPropagation();
         const isOpen = mainNav.classList.toggle('is-open');
         toggleBtn.setAttribute('aria-expanded', String(isOpen));
+        $('#siteHeader')?.classList.toggle('menu-is-open', isOpen);
+        toggleBtn.setAttribute('aria-label', isOpen ? 'Cerrar menú' : 'Abrir menú');
+        if (isOpen) $('#siteHeader').style.transform = 'translateY(0)';
         Sound.click();
     });
 
@@ -281,8 +333,9 @@ const Sound = (() => {
     });
 
     document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') close();
+        if (e.key === 'Escape' && mainNav.classList.contains('is-open')) { close(); toggleBtn.focus(); }
     });
+    window.matchMedia('(max-width: 1100px)').addEventListener('change', close);
 })();
 
 
@@ -428,41 +481,32 @@ const Sound = (() => {
 
     if (!filterBtns.length || !sections.length) return;
 
-    /* Cuenta los juegos por categoría */
-    function updateCounters() {
-        const counts = { all: 0 };
-
-        sections.forEach(sec => {
-            const category = sec.dataset.section;
-            const numGames = $$('.game-card', sec).length;
-            counts[category] = numGames;
-            counts.all += numGames;
-        });
-
-        $$('[data-count]').forEach(el => {
-            const key = el.dataset.count;
-            el.textContent = counts[key] ?? 0;
-        });
+    const cards = $$('.game-card');
+    function courseKeys(card) {
+        return (card.dataset.courses || card.dataset.category || '').split(/\s+/).filter(Boolean);
     }
-
-    /* Aplica el filtro */
+    function updateCounters() {
+        const counts = { all: cards.length };
+        cards.forEach(card => new Set(courseKeys(card)).forEach(key => {
+            counts[key] = (counts[key] || 0) + 1;
+        }));
+        $$('[data-count]').forEach(el => el.textContent = counts[el.dataset.count] || 0);
+    }
     function applyFilter(filter) {
+        cards.forEach(card => { card.hidden = filter !== 'all' && !courseKeys(card).includes(filter); });
         let visibleSections = 0;
-
-        sections.forEach(sec => {
-            const isTarget = (filter === 'all') || (sec.dataset.section === filter);
-            sec.classList.toggle('is-hidden', !isTarget);
-            if (isTarget) visibleSections++;
+        sections.forEach(section => {
+            const visible = $$('.game-card', section).filter(card => !card.hidden).length;
+            section.classList.toggle('is-hidden', visible === 0);
+            const counter = $('.games-section-count-num', section);
+            if (counter) counter.textContent = visible;
+            if (visible) visibleSections++;
         });
-
-        if (gamesEmpty) {
-            gamesEmpty.hidden = visibleSections > 0;
-        }
-
+        if (gamesEmpty) gamesEmpty.hidden = visibleSections > 0;
         filterBtns.forEach(btn => {
-            const isActive = btn.dataset.filter === filter;
-            btn.classList.toggle('is-active', isActive);
-            btn.setAttribute('aria-selected', String(isActive));
+            const active = btn.dataset.filter === filter;
+            btn.classList.toggle('is-active', active);
+            btn.setAttribute('aria-selected', String(active));
         });
     }
 
@@ -570,31 +614,25 @@ const Sound = (() => {
     const robot = $('.hero-character .robot-img');
     if (!robot) return;
 
-    /* 12.1 — Parallax del robot con el scroll */
-    if (!prefersReducedMotion && !window.matchMedia('(max-width: 1024px)').matches) {
-        let ticking = false;
-
-        window.addEventListener('scroll', () => {
-            if (ticking) return;
-            ticking = true;
-
-            requestAnimationFrame(() => {
-                const y = window.scrollY;
-
-                if (y < window.innerHeight) {
-                    const offset = y * 0.15;
-                    const rotate = y * 0.02;
-
-                    robot.style.setProperty('--parallax-y', `${offset}px`);
-                    robot.style.setProperty('--parallax-rotate', `${rotate}deg`);
-                }
-
-                ticking = false;
+    /* El escenario se mueve; el robot conserva su animación independiente. */
+    const stage = robot.closest('.rayet-stage');
+    if (stage && !prefersReducedMotion && matchMedia('(pointer: fine)').matches) {
+        let raf = 0;
+        stage.addEventListener('pointermove', event => {
+            if (raf) cancelAnimationFrame(raf);
+            raf = requestAnimationFrame(() => {
+                const r = stage.getBoundingClientRect();
+                stage.style.setProperty('--tilt-x', ((event.clientX-r.left)/r.width-.5)*8+'deg');
+                stage.style.setProperty('--tilt-y', -((event.clientY-r.top)/r.height-.5)*6+'deg');
+                raf = 0;
             });
-        }, { passive: true });
-
-        robot.style.animation = 'none';
-        robot.style.transform = 'translateY(var(--parallax-y, 0)) rotate(var(--parallax-rotate, 0))';
+        });
+        stage.addEventListener('pointerleave', () => {
+            if (raf) cancelAnimationFrame(raf);
+            raf = 0;
+            stage.style.setProperty('--tilt-x', '0deg');
+            stage.style.setProperty('--tilt-y', '0deg');
+        });
     }
 
     /* 12.2 — Revolución del motor la primera vez que aparece */
@@ -616,27 +654,20 @@ const Sound = (() => {
     robot.style.cursor = 'pointer';
     robot.setAttribute('role', 'button');
     robot.setAttribute('tabindex', '0');
-    robot.setAttribute('aria-label', '¡Toca la bocina de Rayet!');
+    robot.setAttribute('aria-label', '¡Activa el turbo de Rugged!');
 
     let isBouncing = false;
 
     function honk() {
-        if (isBouncing || prefersReducedMotion) return;
-        isBouncing = true;
-
+        if (isBouncing) return;
         Sound.horn();
-
-        robot.style.transition = 'transform 0.15s cubic-bezier(.22,.61,.36,1)';
-        robot.style.transform = 'translateY(-25px) scale(1.08) rotate(-5deg)';
-
+        if (prefersReducedMotion) return;
+        isBouncing = true;
+        stage?.classList.add('is-boosting');
         setTimeout(() => {
-            robot.style.transform = 'translateY(0) scale(1) rotate(0)';
-            setTimeout(() => {
-                isBouncing = false;
-                robot.style.transition = '';
-                robot.style.transform = '';
-            }, 200);
-        }, 150);
+            stage?.classList.remove('is-boosting');
+            isBouncing = false;
+        }, 850);
     }
 
     robot.addEventListener('click', honk);
@@ -715,7 +746,7 @@ window.RayetPortal = {
    15. LOG DE BIENVENIDA
    ============================================================ */
 console.log(
-    '%c 🏎️ AVENTURAS DE RAYET %c 20 juegos · 5 categorías · ¡Aprende a toda velocidad!',
+    '%c 🏎️ AVENTURAS DE RAYET %c 8 juegos disponibles · organizados por cursos · ¡Aprende a toda velocidad!',
     'background: linear-gradient(90deg, #ffb347, #ff8c42, #d96a1e); color: #fff; padding: 6px 14px; border-radius: 8px; font-weight: 900; font-family: sans-serif;',
     'color: #ff8c42; font-weight: 700; padding: 4px 8px; font-family: sans-serif;'
 );
