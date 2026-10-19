@@ -1,34 +1,43 @@
-BIBLIOTECA DE CUENTOS · VERSIÓN COMPLETA CORREGIDA
+BIBLIOTECA DE HISTORIAS
 
-1. Extrae el ZIP completo.
-2. Abre Biblioteca/Biblioteca.html. También puedes abrir Biblioteca/index.html.
-3. Selecciona el libro de Bertha y pulsa «Comenzar cuento».
+Abre index.html o Biblioteca.html. Ambas entradas muestran la misma biblioteca.
+Puedes usar los archivos directamente o servir la carpeta en tu página web.
 
-La carpeta incluye las imágenes, las cartas, la música y los audios de los ocho capítulos y la moraleja. No hace falta instalar nada.
+ESTRUCTURA
+- audio/: músicas de fondo y efectos compartidos entre historias.
+- assets/: fondos, estantería y portadas de la biblioteca.
+- js/catalogo.js: listado de historias para el carrusel.
+- cuentos/bertha-benz/: historia de Bertha, actividades, páginas y narraciones.
+- cuentos/bertha-benz/assets/nuevos/carta-1.png a carta-4.png: escenas de la actividad final del viaje.
 
-CAMBIOS INTEGRADOS
-- Biblioteca original conservada, con música de fondo del cuento y volumen en la parte superior.
-- El audio de la biblioteca se detiene al abrir el cuento.
-- Libro centrado, con su proporción original y todas las imágenes completas. El fondo acompaña la lectura en pantallas de distintas proporciones.
-- Sin botón interno de pantalla completa: se puede usar el de la página donde se integre.
-- Flechas laterales y barra inferior única para el capítulo/actividad, la narración, el modo automático y la música.
-- Narradora con tus MP3: empieza después de cinco segundos al abrir el cuento y cambia de audio después del volteo de cada hoja.
-- Modo Auto opcional: al terminar una narración pasa a la página siguiente; espera en las actividades y continúa al resolverlas.
-- Actividades repartidas entre las dos hojas, tarjetas sin nombres duplicados y pistas breves dentro del papel.
-- Validación automática. Después de acertar, espera cinco segundos antes de continuar.
-- La actividad del zapatero presenta las palabras debajo de su imagen; una oración incorrecta se limpia para volver a intentar.
-- Música del cuento más baja durante la narración.
-- Enlace de regreso a la biblioteca corregido.
+CAMBIOS DE ESTA VERSIÓN
+- Biblioteca de Historias con seis libros en el catálogo y tres portadas visibles.
+- Transición suave: las portadas se deslizan y cambian de tamaño hasta ocupar su posición.
+- Navegación por flechas, teclado, indicadores y deslizamiento táctil.
+- Dos libros nuevos muestran Próximamente.
+- Controles de música en la parte inferior de la biblioteca.
+- Título compacto, estante más grande y apoyado visualmente en el piso, sin deformar las imágenes.
+- Ada Lovelace figura como Próximamente; no se abre una historia incompleta.
+- Músicas Beyond_the_Gilded_Spine.mp3 y Tales_Beneath_the_Lamp.mp3 en audio/.
+- Las narraciones capitulo1.mp3 a capitulo8.mp3 y moraleja.mp3 permanecen con Bertha.
+- Panel inicial: Solo historia (8 capítulos y moraleja, 9 vistas) o Historia con actividades (14 vistas).
+- Cambiar modo permite elegir otra modalidad durante la lectura; una nueva elección empieza desde el inicio.
+- Leer de nuevo conserva la modalidad elegida.
+- La narración empieza cinco segundos después de seleccionar el modo.
+- Las cinco actividades tienen Saltar actividad para continuar sin resolverlas.
+- Respuestas correctas mantienen el avance a los cinco segundos.
+- Panel final al terminar la narración de la moraleja, o al pulsar la flecha siguiente de esa página.
+- Panel final con Volver a la biblioteca, Leer de nuevo y Volver a la moraleja.
+- Sonido breve de destellos al terminar, generado en JavaScript; no se inicia música larga ni en bucle.
+- Se conserva el sonido de botones y actividades con el volumen aumentado.
 
-Si el navegador bloquea el sonido al cargar, haz clic o toca la página para habilitar la música. También están los controles de audio.
-Se recomienda jugar en horizontal para leer mejor las dos hojas.
-Si reemplazas una versión anterior, recarga con Ctrl+F5.
+PARA AÑADIR HISTORIAS
+Edita js/catalogo.js y agrega una entrada al arreglo window.HISTORIAS.
+Usa id, title, cover, description y href. cover apunta a la portada y href al HTML de la historia.
+Si no agregas href, se mostrará Próximamente. La portada puede omitirse temporalmente.
+Las flechas y los indicadores se actualizan automáticamente.
 
-ACTUALIZACIÓN DE ACTIVIDADES Y SONIDOS
-- Las cuatro cartas de ordenar están alineadas y numeradas del 1 al 4.
-- Se conservan la pista y las instrucciones; se añaden Comprobar y Saltar para ordenar.
-- La actividad de parejas muestra cartas más grandes y retira el texto inferior.
-- Errores con sacudida y señal sonora breve; parejas correctas con una pequeña animación.
-- Efectos de botones y actividades generados con JavaScript. Las flechas conservan únicamente el sonido de pasar la hoja.
-- Se deja de utilizar actividad.mp3, que duraba unos 90 segundos, como sonido de acierto.
-- Se elimina el fondo rectangular de la hoja animada y se ocultan los sobrantes blancos del exterior de las páginas sin modificar las ilustraciones originales.
+Para agregar una música compartida, colócala en audio/ y añade su opción en los selectores de la biblioteca y de la historia.
+Conservamos el nombre de la carpeta cuentos/ para mantener los enlaces existentes.
+
+El navegador puede necesitar un primer toque para permitir la reproducción de audio.
