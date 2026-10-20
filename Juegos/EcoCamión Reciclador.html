@@ -1,625 +1,2085 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>🚛 EcoCamión Reciclador 🌱 - Ciencia y Ambiente</title>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        body {
-            font-family: 'Fredoka', 'Comic Sans MS', cursive;
-            background: #87ceeb;
-            overflow: hidden;
-            user-select: none;
-            height: 100vh;
-            width: 100vw;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 
-        /* PANTALLA DE CONFIGURACIÓN PREVIA (LOBBY) */
-        #setup-screen {
-            position: absolute; inset: 0; z-index: 500;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
-        }
+<title>EcoCamión Reciclador</title>
 
-        .setup-card {
-            background: white; padding: 35px; border-radius: 30px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.4); border: 8px solid #4caf50;
-            text-align: center; max-width: 90%; width: 580px;
-            display: flex; flex-direction: column; gap: 15px;
-            max-height: 95vh; overflow-y: auto;
-        }
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
 
-        .setup-card h1 { font-size: 30px; color: #2e7d32; margin: 0; }
-        .setup-card p { font-size: 14px; color: #555; margin-top: -5px; font-weight: 600; }
-        
-        .setup-section {
-            background: #e8f5e9; padding: 12px; border-radius: 20px; border: 3px dashed #81c784;
-            display: flex; flex-direction: column; gap: 10px; align-items: center;
-        }
-        .setup-section h3 { margin: 0; color: #1b5e20; font-size: 16px; text-transform: uppercase; }
-        
-        .setup-row { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; width: 100%; }
-        
-        .setup-btn { background: #fff; border: 3px solid #bdc3c7; padding: 10px 18px; border-radius: 15px; font-size: 14px; font-weight: bold; color: #7f8c8d; cursor: pointer; transition: all 0.2s; font-family: 'Fredoka', sans-serif; }
-        .setup-btn.active.diff { background: #ffeb3b; border-color: #fbc02d; color: #5d4037; box-shadow: 0 4px 0 #fbc02d; transform: translateY(-2px); }
-        
-        .start-btn {
-            background: #4CAF50; border: none; box-shadow: 0 8px 0 #388E3C; padding: 12px 30px; font-size: 22px; color: white; border-radius: 20px; text-transform: uppercase; font-weight: bold; font-family: 'Fredoka', sans-serif; cursor: pointer; margin-top: 5px; transition: all 0.1s;
-        }
-        .start-btn:active { transform: translateY(6px); box-shadow: 0 2px 0 #388E3C; }
+:root{
+    font-family:"Trebuchet MS",Arial,sans-serif;
+    color:#254c39;
+}
 
-        /* CONTENEDOR PRINCIPAL DEL JUEGO */
-        #game {
-            width: 100vw; height: 100vh; position: relative; overflow: hidden; display: none; flex-direction: column;
-        }
+body{
+    width:100%;
+    height:100dvh;
+    overflow:hidden;
+    background:#b8e6f0;
+}
 
-        /* HEADER SUPERIOR */
-        .game-header {
-            position: absolute; top: 15px; left: 15px; right: 15px;
-            display: flex; justify-content: space-between; align-items: center; z-index: 100;
-        }
+button{
+    font:inherit;
+    cursor:pointer;
+    touch-action:manipulation;
+    -webkit-tap-highlight-color:transparent;
+}
 
-        .hud-group { display: flex; gap: 12px; align-items: center; }
+button:focus-visible{
+    outline:4px solid #ffae35;
+    outline-offset:3px;
+}
 
-        .hud-box {
-            background: white; padding: 6px 16px; border-radius: 25px;
-            border: 4px solid #ff80ab; box-shadow: 0 4px 0 #c2185b;
-            font-weight: bold; color: #5d4037; font-size: 16px; display: flex; align-items: center; gap: 5px;
-        }
+button:disabled{
+    cursor:default;
+}
 
-        .back-menu-btn { background: #fff; border: 4px solid #bdc3c7; padding: 6px 12px; border-radius: 20px; font-size: 14px; font-weight: bold; color: #2c3e50; cursor: pointer; transition: all 0.2s; font-family: 'Fredoka', sans-serif; box-shadow: 0 4px 0 #bdc3c7; }
-        .back-menu-btn:active { transform: translateY(4px); box-shadow: 0 1px 0 #bdc3c7; }
+.oculto{
+    display:none!important;
+}
 
-        .sound-toggle { background: rgba(255, 255, 255, 0.9); border: 4px solid #3498db; border-radius: 50%; width: 40px; height: 40px; font-size: 18px; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 4px 0 #2980b9; transition: all 0.2s; }
-        .sound-toggle:active { transform: translateY(4px); box-shadow: 0 1px 0 #2980b9; }
+/* DISTRIBUCIÓN */
 
-        #title {
-            position: absolute; top: 15px; left: 50%; transform: translateX(-50%);
-            background: linear-gradient(180deg, #fff 0%, #e8f5e9 100%); padding: 8px 24px;
-            border-radius: 35px; border: 4px solid #4caf50; box-shadow: 0 4px 0 #2e7d32;
-            font-size: 20px; font-weight: bold; color: #1b5e20; z-index: 100; white-space: nowrap;
-        }
-        
-        /* ZONA SUPERIOR: CIELO + CIUDAD */
-        #world { position: relative; width: 100%; height: 55%; flex-shrink: 0; overflow: hidden; }
-        
-        #sky { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(180deg, #a8e6ff 0%, #d4f1ff 100%); z-index: 1; transition: background 0.8s ease; }
-        #sun { position: absolute; top: 25%; right: 6%; width: 80px; height: 80px; background: radial-gradient(circle, #fff9a8 0%, #ffd54f 100%); border-radius: 50%; box-shadow: 0 0 50px #ffd54f; animation: sunPulse 3s ease-in-out infinite; z-index: 2; }
-        #sun::before { content: '◕ ◕'; position: absolute; top: 24px; left: 15px; font-size: 14px; color: #5d4037; letter-spacing: 10px; }
-        #sun::after { content: '◡'; position: absolute; top: 42px; left: 30px; font-size: 18px; color: #5d4037; }
-        @keyframes sunPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); } }
-        
-        .cloud { position: absolute; background: white; border-radius: 50%; box-shadow: 0 0 20px rgba(255,255,255,0.8); z-index: 2; }
-        .cloud::before, .cloud::after { content: ''; position: absolute; background: white; border-radius: 50%; }
-        .cloud1 { width: 80px; height: 40px; top: 15%; left: 10%; animation: floatCloud 25s linear infinite; }
-        .cloud1::before { width: 50px; height: 50px; top: -20px; left: 10px; }
-        .cloud1::after { width: 40px; height: 40px; top: -16px; left: 40px; }
-        .cloud2 { width: 100px; height: 50px; top: 25%; left: 55%; animation: floatCloud 30s linear infinite; animation-delay: -12s; }
-        .cloud2::before { width: 60px; height: 60px; top: -26px; left: 15px; }
-        .cloud2::after { width: 50px; height: 50px; top: -20px; left: 50px; }
-        .cloud3 { width: 70px; height: 35px; top: 35%; left: 30%; animation: floatCloud 22s linear infinite; animation-delay: -6s; }
-        .cloud3::before { width: 45px; height: 45px; top: -18px; left: 10px; }
-        .cloud3::after { width: 35px; height: 35px; top: -12px; left: 35px; }
-        @keyframes floatCloud { from { transform: translateX(-200px); } to { transform: translateX(calc(100vw + 200px)); } }
-        
-        #city { position: absolute; bottom: 0; left: 0; width: 100%; height: 70%; z-index: 3; }
-        #buildings { position: absolute; bottom: 32%; left: 0; width: 100%; height: 68%; display: flex; align-items: flex-end; justify-content: space-around; padding: 0 20px; gap: 8px; }
-        
-        .building { position: relative; border-radius: 15px 15px 0 0; border: 4px solid rgba(0,0,0,0.15); border-bottom: none; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; padding-bottom: 10px; flex: 1; max-width: 120px; min-width: 55px; }
-        .building::before { content: ''; position: absolute; top: -20px; left: 50%; transform: translateX(-50%); width: 60%; height: 20px; background: inherit; border-radius: 10px 10px 0 0; border: 4px solid rgba(0,0,0,0.15); border-bottom: none; filter: brightness(0.9); }
-        .building .face { font-size: 28px; margin-bottom: 5px; }
-        .building .windows { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; padding: 4px; }
-        .window { width: 15px; height: 19px; background: #b3e5fc; border-radius: 5px; border: 2px solid rgba(0,0,0,0.2); }
-        
-        .decor { position: relative; display: flex; align-items: flex-end; justify-content: center; flex-shrink: 0; animation: swayDecor 3s ease-in-out infinite; transform-origin: bottom center; }
-        .decor .decor-emoji { font-size: 50px; line-height: 1; filter: drop-shadow(0 4px 3px rgba(0,0,0,0.2)); }
-        .decor.small .decor-emoji { font-size: 38px; }
-        .decor.tiny .decor-emoji  { font-size: 30px; }
-        @keyframes swayDecor { 0%, 100% { transform: rotate(-2deg); } 50% { transform: rotate(2deg); } }
-        .decor:nth-child(odd) { animation-delay: -1s; }
-        .decor:nth-child(even) { animation-delay: -2s; }
-        
-        #street { position: absolute; bottom: 0; left: 0; width: 100%; height: 32%; background: linear-gradient(180deg, #90a4ae 0%, #78909c 100%); border-top: 6px solid #546e7a; }
-        #street::before { content: ''; position: absolute; top: 50%; left: 0; width: 100%; height: 5px; background: repeating-linear-gradient(90deg, #fff59d 0, #fff59d 40px, transparent 40px, transparent 80px); }
-        #street::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 15px; background: #b0bec5; border-bottom: 3px solid #78909c; }
-        
-        /* CAMIÓN KAWAII CSS */
-        #truck { position: absolute; bottom: 12%; left: 15%; transform: translateX(-50%); width: 220px; height: 140px; z-index: 10; transition: left 1.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
-        .truck-body { position: absolute; bottom: 25px; left: 0; width: 160px; height: 90px; background: linear-gradient(180deg, #81c784 0%, #4caf50 100%); border-radius: 15px 15px 10px 10px; border: 3px solid #2e7d32; box-shadow: inset -5px -5px 0 rgba(0,0,0,0.1); }
-        .truck-body::before { content: '♻'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 40px; color: white; text-shadow: 2px 2px 0 #2e7d32; }
-        .truck-cabin { position: absolute; bottom: 25px; right: 0; width: 80px; height: 70px; background: linear-gradient(180deg, #a5d6a7 0%, #66bb6a 100%); border-radius: 15px 20px 10px 10px; border: 3px solid #2e7d32; }
-        .truck-window { position: absolute; top: 10px; right: 10px; width: 55px; height: 35px; background: linear-gradient(180deg, #b3e5fc 0%, #81d4fa 100%); border-radius: 10px 12px 5px 5px; border: 2px solid #2e7d32; overflow: hidden; }
-        .driver { position: absolute; bottom: 3px; left: 50%; transform: translateX(-50%); width: 30px; height: 30px; background: #ffcc80; border-radius: 50%; }
-        .driver::before { content: '◕ ◕'; position: absolute; top: 8px; left: 3px; font-size: 9px; color: #3e2723; letter-spacing: 3px; }
-        .driver::after { content: '◡'; position: absolute; top: 17px; left: 11px; font-size: 10px; color: #3e2723; }
-        .truck-face { position: absolute; bottom: 55px; left: 20px; width: 120px; height: 40px; pointer-events: none; }
-        .eye { position: absolute; top: 5px; width: 14px; height: 18px; background: #263238; border-radius: 50%; animation: blink 4s infinite; }
-        .eye.left { left: 30px; } .eye.right { left: 75px; }
-        .eye::after { content: ''; position: absolute; top: 3px; left: 3px; width: 5px; height: 5px; background: white; border-radius: 50%; }
-        @keyframes blink { 0%, 90%, 100% { transform: scaleY(1); } 95% { transform: scaleY(0.1); } }
-        .mouth { position: absolute; top: 25px; left: 50%; transform: translateX(-50%); width: 25px; height: 12px; border: 3px solid #263238; border-top: none; border-radius: 0 0 20px 20px; background: #ff8a80; }
-        .cheek { position: absolute; top: 20px; width: 12px; height: 8px; background: #ff8a80; border-radius: 50%; opacity: 0.7; }
-        .cheek.left { left: 15px; } .cheek.right { left: 95px; }
-        .wheel { position: absolute; bottom: 0; width: 35px; height: 35px; background: radial-gradient(circle, #546e7a 30%, #263238 70%); border-radius: 50%; border: 3px solid #1a1a1a; }
-        .wheel::after { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 10px; height: 10px; background: #b0bec5; border-radius: 50%; }
-        .wheel.left { left: 15px; animation: spin 0.8s linear infinite; }
-        .wheel.right { right: 15px; animation: spin 0.8s linear infinite; }
-        @keyframes spin { from { transform: rotate(0); } to { transform: rotate(360deg); } }
-        #truck.driving .wheel { animation-duration: 0.3s; }
-        .smoke { position: absolute; top: 10px; left: -15px; width: 20px; height: 20px; background: white; border-radius: 50%; opacity: 0; }
-        #truck.driving .smoke { animation: smokePuff 0.6s ease-out infinite; }
-        @keyframes smokePuff { 0% { opacity: 0.8; transform: translate(0,0) scale(0.5); } 100% { opacity: 0; transform: translate(-30px, -20px) scale(1.5); } }
-        
-        /* ZONA DE JUEGO */
-        #playArea { position: relative; flex: 1; background: linear-gradient(180deg, #fff9c4 0%, #ffecb3 100%); border-top: 6px dashed #ffb74d; display: flex; align-items: center; justify-content: space-around; gap: 30px; padding: 14px 30px; z-index: 5; overflow: hidden; }
-        
-        #bins { display: flex; gap: 18px; justify-content: center; align-items: center; flex-shrink: 0; }
-        .bin { width: 120px; height: 145px; border-radius: 20px 20px 14px 14px; cursor: pointer; position: relative; transition: all 0.2s; border: 5px solid rgba(0,0,0,0.25); box-shadow: 0 9px 0 rgba(0,0,0,0.3), 0 12px 22px rgba(0,0,0,0.18); display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; font-weight: bold; text-shadow: 2px 2px 0 rgba(0,0,0,0.35); padding-top: 10px; }
-        .bin:hover { transform: translateY(-10px) scale(1.06); box-shadow: 0 16px 0 rgba(0,0,0,0.3), 0 20px 28px rgba(0,0,0,0.22); }
-        .bin:active { transform: translateY(-2px) scale(0.98); box-shadow: 0 5px 0 rgba(0,0,0,0.3); }
-        .bin-icon { font-size: 42px; margin-bottom: 6px; filter: drop-shadow(2px 3px 0 rgba(0,0,0,0.25)); line-height: 1; }
-        .bin-label { font-size: 14px; background: rgba(0,0,0,0.18); padding: 4px 12px; border-radius: 20px; white-space: nowrap; }
-        .bin::before { content: ''; position: absolute; top: -14px; left: -8px; right: -8px; height: 16px; background: inherit; border-radius: 12px 12px 4px 4px; border: 5px solid rgba(0,0,0,0.25); filter: brightness(0.85); }
-        .bin::after { content: ''; position: absolute; top: -26px; left: 50%; transform: translateX(-50%); width: 40px; height: 14px; background: rgba(0,0,0,0.3); border-radius: 8px 8px 0 0; border: 3px solid rgba(0,0,0,0.25); border-bottom: none; }
-        
-        .bin.organic { background: linear-gradient(180deg, #a1887f 0%, #6d4c41 100%); }
-        .bin.plastic { background: linear-gradient(180deg, #ffeb3b 0%, #fbc02d 100%); color: #5d4037; text-shadow: 1px 1px 0 rgba(255,255,255,0.5); }
-        .bin.paper   { background: linear-gradient(180deg, #42a5f5 0%, #1976d2 100%); }
-        .bin.glass   { background: linear-gradient(180deg, #66bb6a 0%, #2e7d32 100%); }
-        
-        .bin.organic .bin-label { background: rgba(0,0,0,0.25); }
-        .bin.plastic .bin-label { background: rgba(255,255,255,0.5); color: #5d4037; }
-        .bin.paper .bin-label   { background: rgba(0,0,0,0.25); }
-        .bin.glass .bin-label   { background: rgba(0,0,0,0.25); }
-        
-        .bin.correct { animation: correctPop 0.5s ease; }
-        @keyframes correctPop { 0% { transform: scale(1); } 40% { transform: scale(1.15) translateY(-10px); box-shadow: 0 0 0 8px #fff59d, 0 20px 0 rgba(0,0,0,0.3); } 100% { transform: scale(1); } }
-        .bin.wrong { animation: wrongShake 0.5s ease; }
-        @keyframes wrongShake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
-        
-        /* BASURA A RECICLAR */
-        #trashPanel { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; flex-shrink: 0; }
-        #trashDisplay { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; }
-        #trashEmoji { font-size: 130px; line-height: 1; animation: bounceTrash 1.5s ease-in-out infinite; filter: drop-shadow(0 8px 6px rgba(0,0,0,0.2)); }
-        @keyframes bounceTrash { 0%, 100% { transform: translateY(0) rotate(-4deg); } 50% { transform: translateY(-12px) rotate(4deg); } }
-        #trashName { font-size: 24px; font-weight: bold; color: #5d4037; background: white; padding: 8px 26px; border-radius: 30px; border: 4px solid #ff8a65; box-shadow: 0 5px 0 #d84315; white-space: nowrap; }
-        
-        /* MENSAJES FLOTANTES */
-        #message { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0); font-size: 90px; font-weight: 900; color: #2e7d32; z-index: 200; transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); pointer-events: none; white-space: nowrap; letter-spacing: 2px; -webkit-text-stroke: 5px white; text-shadow: 0 0 12px rgba(0,0,0,0.25), 6px 6px 0 rgba(0,0,0,0.12); }
-        #message.show { transform: translate(-50%, -50%) scale(1); }
-        #message.wrong { color: #e53935; -webkit-text-stroke: 5px white; }
-        
-        /* PANTALLA FINAL */
-        #endScreen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(180deg, #ffe0f0 0%, #e0f7ff 100%); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 300; gap: 22px; padding: 20px; }
-        #endScreen.show { display: flex; }
-        #endScreen h1 { font-size: 54px; color: #d81b60; text-shadow: 4px 4px 0 #fff, 8px 8px 0 #ff80ab; text-align: center; }
-        #endScreen p { font-size: 24px; color: #5d4037; background: white; padding: 16px 32px; border-radius: 30px; border: 5px solid #ff80ab; box-shadow: 0 5px 0 #c2185b; text-align: center; }
-        .end-btn-group { display: flex; gap: 15px; }
-        .end-btn { padding: 16px 30px; font-size: 22px; font-weight: bold; font-family: 'Fredoka', sans-serif; background: linear-gradient(180deg, #81c784 0%, #4caf50 100%); color: white; border: 5px solid #2e7d32; border-radius: 35px; box-shadow: 0 7px 0 #2e7d32; cursor: pointer; transition: all 0.2s; }
-        .end-btn.menu { background: linear-gradient(180deg, #9b59b6 0%, #8e44ad 100%); border-color: #5b2c6f; box-shadow: 0 7px 0 #5b2c6f; }
-        .end-btn:hover { transform: translateY(-4px); }
-        .end-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #2e7d32; }
-        .end-btn.menu:active { box-shadow: 0 2px 0 #5b2c6f; }
-        
-        .confetti { position: absolute; width: 12px; height: 12px; top: -15px; animation: fall 3s linear forwards; z-index: 301; }
-        @keyframes fall { to { transform: translateY(110vh) rotate(720deg); } }
-        
-        @media (max-height: 720px) {
-            .hud-box { padding: 6px 14px; font-size: 15px; }
-            #title { padding: 6px 20px; font-size: 18px; top: 10px; }
-            .game-header { top: 10px; }
-            .bin { width: 100px; height: 120px; }
-            .bin-icon { font-size: 34px; }
-            .bin-label { font-size: 12px; padding: 3px 9px; }
-            #bins { gap: 14px; }
-            #trashEmoji { font-size: 100px; }
-            #trashName { font-size: 18px; padding: 6px 20px; }
-            #message { font-size: 60px; -webkit-text-stroke: 4px white; }
-            .decor .decor-emoji { font-size: 40px; }
-            #playArea { gap: 20px; padding: 10px 20px; }
-        }
-    </style>
+#juego{
+    width:100%;
+    height:100dvh;
+    display:grid;
+    grid-template-rows:57% 43%;
+}
+
+/* ENCABEZADO */
+
+.encabezado{
+    position:absolute;
+    top:max(10px,env(safe-area-inset-top));
+    left:14px;
+    right:14px;
+    z-index:10;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:8px;
+}
+
+.titulo,
+.indicador,
+.boton-pequeno{
+    background:#fffffff2;
+    border:2px solid #cce4cc;
+    border-radius:15px;
+    padding:9px 12px;
+    box-shadow:0 4px 0 #214b3420;
+    font-weight:bold;
+}
+
+.titulo{
+    font-size:clamp(16px,2vw,25px);
+}
+
+.hud{
+    display:flex;
+    align-items:center;
+    gap:7px;
+}
+
+.boton-pequeno{
+    min-height:42px;
+}
+
+/* ESCENARIO */
+
+#escenario{
+    position:relative;
+    overflow:hidden;
+    isolation:isolate;
+    background:linear-gradient(#b0e7f8,#dff0cf);
+}
+
+/*
+UNA SOLA IMAGEN DE FONDO.
+
+No se repite.
+No se desplaza.
+Se muestra completa ocupando el escenario.
+*/
+
+#imagen-fondo{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    object-fit:fill;
+    z-index:0;
+    pointer-events:none;
+}
+
+/* CASAS */
+
+#casas{
+    position:absolute;
+    inset:0;
+    z-index:2;
+    will-change:transform;
+}
+
+.casa{
+    position:absolute;
+    bottom:27%;
+    width:var(--ancho-casa,220px);
+    height:63%;
+    display:flex;
+    justify-content:center;
+    align-items:flex-end;
+}
+
+.casa img{
+    max-width:100%;
+    max-height:100%;
+    object-fit:contain;
+    filter:drop-shadow(0 5px 3px #0002);
+    pointer-events:none;
+}
+
+.casa-respaldo{
+    font-size:130px;
+    line-height:1;
+}
+
+/* CAMIÓN */
+
+#camion{
+    position:absolute;
+    left:25%;
+    bottom:7%;
+    width:clamp(170px,23vw,310px);
+    height:41%;
+    transform:translateX(-50%);
+    display:flex;
+    align-items:flex-end;
+    justify-content:center;
+    z-index:4;
+}
+
+#imagen-camion{
+    max-width:100%;
+    max-height:100%;
+    object-fit:contain;
+    transform-origin:center 85%;
+    pointer-events:none;
+}
+
+#camion-respaldo{
+    font-size:110px;
+    line-height:1;
+    transform:scaleX(-1);
+}
+
+#camion.andando #imagen-camion{
+    animation:suspension .24s ease-in-out infinite;
+}
+
+@keyframes suspension{
+    50%{
+        transform:translateY(-3px) rotate(.35deg);
+    }
+}
+
+.polvo{
+    position:absolute;
+    bottom:2%;
+    left:0;
+    width:23px;
+    height:17px;
+    border-radius:50%;
+    background:#fff2db;
+    box-shadow:
+        15px -7px 0 3px #fff2db,
+        28px 1px 0 1px #fff2db;
+    opacity:0;
+    z-index:-1;
+}
+
+#camion.andando .polvo{
+    animation:nube .65s ease-out infinite;
+}
+
+#camion.andando .polvo.segundo{
+    left:58%;
+    animation-delay:.3s;
+}
+
+@keyframes nube{
+    from{
+        opacity:.8;
+        transform:translateX(0) scale(.5);
+    }
+    to{
+        opacity:0;
+        transform:translateX(-65px) scale(1.5);
+    }
+}
+
+/* INFORMACIÓN */
+
+.info-escenario{
+    position:absolute;
+    top:74px;
+    left:15px;
+    right:15px;
+    z-index:5;
+    display:flex;
+    justify-content:space-between;
+    gap:8px;
+    pointer-events:none;
+}
+
+.info-escenario span{
+    background:#ffffffe8;
+    padding:7px 11px;
+    border-radius:12px;
+    font-size:12px;
+    font-weight:bold;
+}
+
+#ruta{
+    position:absolute;
+    bottom:8px;
+    left:50%;
+    transform:translateX(-50%);
+    display:flex;
+    gap:10px;
+    padding:6px 12px;
+    border-radius:20px;
+    background:#ffffffe8;
+    z-index:5;
+}
+
+.punto{
+    width:9px;
+    height:9px;
+    border-radius:50%;
+    background:#bfd2ba;
+}
+
+.punto.completo{
+    background:#229d67;
+}
+
+.punto.actual{
+    background:#f3b138;
+    box-shadow:0 0 0 3px #f3b13833;
+}
+
+/* CONTROLES */
+
+#controles{
+    background:linear-gradient(#fff8cf,#ffebba);
+    border-top:5px dashed #e7b85d;
+    padding:clamp(12px,2vw,26px);
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(150px,.27fr);
+    gap:clamp(15px,3vw,42px);
+    min-height:0;
+}
+
+#clasificacion{
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    gap:12px;
+    min-width:0;
+}
+
+.fila-progreso{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:8px;
+}
+
+.fila-progreso h2{
+    font-size:clamp(16px,1.8vw,24px);
+}
+
+#contador{
+    font-size:12px;
+    font-weight:bold;
+    white-space:nowrap;
+}
+
+/* TACHOS */
+
+#tachos{
+    display:grid;
+    grid-template-columns:repeat(var(--cantidad,4),minmax(0,1fr));
+    gap:clamp(6px,1.2vw,18px);
+    align-items:end;
+}
+
+.tacho{
+    min-width:0;
+    height:clamp(100px,22vh,205px);
+    border:0;
+    background:transparent;
+    display:flex;
+    align-items:flex-end;
+    justify-content:center;
+    border-radius:12px;
+    transition:transform .15s;
+}
+
+.tacho img{
+    max-width:100%;
+    max-height:100%;
+    object-fit:contain;
+    filter:drop-shadow(0 5px 2px #0002);
+    pointer-events:none;
+}
+
+.tacho:not(:disabled):hover{
+    transform:translateY(-5px);
+}
+
+.tacho.correcto{
+    animation:acierto .35s ease;
+}
+
+.tacho.incorrecto{
+    animation:error .3s ease;
+}
+
+@keyframes acierto{
+    50%{
+        transform:translateY(-8px) scale(1.05);
+    }
+}
+
+@keyframes error{
+    25%{
+        transform:translateX(-6px);
+    }
+    75%{
+        transform:translateX(6px);
+    }
+}
+
+.tacho-respaldo{
+    width:100%;
+    height:90%;
+    min-height:75px;
+    border:3px solid #0003;
+    border-radius:12px 12px 17px 17px;
+    box-shadow:0 5px 0 #0003;
+    background:var(--color);
+    color:var(--texto);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:5px;
+    padding:4px;
+}
+
+.tacho-respaldo .simbolo{
+    font-size:clamp(25px,3vw,42px);
+}
+
+.tacho-respaldo strong{
+    font-size:clamp(9px,1vw,14px);
+    text-align:center;
+}
+
+.tacho-respaldo small{
+    font-size:clamp(16px,2vw,25px);
+}
+
+/* RESIDUO */
+
+#panel-residuo{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    min-height:0;
+}
+
+#panel-residuo small{
+    text-align:center;
+    font-size:11px;
+    letter-spacing:1px;
+    font-weight:bold;
+    color:#8a7950;
+}
+
+#imagen-residuo{
+    width:100%;
+    height:70%;
+    object-fit:contain;
+    filter:drop-shadow(0 7px 4px #0002);
+    animation:flotar 2s ease-in-out infinite;
+}
+
+#residuo-respaldo{
+    font-size:clamp(70px,9vw,125px);
+    line-height:1.2;
+}
+
+@keyframes flotar{
+    50%{
+        transform:translateY(-5px) rotate(2deg);
+    }
+}
+
+/* MENSAJE Y BARRA */
+
+#mensaje{
+    min-height:22px;
+    font-size:clamp(12px,1.2vw,16px);
+    line-height:1.2;
+    font-weight:bold;
+    color:#33774f;
+}
+
+#mensaje.error{
+    color:#b34d37;
+}
+
+.barra{
+    height:8px;
+    background:#e6d7ab;
+    border-radius:10px;
+    overflow:hidden;
+}
+
+#relleno{
+    height:100%;
+    width:0;
+    background:linear-gradient(90deg,#23ae76,#a3d467);
+    transition:width .3s;
+}
+
+/* MENÚ Y FINAL */
+
+.pantalla{
+    position:fixed;
+    inset:0;
+    z-index:30;
+    background:#194e3bcc;
+    backdrop-filter:blur(7px);
+    padding:18px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    overflow:auto;
+}
+
+.tarjeta{
+    width:100%;
+    max-width:680px;
+    max-height:100%;
+    overflow:auto;
+    background:#fffdf4;
+    border:5px solid white;
+    border-radius:28px;
+    padding:clamp(22px,4vw,40px);
+    text-align:center;
+    box-shadow:0 20px 60px #0003;
+}
+
+.icono-grande{
+    font-size:56px;
+}
+
+.tarjeta h1{
+    font-size:clamp(27px,4vw,39px);
+    color:#17734e;
+    margin:10px 0;
+}
+
+.tarjeta p{
+    font-size:14px;
+    line-height:1.5;
+    color:#69806b;
+}
+
+.niveles{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:10px;
+    margin:22px 0;
+}
+
+.nivel{
+    background:white;
+    border:2px solid #d5e3cf;
+    border-radius:17px;
+    padding:14px 5px;
+    color:#355d44;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:7px;
+}
+
+.nivel.activo{
+    border-color:#27975f;
+    background:#eaf7e4;
+    box-shadow:0 4px 0 #27975f;
+}
+
+.nivel span{
+    font-size:27px;
+}
+
+.nivel small{
+    font-size:11px;
+}
+
+.principal{
+    width:100%;
+    padding:15px 22px;
+    border:0;
+    border-radius:16px;
+    background:#18895b;
+    box-shadow:0 6px 0 #106642;
+    color:white;
+    font-size:20px;
+    font-weight:bold;
+    margin:9px 0 17px;
+}
+
+.secundario{
+    padding:10px 16px;
+    background:white;
+    color:#365d45;
+    border:2px solid #d0dfca;
+    border-radius:12px;
+    font-weight:bold;
+}
+
+#resultado{
+    font-size:24px;
+    color:#188454;
+    font-weight:bold;
+    margin:20px 0;
+}
+
+/* CELULAR VERTICAL */
+
+@media(max-width:700px) and (orientation:portrait){
+    #juego{
+        grid-template-rows:49% 51%;
+    }
+
+    .encabezado{
+        left:8px;
+        right:8px;
+        gap:4px;
+    }
+
+    .titulo{
+        font-size:15px;
+        padding:7px;
+    }
+
+    .hud{
+        gap:4px;
+    }
+
+    .indicador,
+    .boton-pequeno{
+        padding:7px;
+        min-height:38px;
+        font-size:13px;
+    }
+
+    .texto-menu{
+        display:none;
+    }
+
+    .info-escenario{
+        top:61px;
+        left:10px;
+        right:10px;
+    }
+
+    .info-escenario span{
+        padding:6px 8px;
+        font-size:10px;
+    }
+
+    #controles{
+        grid-template-columns:1fr;
+        grid-template-rows:82px minmax(0,1fr);
+        gap:6px;
+        padding:10px 12px 12px;
+    }
+
+    #panel-residuo{
+        grid-row:1;
+        flex-direction:row;
+        gap:12px;
+    }
+
+    #panel-residuo small{
+        max-width:120px;
+        font-size:10px;
+    }
+
+    #imagen-residuo{
+        width:85px;
+        height:78px;
+    }
+
+    #residuo-respaldo{
+        font-size:65px;
+    }
+
+    #clasificacion{
+        grid-row:2;
+        gap:7px;
+        justify-content:space-evenly;
+    }
+
+    .fila-progreso h2{
+        font-size:15px;
+    }
+
+    #contador{
+        font-size:11px;
+    }
+
+    #tachos{
+        grid-template-columns:repeat(4,minmax(0,1fr));
+        gap:8px;
+    }
+
+    .tacho{
+        height:clamp(65px,10vh,96px);
+    }
+
+    .tacho-respaldo{
+        min-height:60px;
+    }
+
+    .tacho-respaldo .simbolo{
+        font-size:23px;
+    }
+
+    .tacho-respaldo strong{
+        font-size:9px;
+    }
+
+    .tacho-respaldo small{
+        font-size:15px;
+    }
+
+    #controles.cuatro .tacho{
+        height:clamp(100px,17vh,150px);
+    }
+
+    #mensaje{
+        font-size:11px;
+        min-height:27px;
+    }
+
+    #camion{
+        left:27%;
+        width:170px;
+        height:36%;
+    }
+
+    .casa{
+        height:59%;
+    }
+
+    .niveles{
+        gap:6px;
+    }
+
+    .nivel b{
+        font-size:13px;
+    }
+
+    .nivel small{
+        font-size:10px;
+    }
+}
+
+/* CELULAR HORIZONTAL */
+
+@media(max-height:550px) and (orientation:landscape){
+    #juego{
+        grid-template-rows:54% 46%;
+    }
+
+    .encabezado{
+        top:7px;
+    }
+
+    .titulo{
+        font-size:17px;
+        padding:6px 10px;
+    }
+
+    .indicador,
+    .boton-pequeno{
+        padding:6px 9px;
+        min-height:34px;
+        font-size:13px;
+    }
+
+    .info-escenario{
+        top:51px;
+    }
+
+    .info-escenario span{
+        padding:5px 8px;
+        font-size:10px;
+    }
+
+    #controles{
+        grid-template-columns:1fr 130px;
+        padding:8px 18px;
+        gap:18px;
+    }
+
+    #clasificacion{
+        gap:6px;
+    }
+
+    .fila-progreso h2{
+        font-size:14px;
+    }
+
+    .tacho{
+        height:clamp(65px,24vh,100px);
+    }
+
+    .tacho-respaldo{
+        min-height:58px;
+    }
+
+    .tacho-respaldo .simbolo{
+        font-size:23px;
+    }
+
+    .tacho-respaldo strong{
+        font-size:9px;
+    }
+
+    .tacho-respaldo small{
+        font-size:15px;
+    }
+
+    #imagen-residuo{
+        height:85px;
+    }
+
+    #panel-residuo small{
+        font-size:9px;
+    }
+
+    #residuo-respaldo{
+        font-size:65px;
+    }
+
+    #mensaje{
+        font-size:10px;
+        min-height:14px;
+    }
+
+    #camion{
+        width:190px;
+        height:36%;
+    }
+
+    .casa{
+        height:57%;
+    }
+
+    .tarjeta{
+        padding:15px 22px;
+    }
+
+    .icono-grande{
+        font-size:28px;
+    }
+
+    .tarjeta h1{
+        margin:5px;
+        font-size:26px;
+    }
+
+    .tarjeta p{
+        font-size:12px;
+    }
+
+    .niveles{
+        margin:12px 0;
+    }
+
+    .nivel{
+        padding:8px;
+        gap:3px;
+    }
+
+    .nivel span{
+        font-size:20px;
+    }
+
+    .principal{
+        padding:10px;
+        margin-bottom:10px;
+    }
+}
+
+@media(prefers-reduced-motion:reduce){
+    *,
+    *::before,
+    *::after{
+        animation:none!important;
+        transition-duration:.01s!important;
+    }
+}
+</style>
 </head>
+
 <body>
 
-    <audio id="bgm" loop>
-        <source src="../assets/musicaFondo/cancion1.mp3" type="audio/mpeg">
-    </audio>
+<main id="juego">
 
-    <!-- PANTALLA DE CONFIGURACIÓN (LOBBY) -->
-    <div id="setup-screen">
-        <div class="setup-card">
-            <h1>Configuración ⚙️</h1>
-            <p>Curso: Ciencia y Ambiente 🌿</p>
-            
-            <div class="setup-section">
-                <h3>Nivel de Dificultad</h3>
-                <div class="setup-row">
-                    <button id="setup-diff-10" class="setup-btn diff" onclick="selectDiff(10)">🌱 Inicial (10)</button>
-                    <button id="setup-diff-25" class="setup-btn diff active" onclick="selectDiff(25)">⭐ Primaria Medio (25)</button>
-                    <button id="setup-diff-50" class="setup-btn diff" onclick="selectDiff(50)">🔥 Primaria Difícil (50)</button>
-                </div>
+    <header class="encabezado">
+        <div class="titulo">🚛 EcoCamión</div>
+
+        <div class="hud">
+
+            <button
+                class="boton-pequeno"
+                id="boton-menu"
+                aria-label="Volver al menú"
+            >
+                ⚙️ <span class="texto-menu">Menú</span>
+            </button>
+
+            <span class="indicador" id="vidas">
+                ❤️❤️❤️
+            </span>
+
+            <span class="indicador">
+                ⭐ <span id="puntos">0</span>
+            </span>
+
+            <button
+                class="boton-pequeno"
+                id="boton-sonido"
+                aria-label="Activar sonido"
+            >🔇</button>
+
+        </div>
+    </header>
+
+    <section id="escenario" aria-label="Ruta del camión">
+
+        <img id="imagen-fondo" alt="">
+
+        <div id="casas"></div>
+
+        <div class="info-escenario">
+            <span id="nombre-escenario">🌷 Parque</span>
+            <span id="numero-casa">Casa 1 / 6</span>
+        </div>
+
+        <div id="camion">
+            <img id="imagen-camion" alt="Camión recolector">
+
+            <span id="camion-respaldo" class="oculto">
+                🚛
+            </span>
+
+            <i class="polvo"></i>
+            <i class="polvo segundo"></i>
+        </div>
+
+        <div id="ruta" aria-hidden="true"></div>
+
+    </section>
+
+    <section id="controles">
+
+        <div id="clasificacion">
+
+            <div class="fila-progreso">
+                <h2>¿En qué tacho va?</h2>
+                <span id="contador">0 / 10</span>
             </div>
 
-            <button class="start-btn" onclick="startGame()">¡A Reciclar!</button>
-        </div>
-    </div>
+            <div id="tachos"></div>
 
-    <!-- PANTALLA DE JUEGO -->
-    <div id="game">
-        <div class="game-header">
-            <button class="back-menu-btn" onclick="backToMenu()">⚙️ Menú</button>
-            <div id="title">🚛 EcoCamión Reciclador 🌱</div>
-            <div class="hud-group">
-                <div id="lives-display" class="hud-box" style="display: none; border-color: #e74c3c; color: #c0392b;">❤️ <span id="lives">3</span></div>
-                <div class="hud-box">⭐ <span id="score">0</span></div>
-                <button id="soundToggle" class="sound-toggle" aria-label="Activar o desactivar sonido" title="Sonido">🔇</button>
+            <div id="mensaje" role="status" aria-live="polite">
+                ¡Vamos a reciclar!
             </div>
+
+            <div
+                id="barra-progreso"
+                class="barra"
+                role="progressbar"
+                aria-label="Residuos reciclados"
+                aria-valuemin="0"
+                aria-valuemax="10"
+                aria-valuenow="0"
+            >
+                <div id="relleno"></div>
+            </div>
+
         </div>
-        
-        <div id="world">
-            <div id="sky">
-                <div id="sun"></div>
-                <div class="cloud cloud1"></div>
-                <div class="cloud cloud2"></div>
-                <div class="cloud cloud3"></div>
-            </div>
-            <div id="city">
-                <div id="buildings"></div>
-                <div id="street"></div>
-                <div id="truck">
-                    <div class="smoke"></div>
-                    <div class="truck-body">
-                        <div class="truck-face">
-                            <div class="eye left"></div>
-                            <div class="eye right"></div>
-                            <div class="cheek left"></div>
-                            <div class="cheek right"></div>
-                            <div class="mouth"></div>
-                        </div>
-                    </div>
-                    <div class="truck-cabin">
-                        <div class="truck-window"><div class="driver"></div></div>
-                    </div>
-                    <div class="wheel left"></div>
-                    <div class="wheel right"></div>
-                </div>
-            </div>
+
+        <div id="panel-residuo">
+            <small>CLASIFICA ESTE RESIDUO</small>
+
+            <img
+                id="imagen-residuo"
+                alt="Residuo para clasificar"
+            >
+
+            <span
+                id="residuo-respaldo"
+                class="oculto"
+            ></span>
         </div>
-        
-        <!-- ZONA DE JUEGO -->
-        <div id="playArea">
-            <div id="bins">
-                <div class="bin organic" data-type="organic">
-                    <div class="bin-icon">🥬</div>
-                    <div class="bin-label">Orgánico</div>
-                </div>
-                <div class="bin plastic" data-type="plastic">
-                    <div class="bin-icon">🧴</div>
-                    <div class="bin-label">Plástico</div>
-                </div>
-                <div class="bin paper" data-type="paper">
-                    <div class="bin-icon">📰</div>
-                    <div class="bin-label">Papel</div>
-                </div>
-                <div class="bin glass" data-type="glass">
-                    <div class="bin-icon">🍾</div>
-                    <div class="bin-label">Vidrio</div>
-                </div>
-            </div>
-            
-            <div id="trashPanel">
-                <div id="trashDisplay">
-                    <span id="trashEmoji">🍎</span>
-                    <span id="trashName">Manzana</span>
-                </div>
-            </div>
+
+    </section>
+</main>
+
+<!-- MENÚ -->
+
+<div id="menu" class="pantalla">
+    <section class="tarjeta">
+
+        <div class="icono-grande">🚛🌱</div>
+
+        <h1>¡Una ruta por el planeta!</h1>
+
+        <p>
+            Clasifica los residuos y acompaña al camión.<br>
+            <b>Tres vidas en todas las dificultades.</b>
+        </p>
+
+        <div class="niveles">
+
+            <button
+                class="nivel activo"
+                data-nivel="facil"
+                aria-pressed="true"
+            >
+                <span>🌱</span>
+                <b>Fácil</b>
+                <small>10 residuos</small>
+                <small>4 tachos con referencias</small>
+            </button>
+
+            <button
+                class="nivel"
+                data-nivel="intermedio"
+                aria-pressed="false"
+            >
+                <span>🌟</span>
+                <b>Intermedio</b>
+                <small>25 residuos</small>
+                <small>7 tachos con referencias</small>
+            </button>
+
+            <button
+                class="nivel"
+                data-nivel="dificil"
+                aria-pressed="false"
+            >
+                <span>🔥</span>
+                <b>Difícil</b>
+                <small>50 residuos</small>
+                <small>4 → 5 → 6 → 7 tachos</small>
+                <small>Sin referencias</small>
+            </button>
+
         </div>
-        
-        <div id="message"></div>
-        
-        <div id="endScreen">
-            <h1 id="endTitle">🎉 ¡Misión Cumplida! 🎉</h1>
-            <p>Puntuación final: <span id="finalScore">0</span> ⭐</p>
-            <div class="end-btn-group">
-                <button id="restartBtn" class="end-btn">🔄 Jugar de nuevo</button>
-                <button id="menuBtn" class="end-btn menu">⚙️ Menú</button>
-            </div>
-        </div>
-    </div>
+
+        <button id="boton-iniciar" class="principal">
+            ¡A reciclar! →
+        </button>
+
+        <p>
+            Llega a la última casa para descubrir otro escenario.
+        </p>
+
+    </section>
+</div>
+
+<!-- FINAL -->
+
+<div id="final" class="pantalla oculto">
+    <section class="tarjeta">
+
+        <div id="icono-final" class="icono-grande">🏆</div>
+
+        <h1 id="titulo-final"></h1>
+        <p id="texto-final"></p>
+
+        <div id="resultado"></div>
+
+        <button id="boton-reiniciar" class="principal">
+            🔄 Volver a jugar
+        </button>
+
+        <button id="boton-final-menu" class="secundario">
+            Cambiar dificultad
+        </button>
+
+    </section>
+</div>
 
 <script>
-    // MOTOR DE SONIDO (WEB AUDIO API + BGM)
-    const AudioContext = window.AudioContext || window.webkitAudioContext;
-    let audioCtx; let isMuted = true;
-    
-    const bgAudio = document.getElementById('bgm');
-    const soundToggle = document.getElementById('soundToggle');
+"use strict";
 
-    soundToggle.addEventListener('click', () => {
-        if (!audioCtx) audioCtx = new AudioContext();
-        if (audioCtx.state === 'suspended') audioCtx.resume();
-        
-        isMuted = !isMuted;
-        if(isMuted) {
-            bgAudio.pause();
-            soundToggle.innerText = '🔇';
-        } else {
-            bgAudio.volume = 0.20; 
-            bgAudio.play().catch(e => console.log('Interacción requerida'));
-            soundToggle.innerText = '🔊';
+/* ==========================================================
+   CARPETA DE LAS IMÁGENES
+
+   Este código supone:
+
+   Tu archivo HTML está junto a la carpeta img_EcoCamion.
+
+   Dentro de img_EcoCamion están:
+   - Los cinco fondos.
+   - Las treinta casitas.
+   - Los catorce tachos.
+   - Los residuos.
+   - camion.png
+
+   Si la ubicación es diferente, cambia SOLO esta constante.
+   ========================================================== */
+
+const CARPETA = "./img_EcoCamion/";
+
+/* ==========================================================
+   CAMIÓN
+   ========================================================== */
+
+const ARCHIVO_CAMION = "camion.png";
+
+/* ==========================================================
+   FONDOS Y CASITAS
+
+   Todos los nombres se escriben completos, incluyendo .png.
+   No se añade ninguna extensión automáticamente.
+   ========================================================== */
+
+const ESCENARIOS = [
+    {
+        nombre: "🌷 Parque",
+        fondo: "Parque primaveral con flores y colinas-1.png",
+        casas: [
+            "Seis casitas encantadoras del parque-1.1.png",
+            "Seis casitas encantadoras del parque-1.2.png",
+            "Seis casitas encantadoras del parque-1.3.png",
+            "Seis casitas encantadoras del parque-1.4.png",
+            "Seis casitas encantadoras del parque-1.5.png",
+            "Seis casitas encantadoras del parque-1.6.png"
+        ]
+    },
+    {
+        nombre: "🏫 Escuela",
+        fondo: "Paisaje escolar verde con acera y carretera-4.png",
+        casas: [
+            "Seis edificios escolares de cuento-1.1.png",
+            "Seis edificios escolares de cuento-1.2.png",
+            "Seis edificios escolares de cuento-1.3.png",
+            "Seis edificios escolares de cuento-1.4.png",
+            "Seis edificios escolares de cuento-1.5.png",
+            "Seis edificios escolares de cuento-1.6.png"
+        ]
+    },
+    {
+        nombre: "🏙️ Ciudad",
+        fondo: "Parque urbano con árboles y carretera-2.png",
+        casas: [
+            "Seis edificios urbanos coloridos-1.1.png",
+            "Seis edificios urbanos coloridos-1.2.png",
+            "Seis edificios urbanos coloridos-1.3.png",
+            "Seis edificios urbanos coloridos-1.4.png",
+            "Seis edificios urbanos coloridos-1.5.png",
+            "Seis edificios urbanos coloridos-1.6.png"
+        ]
+    },
+    {
+        nombre: "🏖️ Playa",
+        fondo: "Playa tropical y cielo azul-3.png",
+        casas: [
+            "Seis casitas playeras de cuento-1.1.png",
+            "Seis casitas playeras de cuento-1.2.png",
+            "Seis casitas playeras de cuento-1.3.png",
+            "Seis casitas playeras de cuento-1.4.png",
+            "Seis casitas playeras de cuento-1.5.png",
+            "Seis casitas playeras de cuento-1.6.png"
+        ]
+    },
+    {
+        nombre: "🌲 Bosque",
+        fondo: "Bosque encantado junto al camino-5.png",
+        casas: [
+            "Seis casitas del bosque-1.1.png",
+            "Seis casitas del bosque-1.2.png",
+            "Seis casitas del bosque-1.3.png",
+            "Seis casitas del bosque-1.4.png",
+            "Seis casitas del bosque-1.5.png",
+            "Seis casitas del bosque-1.6.png"
+        ]
+    }
+];
+
+/* ==========================================================
+   TACHOS: IMÁGENES DEFINIDAS EXPLÍCITAMENTE
+   ========================================================== */
+
+const TIPOS = {
+    organico: {
+        nombre: "Orgánico",
+        color: "marrón",
+        fondo: "#956443",
+        texto: "#ffffff",
+        referencia: "🍌🍎",
+        conPistas: "tacho_marron_con_pistas.png",
+        sinPistas: "tacho_marron_sin_pistas.png"
+    },
+
+    plastico: {
+        nombre: "Plástico",
+        color: "blanco",
+        fondo: "#f4f4ee",
+        texto: "#344139",
+        referencia: "🧴",
+        conPistas: "tacho_blanco_con_pistas.png",
+        sinPistas: "tacho_blanco_sin_pistas.png"
+    },
+
+    papel: {
+        nombre: "Papel y cartón",
+        color: "azul",
+        fondo: "#328fda",
+        texto: "#ffffff",
+        referencia: "📰📦",
+        conPistas: "tacho_azul_con_pistas.png",
+        sinPistas: "tacho_azul_sin_pistas.png"
+    },
+
+    vidrio: {
+        nombre: "Vidrio",
+        color: "verde",
+        fondo: "#39a65e",
+        texto: "#ffffff",
+        referencia: "🫙",
+        conPistas: "tacho_verde_con_pistas.png",
+        sinPistas: "tacho_verde_sin_pistas.png"
+    },
+
+    no_aprovechable: {
+        nombre: "No aprovechables",
+        color: "negro",
+        fondo: "#363f3c",
+        texto: "#ffffff",
+        referencia: "🧻",
+        conPistas: "tacho_negro_con_pistas.png",
+        sinPistas: "tacho_negro_sin_pistas.png"
+    },
+
+    metal: {
+        nombre: "Metales",
+        color: "amarillo",
+        fondo: "#f2ca37",
+        texto: "#453b20",
+        referencia: "🥫",
+        conPistas: "tacho_amarillo_con_pistas.png",
+        sinPistas: "tacho_amarillo_sin_pistas.png"
+    },
+
+    peligroso: {
+        nombre: "Peligrosos",
+        color: "rojo",
+        fondo: "#e94f47",
+        texto: "#ffffff",
+        referencia: "🔋💡",
+        conPistas: "tacho_rojo_con_pistas.png",
+        sinPistas: "tacho_rojo_sin_pistas.png"
+    }
+};
+
+const ORDEN = [
+    "organico",
+    "plastico",
+    "papel",
+    "vidrio",
+    "no_aprovechable",
+    "metal",
+    "peligroso"
+];
+
+/* ==========================================================
+   DIFICULTADES
+   ========================================================== */
+
+const NIVELES = {
+    facil: {
+        total: 10,
+        pistas: true
+    },
+
+    intermedio: {
+        total: 25,
+        pistas: true
+    },
+
+    dificil: {
+        total: 50,
+        pistas: false
+    }
+};
+
+/* ==========================================================
+   RESIDUOS
+
+   Reemplaza el nombre del archivo por el tuyo si es diferente.
+   Incluye .png.
+
+   No se muestran nombres de residuos durante el juego.
+   El emoji solo aparece si falta la imagen.
+   ========================================================== */
+
+const RESIDUOS = [
+    ["manzana.png", "organico", "🍎"],
+    ["platano.png", "organico", "🍌"],
+    ["naranja.png", "organico", "🍊"],
+    ["hojas.png", "organico", "🍂"],
+    ["cascara_papa.png", "organico", "🥔"],
+    ["restos_verduras.png", "organico", "🥬"],
+
+    ["botella_plastico.png", "plastico", "🧴"],
+    ["champu.png", "plastico", "🧴"],
+    ["bolsa_plastica.png", "plastico", "🛍️"],
+    ["envase_plastico.png", "plastico", "🥡"],
+
+    ["periodico.png", "papel", "📰"],
+    ["carton.png", "papel", "📦"],
+    ["papel.png", "papel", "📄"],
+    ["cuaderno.png", "papel", "📒"],
+
+    ["botella_vidrio.png", "vidrio", "🍾"],
+    ["frasco_vidrio.png", "vidrio", "🫙"],
+    ["frasco_salsa.png", "vidrio", "🫙"],
+    ["frasco_ambar.png", "vidrio", "🫙"],
+
+    ["panal.png", "no_aprovechable", "🧷"],
+    ["papel_higienico.png", "no_aprovechable", "🧻"],
+    ["servilletas.png", "no_aprovechable", "🧻"],
+    ["taza_rota.png", "no_aprovechable", "☕"],
+    ["colilla.png", "no_aprovechable", "🚬"],
+    ["plato_roto.png", "no_aprovechable", "🍽️"],
+
+    ["lata_refresco.png", "metal", "🥫"],
+    ["lata_conserva.png", "metal", "🥫"],
+    ["chatarra.png", "metal", "🔩"],
+    ["lata_aplastada.png", "metal", "🥫"],
+
+    ["pilas.png", "peligroso", "🔋"],
+    ["bateria.png", "peligroso", "🔋"],
+    ["foco.png", "peligroso", "💡"],
+    ["foco_ahorrador.png", "peligroso", "💡"],
+    ["pastillas.png", "peligroso", "💊"],
+    ["plaguicida.png", "peligroso", "⚠️"],
+    ["bateria_recargable.png", "peligroso", "🔋"],
+    ["medicinas.png", "peligroso", "💊"]
+
+].map(([archivo, tipo, emoji]) => ({
+    archivo,
+    tipo,
+    emoji
+}));
+
+/* ==========================================================
+   VARIABLES
+   ========================================================== */
+
+const $ = id => document.getElementById(id);
+
+let nivel = "facil";
+let puntos = 0;
+let vidas = 3;
+
+let escenarioActual = 0;
+let completados = 0;
+let completadosEscenario = 0;
+
+let activo = false;
+let bloqueado = true;
+
+let residuoActual = null;
+let cola = [];
+
+let sesion = 0;
+
+let anchoCasa = 220;
+let separacion = 310;
+let anclaCamion = 0;
+
+let sonido = false;
+let contextoAudio;
+
+const esperar = ms => new Promise(
+    resolver => setTimeout(resolver, ms)
+);
+
+/* ==========================================================
+   RUTAS Y CARGA DIRECTA DE IMÁGENES
+   ========================================================== */
+
+function obtenerURL(archivo) {
+    return new URL(
+        CARPETA + archivo,
+        document.baseURI
+    ).href;
+}
+
+function cargarImagen(imagen, archivo, respaldo) {
+    imagen.onload = () => {
+        imagen.classList.remove("oculto");
+
+        if (respaldo) {
+            respaldo.classList.add("oculto");
         }
+    };
+
+    imagen.onerror = () => {
+        imagen.classList.add("oculto");
+
+        if (respaldo) {
+            respaldo.classList.remove("oculto");
+        }
+
+        console.warn(
+            "No se encontró la imagen:",
+            obtenerURL(archivo)
+        );
+    };
+
+    imagen.classList.remove("oculto");
+
+    if (respaldo) {
+        respaldo.classList.add("oculto");
+    }
+
+    imagen.src = obtenerURL(archivo);
+}
+
+function cargarCamion() {
+    cargarImagen(
+        $("imagen-camion"),
+        ARCHIVO_CAMION,
+        $("camion-respaldo")
+    );
+}
+
+/* ==========================================================
+   SONIDOS
+   ========================================================== */
+
+function tono(frecuencia) {
+    if (!sonido) return;
+
+    try {
+        contextoAudio ??= new (
+            window.AudioContext ||
+            window.webkitAudioContext
+        )();
+
+        contextoAudio.resume();
+
+        const oscilador = contextoAudio.createOscillator();
+        const ganancia = contextoAudio.createGain();
+
+        oscilador.frequency.value = frecuencia;
+
+        ganancia.gain.setValueAtTime(
+            .06,
+            contextoAudio.currentTime
+        );
+
+        ganancia.gain.exponentialRampToValueAtTime(
+            .001,
+            contextoAudio.currentTime + .18
+        );
+
+        oscilador.connect(ganancia);
+        ganancia.connect(contextoAudio.destination);
+
+        oscilador.start();
+        oscilador.stop(contextoAudio.currentTime + .18);
+
+    } catch (error) {
+        // El juego puede funcionar sin sonido.
+    }
+}
+
+/* ==========================================================
+   REGLAS DE LOS NIVELES
+   ========================================================== */
+
+function cantidadTachos() {
+    if (nivel === "facil") {
+        return 4;
+    }
+
+    if (nivel === "intermedio") {
+        return 7;
+    }
+
+    // Parque 4, Escuela 5, Ciudad 6, Playa 7, Bosque 7.
+    return [4, 5, 6, 7, 7][escenarioActual];
+}
+
+function tiposDisponibles() {
+    return ORDEN.slice(0, cantidadTachos());
+}
+
+function residuosPorEscenario() {
+    return NIVELES[nivel].total / ESCENARIOS.length;
+}
+
+/* ==========================================================
+   INTERFAZ
+   ========================================================== */
+
+function bloquear(valor) {
+    bloqueado = valor;
+
+    document.querySelectorAll(".tacho").forEach(
+        boton => {
+            boton.disabled = valor || !activo;
+        }
+    );
+}
+
+function mostrarMensaje(texto, esError = false) {
+    $("mensaje").textContent = texto;
+
+    $("mensaje").classList.toggle(
+        "error",
+        esError
+    );
+}
+
+function actualizarIndicadores() {
+    $("puntos").textContent = puntos;
+
+    $("vidas").textContent =
+        "❤️".repeat(vidas) +
+        "🤍".repeat(3 - vidas);
+
+    $("vidas").setAttribute(
+        "aria-label",
+        `${vidas} vidas`
+    );
+
+    const total = NIVELES[nivel].total;
+
+    $("contador").textContent =
+        `${completados} / ${total}`;
+
+    $("relleno").style.width =
+        `${completados / total * 100}%`;
+
+    $("barra-progreso").setAttribute(
+        "aria-valuemax",
+        total
+    );
+
+    $("barra-progreso").setAttribute(
+        "aria-valuenow",
+        completados
+    );
+}
+
+/* ==========================================================
+   CREAR LOS TACHOS
+   ========================================================== */
+
+function crearTachos() {
+    const pistas = NIVELES[nivel].pistas;
+
+    $("tachos").replaceChildren();
+
+    $("tachos").style.setProperty(
+        "--cantidad",
+        cantidadTachos()
+    );
+
+    $("controles").classList.toggle(
+        "cuatro",
+        cantidadTachos() === 4
+    );
+
+    for (const tipo of tiposDisponibles()) {
+        const datos = TIPOS[tipo];
+
+        const boton = document.createElement("button");
+        boton.className = "tacho";
+
+        boton.setAttribute(
+            "aria-label",
+            pistas
+                ? datos.nombre
+                : `Tacho ${datos.color}`
+        );
+
+        const imagen = document.createElement("img");
+        imagen.alt = "";
+        imagen.draggable = false;
+
+        const respaldo = document.createElement("span");
+
+        respaldo.className = "tacho-respaldo oculto";
+
+        respaldo.style.setProperty(
+            "--color",
+            datos.fondo
+        );
+
+        respaldo.style.setProperty(
+            "--texto",
+            datos.texto
+        );
+
+        respaldo.innerHTML =
+            '<span class="simbolo">♻</span>' +
+            (
+                pistas
+                    ? `<strong>${datos.nombre}</strong>
+                       <small>${datos.referencia}</small>`
+                    : ""
+            );
+
+        boton.append(imagen, respaldo);
+
+        const archivo = pistas
+            ? datos.conPistas
+            : datos.sinPistas;
+
+        cargarImagen(
+            imagen,
+            archivo,
+            respaldo
+        );
+
+        boton.onclick = () => {
+            responder(boton, tipo);
+        };
+
+        $("tachos").append(boton);
+    }
+
+    bloquear(bloqueado);
+}
+
+/* ==========================================================
+   RECORRIDO
+   ========================================================== */
+
+function actualizarRuta() {
+    const parada = Math.min(
+        5,
+        Math.round(
+            completadosEscenario /
+            residuosPorEscenario() * 5
+        )
+    );
+
+    $("numero-casa").textContent =
+        `Casa ${parada + 1} / 6`;
+
+    $("ruta").innerHTML = Array.from(
+        { length: 6 },
+
+        (_, indice) => `
+            <i class="punto ${
+                indice < parada
+                    ? "completo"
+                    : indice === parada
+                        ? "actual"
+                        : ""
+            }"></i>
+        `
+    ).join("");
+}
+
+function ajustarEscenario() {
+    const ancho = $("escenario").clientWidth;
+
+    anchoCasa = Math.max(
+        160,
+        Math.min(255, ancho * .18)
+    );
+
+    separacion = Math.max(
+        260,
+        anchoCasa + 90
+    );
+
+    const verticalMovil = window.matchMedia(
+        "(max-width:700px) and (orientation:portrait)"
+    ).matches;
+
+    anclaCamion = ancho * (
+        verticalMovil ? .27 : .25
+    );
+
+    document.querySelectorAll(".casa").forEach(
+        (casa, indice) => {
+            casa.style.setProperty(
+                "--ancho-casa",
+                anchoCasa + "px"
+            );
+
+            casa.style.left =
+                (
+                    anclaCamion +
+                    indice * separacion -
+                    anchoCasa / 2
+                ) + "px";
+        }
+    );
+
+    posicionarCasas(false);
+}
+
+function posicionarCasas(animar = true) {
+    const avance = Math.min(
+        1,
+        completadosEscenario /
+        residuosPorEscenario()
+    );
+
+    const desplazamiento =
+        separacion * 5 * avance;
+
+    $("casas").style.transition = animar
+        ? "transform .7s ease-in-out"
+        : "none";
+
+    $("casas").style.transform =
+        `translateX(${-desplazamiento}px)`;
+
+    // El fondo no se mueve ni se repite.
+    actualizarRuta();
+}
+
+function prepararEscenario() {
+    const datos = ESCENARIOS[escenarioActual];
+
+    $("nombre-escenario").textContent =
+        datos.nombre;
+
+    // Una sola imagen de fondo.
+    cargarImagen(
+        $("imagen-fondo"),
+        datos.fondo,
+        null
+    );
+
+    $("casas").replaceChildren();
+
+    datos.casas.forEach(archivo => {
+        const casa = document.createElement("div");
+        casa.className = "casa";
+
+        const imagen = document.createElement("img");
+        imagen.alt = "";
+        imagen.draggable = false;
+
+        const respaldo = document.createElement("span");
+        respaldo.className = "casa-respaldo oculto";
+
+        respaldo.textContent =
+            escenarioActual === 2
+                ? "🏢"
+                : escenarioActual === 1
+                    ? "🏫"
+                    : "🏡";
+
+        casa.append(imagen, respaldo);
+
+        $("casas").append(casa);
+
+        cargarImagen(
+            imagen,
+            archivo,
+            respaldo
+        );
     });
 
-    function playTone(freq, type, duration, vol = 0.1) {
-        if (!audioCtx || isMuted) return;
-        const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
-        osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-        gain.gain.setValueAtTime(vol, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
-        osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + duration);
+    crearTachos();
+    ajustarEscenario();
+    prepararResiduos();
+}
+
+/* ==========================================================
+   RESIDUOS
+   ========================================================== */
+
+function mezclar(lista) {
+    const copia = [...lista];
+
+    for (let i = copia.length - 1; i > 0; i--) {
+        const j = Math.floor(
+            Math.random() * (i + 1)
+        );
+
+        [copia[i], copia[j]] =
+            [copia[j], copia[i]];
     }
 
-    function sfxClick() { playTone(600, 'sine', 0.08, 0.1); }
-    function sfxEat() { playTone(880, 'sine', 0.15, 0.15); setTimeout(() => playTone(1174.66, 'sine', 0.2, 0.15), 80); }
-    function sfxWrong() { playTone(200, 'sawtooth', 0.2, 0.15); setTimeout(() => playTone(150, 'sawtooth', 0.3, 0.2), 150); }
-    function sfxVictory() { let notes = [523.25, 659.25, 783.99, 1046.50]; notes.forEach((freq, i) => { setTimeout(() => playTone(freq, 'square', 0.3, 0.1), i * 150); }); }
+    return copia;
+}
 
-    /* LISTA DE BASURAS (CIENCIA Y AMBIENTE) */
-    const trashItems = [
-        { emoji: '🍎', name: 'Manzana', type: 'organic' }, { emoji: '🍌', name: 'Plátano', type: 'organic' },
-        { emoji: '🍊', name: 'Naranja', type: 'organic' }, { emoji: '🍉', name: 'Sandía', type: 'organic' },
-        { emoji: '🍇', name: 'Uvas', type: 'organic' }, { emoji: '🥕', name: 'Zanahoria', type: 'organic' },
-        { emoji: '🥦', name: 'Brócoli', type: 'organic' }, { emoji: '🍞', name: 'Pan viejo', type: 'organic' },
-        { emoji: '🌽', name: 'Mazorca', type: 'organic' }, { emoji: '🍕', name: 'Restos de pizza', type: 'organic' },
-        { emoji: '🍗', name: 'Hueso de pollo', type: 'organic' }, { emoji: '🥑', name: 'Aguacate', type: 'organic' },
-        { emoji: '🍓', name: 'Fresas', type: 'organic' }, { emoji: '🥔', name: 'Papa', type: 'organic' },
-        { emoji: '🍅', name: 'Tomate', type: 'organic' },
-        { emoji: '🥤', name: 'Vaso de plástico', type: 'plastic' }, { emoji: '🧴', name: 'Botella de champú', type: 'plastic' },
-        { emoji: '🧃', name: 'Tetra brick', type: 'plastic' }, { emoji: '🛍', name: 'Bolsa plástica', type: 'plastic' },
-        { emoji: '🥡', name: 'Envase de comida', type: 'plastic' }, { emoji: '🍶', name: 'Botella de yogur', type: 'plastic' },
-        { emoji: '🪥', name: 'Cepillo de dientes', type: 'plastic' }, { emoji: '🧸', name: 'Juguete roto', type: 'plastic' },
-        { emoji: '💧', name: 'Botella de agua', type: 'plastic' }, { emoji: '🧼', name: 'Envase de jabón', type: 'plastic' },
-        { emoji: '🪣', name: 'Cubeta rota', type: 'plastic' }, { emoji: '🥫', name: 'Lata de refresco', type: 'plastic' },
-        { emoji: '📰', name: 'Periódico', type: 'paper' }, { emoji: '📦', name: 'Caja de cartón', type: 'paper' },
-        { emoji: '📄', name: 'Hojas de papel', type: 'paper' }, { emoji: '📚', name: 'Revista vieja', type: 'paper' },
-        { emoji: '🧻', name: 'Rollo de papel', type: 'paper' }, { emoji: '✉️', name: 'Sobre usado', type: 'paper' },
-        { emoji: '📃', name: 'Folletos', type: 'paper' }, { emoji: '🗞️', name: 'Diario viejo', type: 'paper' },
-        { emoji: '📒', name: 'Cuaderno usado', type: 'paper' }, { emoji: '🎁', name: 'Caja de regalo', type: 'paper' },
-        { emoji: '📋', name: 'Papel de oficina', type: 'paper' },
-        { emoji: '🍾', name: 'Botella de vidrio', type: 'glass' }, { emoji: '🫙', name: 'Frasco de mermelada', type: 'glass' },
-        { emoji: '🥃', name: 'Vaso roto', type: 'glass' }, { emoji: '🍷', name: 'Botella de vino', type: 'glass' },
-        { emoji: '🍶', name: 'Frasco de salsa', type: 'glass' }, { emoji: '🥛', name: 'Vaso de leche', type: 'glass' },
-        { emoji: '🧪', name: 'Tubo de ensayo', type: 'glass' }, { emoji: '🏺', name: 'Jarrón roto', type: 'glass' },
-        { emoji: '💡', name: 'Bombilla', type: 'glass' }, { emoji: '🪞', name: 'Espejo roto', type: 'glass' }
+function prepararResiduos() {
+    const disponibles = tiposDisponibles();
+
+    let anteriores = disponibles;
+
+    if (
+        nivel === "dificil" &&
+        escenarioActual > 0
+    ) {
+        anteriores = ORDEN.slice(
+            0,
+            [4, 5, 6, 7, 7][escenarioActual - 1]
+        );
+    }
+
+    const nuevos = disponibles.filter(
+        tipo => !anteriores.includes(tipo)
+    );
+
+    let tipos = [
+        ...nuevos,
+
+        ...mezclar(
+            disponibles.filter(
+                tipo => !nuevos.includes(tipo)
+            )
+        )
     ];
 
-    /* ESCENARIOS */
-    const scenes = [
-        { name: 'Parque 🌳', skyColors: ['#a8e6ff', '#d4f1ff'], groundColors: ['#90a4ae', '#78909c'], decor: ['🌳', '🌸', '🌷', '🌳', '🌻', '🦋'],
-          buildings: [{ color: '#81c784', height: 120, face: '🌳', windows: 2 }, { color: '#f48fb1', height: 100, face: '🌸', windows: 2 }, { color: '#fff59d', height: 110, face: '🌼', windows: 2 }, { color: '#81c784', height: 130, face: '🌳', windows: 2 }, { color: '#ce93d8', height: 95, face: '🌺', windows: 2 }, { color: '#81c784', height: 115, face: '🌳', windows: 2 }] },
-        { name: 'Escuela 🏫', skyColors: ['#a8e6ff', '#d4f1ff'], groundColors: ['#90a4ae', '#78909c'], decor: ['🌳', '📚', '✏️', '🌳', '🎒', '🌳'],
-          buildings: [{ color: '#ffcc80', height: 140, face: '🏫', windows: 4 }, { color: '#90caf9', height: 110, face: '📚', windows: 3 }, { color: '#ffab91', height: 125, face: '🎒', windows: 3 }, { color: '#ffcc80', height: 135, face: '🏫', windows: 4 }, { color: '#a5d6a7', height: 105, face: '✏️', windows: 3 }, { color: '#ffcc80', height: 130, face: '🏫', windows: 4 }] },
-        { name: 'Ciudad 🏢', skyColors: ['#bbdefb', '#e3f2fd'], groundColors: ['#78909c', '#546e7a'], decor: ['🌳', '🚦', '🌳', '🚏', '🌳', '🏙️'],
-          buildings: [{ color: '#90a4ae', height: 180, face: '🏢', windows: 6 }, { color: '#b0bec5', height: 150, face: '🏬', windows: 5 }, { color: '#78909c', height: 200, face: '🏨', windows: 7 }, { color: '#90a4ae', height: 160, face: '🏪', windows: 5 }, { color: '#b0bec5', height: 170, face: '🏢', windows: 6 }, { color: '#78909c', height: 190, face: '🏬', windows: 6 }] },
-        { name: 'Playa 🏖️', skyColors: ['#81d4fa', '#e1f5fe'], groundColors: ['#ffe082', '#ffca28'], decor: ['🌴', '🌊', '🌴', '🐚', '🌴', '⛱️'],
-          buildings: [{ color: '#4fc3f7', height: 100, face: '🌴', windows: 2 }, { color: '#ffe082', height: 90, face: '🐚', windows: 2 }, { color: '#4dd0e1', height: 95, face: '⛱️', windows: 2 }, { color: '#4fc3f7', height: 105, face: '🌊', windows: 2 }, { color: '#ffe082', height: 88, face: '🌴', windows: 2 }, { color: '#4dd0e1', height: 92, face: '🐚', windows: 2 }] },
-        { name: 'Bosque 🌲', skyColors: ['#b2dfdb', '#e0f2f1'], groundColors: ['#6d4c41', '#4e342e'], decor: ['🌲', '🍄', '🌲', '🦊', '🌲', '🐿️'],
-          buildings: [{ color: '#388e3c', height: 150, face: '🌲', windows: 2 }, { color: '#66bb6a', height: 120, face: '🍄', windows: 2 }, { color: '#2e7d32', height: 140, face: '🦊', windows: 2 }, { color: '#388e3c', height: 160, face: '🌲', windows: 2 }, { color: '#66bb6a', height: 115, face: '🐿️', windows: 2 }, { color: '#2e7d32', height: 145, face: '🌲', windows: 2 }] }
-    ];
-
-    let score = 0; let currentTrash = null; let currentScene = 0; let trashQueue = [];
-    let itemsToRecycle = 25; let itemsRecycled = 0; let itemsInScene = 0;
-    let lives = 3; let isGameActive = false;
-
-    const truckPositions = [15, 30, 45, 62, 78, 90];
-    
-    const scoreEl = document.getElementById('score');
-    const livesEl = document.getElementById('lives');
-    const livesDisplay = document.getElementById('lives-display');
-    const trashEmojiEl = document.getElementById('trashEmoji');
-    const trashNameEl = document.getElementById('trashName');
-    const buildingsEl = document.getElementById('buildings');
-    const truckEl = document.getElementById('truck');
-    const messageEl = document.getElementById('message');
-    const endScreen = document.getElementById('endScreen');
-    const skyEl = document.getElementById('sky');
-    const streetEl = document.getElementById('street');
-
-    function selectDiff(level) {
-        sfxClick();
-        itemsToRecycle = level;
-        document.querySelectorAll('.setup-btn.diff').forEach(btn => btn.classList.remove('active'));
-        document.getElementById('setup-diff-' + level).classList.add('active');
+    while (
+        tipos.length < residuosPorEscenario()
+    ) {
+        tipos.push(...mezclar(disponibles));
     }
 
-    function startGame() {
-        if (!audioCtx) audioCtx = new AudioContext();
-        if (audioCtx.state === 'suspended') audioCtx.resume();
-        sfxClick();
+    cola = tipos
+        .slice(0, residuosPorEscenario())
+        .map(tipo => {
+            const opciones = RESIDUOS.filter(
+                residuo => residuo.tipo === tipo
+            );
 
-        // Activar vidas solo en nivel difícil (50 elementos)
-        if (itemsToRecycle === 50) {
-            lives = 3;
-            livesEl.textContent = lives;
-            livesDisplay.style.display = 'flex';
-        } else {
-            livesDisplay.style.display = 'none';
-        }
-
-        document.getElementById('setup-screen').style.display = 'none';
-        document.getElementById('game').style.display = 'flex';
-        
-        restart();
-    }
-
-    function backToMenu() {
-        sfxClick();
-        isGameActive = false;
-        document.getElementById('game').style.display = 'none';
-        endScreen.classList.remove('show');
-        document.getElementById('setup-screen').style.display = 'flex';
-    }
-
-    function buildScene(sceneIndex) {
-        const scene = scenes[sceneIndex % scenes.length];
-        buildingsEl.innerHTML = '';
-        skyEl.style.background = `linear-gradient(180deg, ${scene.skyColors[0]} 0%, ${scene.skyColors[1]} 100%)`;
-        streetEl.style.background = `linear-gradient(180deg, ${scene.groundColors[0]} 0%, ${scene.groundColors[1]} 100%)`;
-        
-        let decorIndex = 0;
-        scene.buildings.forEach((b, i) => {
-            const building = document.createElement('div'); building.className = 'building';
-            building.style.background = `linear-gradient(180deg, ${b.color} 0%, ${adjustColor(b.color, -20)} 100%)`;
-            building.style.height = b.height + 'px';
-            let windowsHTML = ''; for (let w = 0; w < b.windows; w++) windowsHTML += '<div class="window"></div>';
-            building.innerHTML = `<div class="face">${b.face}</div><div class="windows">${windowsHTML}</div>`;
-            buildingsEl.appendChild(building);
-            
-            if (i < scene.buildings.length - 1 && decorIndex < scene.decor.length) {
-                const decor = document.createElement('div'); decor.className = 'decor';
-                if (i % 2 === 1) decor.classList.add('small'); if (i % 3 === 2) decor.classList.add('tiny');
-                decor.innerHTML = `<div class="decor-emoji">${scene.decor[decorIndex]}</div>`;
-                buildingsEl.appendChild(decor); decorIndex++;
-            }
+            return opciones[
+                Math.floor(
+                    Math.random() * opciones.length
+                )
+            ];
         });
-        while (decorIndex < scene.decor.length) {
-            const decor = document.createElement('div'); decor.className = 'decor small';
-            decor.innerHTML = `<div class="decor-emoji">${scene.decor[decorIndex]}</div>`;
-            buildingsEl.appendChild(decor); decorIndex++;
+}
+
+function siguienteResiduo() {
+    if (!activo) return;
+
+    residuoActual =
+        cola[completadosEscenario];
+
+    $("residuo-respaldo").textContent =
+        residuoActual.emoji;
+
+    cargarImagen(
+        $("imagen-residuo"),
+        residuoActual.archivo,
+        $("residuo-respaldo")
+    );
+
+    bloquear(false);
+}
+
+/* ==========================================================
+   RESPUESTA, VIDAS Y MOVIMIENTO
+   ========================================================== */
+
+async function responder(boton, tipo) {
+    if (
+        !activo ||
+        bloqueado ||
+        !residuoActual
+    ) {
+        return;
+    }
+
+    const sesionActual = sesion;
+
+    bloquear(true);
+
+    const correcto =
+        tipo === residuoActual.tipo;
+
+    boton.classList.add(
+        correcto ? "correcto" : "incorrecto"
+    );
+
+    /* INCORRECTO */
+
+    if (!correcto) {
+        vidas--;
+
+        tono(180);
+        actualizarIndicadores();
+
+        mostrarMensaje(
+            vidas > 0
+                ? "¡Inténtalo con otro tacho! Has perdido una vida."
+                : "Se terminaron las vidas.",
+            true
+        );
+
+        await esperar(420);
+
+        if (sesionActual !== sesion) return;
+
+        boton.classList.remove("incorrecto");
+
+        if (vidas === 0) {
+            terminar(false);
+            return;
         }
+
+        bloquear(false);
+        return;
     }
 
-    function adjustColor(hex, amount) {
-        const num = parseInt(hex.slice(1), 16);
-        const r = Math.min(255, Math.max(0, (num >> 16) + amount));
-        const g = Math.min(255, Math.max(0, ((num >> 8) & 0x00FF) + amount));
-        const b = Math.min(255, Math.max(0, (num & 0x0000FF) + amount));
-        return `#${(r << 16 | g << 8 | b).toString(16).padStart(6, '0')}`;
-    }
+    /* CORRECTO */
 
-    function prepareTrashQueue() {
-        trashQueue = []; let lastType = null; let lastEmoji = null;
-        for (let i = 0; i < itemsToRecycle; i++) {
-            let item; let attempts = 0;
-            do {
-                item = trashItems[Math.floor(Math.random() * trashItems.length)];
-                attempts++;
-            } while (attempts < 30 && (item.emoji === lastEmoji || (item.type === lastType && Math.random() < 0.6)));
-            trashQueue.push(item); lastType = item.type; lastEmoji = item.emoji;
+    puntos += 10;
+
+    completados++;
+    completadosEscenario++;
+
+    residuoActual = null;
+
+    tono(880);
+    actualizarIndicadores();
+
+    mostrarMensaje(
+        "¡Muy bien! 🚛 Seguimos avanzando."
+    );
+
+    $("camion").classList.add("andando");
+
+    posicionarCasas(true);
+
+    await esperar(760);
+
+    if (sesionActual !== sesion) return;
+
+    $("camion").classList.remove("andando");
+
+    boton.classList.remove("correcto");
+
+    /* ÚLTIMA CASA */
+
+    if (
+        completadosEscenario >=
+        residuosPorEscenario()
+    ) {
+        mostrarMensaje(
+            "¡Llegamos a la última casa! 🌟"
+        );
+
+        await esperar(650);
+
+        if (sesionActual !== sesion) return;
+
+        if (
+            escenarioActual ===
+            ESCENARIOS.length - 1
+        ) {
+            terminar(true);
+            return;
         }
+
+        escenarioActual++;
+        completadosEscenario = 0;
+
+        prepararEscenario();
+
+        mostrarMensaje(
+            nivel === "dificil"
+                ? `¡Nuevo escenario! Ahora hay ${cantidadTachos()} tachos, sin referencias.`
+                : "¡Nuevo escenario! Continuamos reciclando."
+        );
     }
 
-    function nextTrash() {
-        if (!isGameActive) return;
-        if (itemsRecycled >= itemsToRecycle) { endGame(false); return; }
-        currentTrash = trashQueue[itemsRecycled];
-        trashEmojiEl.textContent = currentTrash.emoji;
-        trashNameEl.textContent = currentTrash.name;
-    }
+    siguienteResiduo();
+}
 
-    function changeScene() {
-        currentScene++;
-        buildScene(currentScene);
-        const newPos = truckPositions[currentScene % truckPositions.length];
-        truckEl.style.left = newPos + '%';
-        truckEl.classList.add('driving');
-        setTimeout(() => truckEl.classList.remove('driving'), 1500);
-    }
+/* ==========================================================
+   INICIAR Y REINICIAR
+   ========================================================== */
 
-    function showMessage(text, correct) {
-        messageEl.textContent = text;
-        messageEl.classList.toggle('wrong', !correct);
-        messageEl.classList.add('show');
-        setTimeout(() => messageEl.classList.remove('show'), 1100);
-    }
+function iniciar() {
+    sesion++;
 
-    function launchConfetti() {
-        const colors = ['#ff80ab', '#ffd54f', '#81c784', '#64b5f6', '#ba68c8', '#ff7043'];
-        for (let i = 0; i < 40; i++) {
-            const c = document.createElement('div'); c.className = 'confetti';
-            c.style.left = Math.random() * 100 + '%';
-            c.style.background = colors[Math.floor(Math.random() * colors.length)];
-            c.style.animationDelay = Math.random() * 0.8 + 's';
-            c.style.animationDuration = (2 + Math.random() * 2) + 's';
-            c.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
-            document.body.appendChild(c); setTimeout(() => c.remove(), 4500);
-        }
-    }
+    puntos = 0;
+    vidas = 3;
 
-    function handleBinClick(binEl, type) {
-        if (!currentTrash || !isGameActive) return;
-        
-        if (type === currentTrash.type) {
-            score += 10; scoreEl.textContent = score;
-            showMessage('¡Muy bien! 🎉', true); sfxEat();
-            binEl.classList.add('correct'); setTimeout(() => binEl.classList.remove('correct'), 500);
-            
-            itemsRecycled++; itemsInScene++;
-            
-            let itemsPerScene = Math.max(5, Math.floor(itemsToRecycle / 5));
-            if (itemsInScene >= itemsPerScene && itemsRecycled < itemsToRecycle) {
-                itemsInScene = 0; changeScene();
-            } else if (itemsInScene % 2 === 0 && itemsRecycled < itemsToRecycle) {
-                const nextPos = truckPositions[currentScene % truckPositions.length] + (itemsInScene === 2 ? 3 : 5);
-                truckEl.style.left = Math.min(nextPos, 92) + '%';
-                truckEl.classList.add('driving'); setTimeout(() => truckEl.classList.remove('driving'), 1000);
-            }
-            setTimeout(nextTrash, 400);
-        } else {
-            sfxWrong();
-            binEl.classList.add('wrong'); setTimeout(() => binEl.classList.remove('wrong'), 500);
+    escenarioActual = 0;
+    completados = 0;
+    completadosEscenario = 0;
 
-            if (itemsToRecycle === 50) {
-                // Nivel Difícil: Restar vidas
-                lives--;
-                livesEl.textContent = lives;
-                showMessage(`¡Ups! Quedan ${lives} vidas ❌`, false);
-                if (lives <= 0) {
-                    endGame(false, true); // Fin por perder todas las vidas
-                    return;
+    residuoActual = null;
+
+    activo = true;
+    bloqueado = true;
+
+    $("menu").classList.add("oculto");
+    $("final").classList.add("oculto");
+
+    $("camion").classList.remove("andando");
+
+    actualizarIndicadores();
+    prepararEscenario();
+    siguienteResiduo();
+
+    mostrarMensaje(
+        "Elige el tacho correcto. ¡Tienes tres vidas!"
+    );
+}
+
+function volverMenu() {
+    sesion++;
+
+    activo = false;
+    residuoActual = null;
+
+    bloquear(true);
+
+    $("camion").classList.remove("andando");
+
+    $("final").classList.add("oculto");
+    $("menu").classList.remove("oculto");
+
+    $("boton-iniciar").focus();
+}
+
+/* ==========================================================
+   FINAL
+   ========================================================== */
+
+function terminar(gano) {
+    activo = false;
+    residuoActual = null;
+
+    bloquear(true);
+
+    $("icono-final").textContent =
+        gano ? "🏆" : "🌱";
+
+    $("titulo-final").textContent = gano
+        ? "¡Misión cumplida!"
+        : "¡Vamos a intentarlo otra vez!";
+
+    $("texto-final").textContent = gano
+        ? "Completaste los cinco escenarios y ayudaste a cuidar el planeta."
+        : "Se acabaron tus tres vidas. Puedes volver a jugar y seguir aprendiendo.";
+
+    $("resultado").textContent =
+        `${puntos} puntos · ` +
+        `${completados}/${NIVELES[nivel].total} residuos`;
+
+    $("final").classList.remove("oculto");
+
+    $("boton-reiniciar").focus();
+}
+
+/* ==========================================================
+   BOTONES
+   ========================================================== */
+
+document.querySelectorAll(".nivel").forEach(
+    boton => {
+        boton.onclick = () => {
+            nivel = boton.dataset.nivel;
+
+            document.querySelectorAll(".nivel").forEach(
+                otro => {
+                    otro.classList.toggle(
+                        "activo",
+                        otro === boton
+                    );
+
+                    otro.setAttribute(
+                        "aria-pressed",
+                        String(otro === boton)
+                    );
                 }
-            } else {
-                // Niveles Inicial y Medio
-                showMessage('¡Intenta otra vez! 💪', false);
-                score = Math.max(0, score - 2); scoreEl.textContent = score;
-            }
-        }
+            );
+        };
     }
+);
 
-    function endGame(isTimeout, lostLives = false) {
-        isGameActive = false;
-        document.getElementById('finalScore').textContent = score;
-        
-        if (lostLives) {
-            document.getElementById('endTitle').innerHTML = "💀 ¡Game Over! 💀";
-        } else {
-            document.getElementById('endTitle').innerHTML = "🎉 ¡Misión Cumplida! 🎉";
-            sfxVictory(); launchConfetti(); setTimeout(launchConfetti, 600); setTimeout(launchConfetti, 1200);
-        }
-        
-        endScreen.classList.add('show');
-    }
+$("boton-iniciar").onclick = iniciar;
+$("boton-reiniciar").onclick = iniciar;
 
-    function restart() {
-        score = 0; itemsRecycled = 0; itemsInScene = 0; currentScene = 0; scoreEl.textContent = 0;
-        if (itemsToRecycle === 50) { lives = 3; livesEl.textContent = lives; }
-        truckEl.style.left = truckPositions[0] + '%';
-        endScreen.classList.remove('show');
-        
-        isGameActive = true;
-        buildScene(0); prepareTrashQueue(); nextTrash();
-    }
+$("boton-menu").onclick = volverMenu;
+$("boton-final-menu").onclick = volverMenu;
 
-    document.querySelectorAll('.bin').forEach(bin => {
-        bin.addEventListener('click', () => handleBinClick(bin, bin.dataset.type));
-    });
-    
-    document.getElementById('restartBtn').addEventListener('click', restart);
-    document.getElementById('menuBtn').addEventListener('click', backToMenu);
+$("boton-sonido").onclick = () => {
+    sonido = !sonido;
+
+    $("boton-sonido").textContent =
+        sonido ? "🔊" : "🔇";
+
+    $("boton-sonido").setAttribute(
+        "aria-label",
+        sonido
+            ? "Silenciar sonido"
+            : "Activar sonido"
+    );
+
+    tono(660);
+};
+
+window.addEventListener(
+    "resize",
+    ajustarEscenario
+);
+
+/* VISTA INICIAL */
+
+cargarCamion();
+prepararEscenario();
+actualizarIndicadores();
+bloquear(true);
+
 </script>
 </body>
 </html>
