@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Vector Drive: Sintaxis Synthwave 📼</title>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Righteous&display=swap" rel="stylesheet">
+    
+    <style>
+        :root { 
+            --bg-color: #090014;
+            --neon-magenta: #ff00ff;
+            --neon-cyan: #00ffff;
+            --neon-purple: #8a2be2;
+            --neon-yellow: #ffea00;
+            --panel-bg: rgba(20, 0, 40, 0.85);
+        }
+
+        body, html { 
+            font-family: 'Share Tech Mono', monospace; 
+            display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+            margin: 0; padding: 0; width: 100vw; height: 100vh; 
+            color: #fff; background-color: var(--bg-color); 
+            overflow: hidden; box-sizing: border-box; user-select: none;
+        }
+
+        /* EFECTOS SYNTHWAVE / RETRO 80s */
+        .decorations { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; background: linear-gradient(180deg, #1a0033 0%, #090014 60%, #000 100%); }
+        
+        .retro-sun { position: absolute; top: 10%; left: 50%; transform: translateX(-50%); width: 300px; height: 300px; border-radius: 50%; background: linear-gradient(180deg, var(--neon-yellow) 0%, var(--neon-magenta) 100%); box-shadow: 0 0 50px var(--neon-magenta), 0 0 100px var(--neon-yellow); z-index: 1; }
+        .sun-lines { position: absolute; bottom: 0; width: 100%; height: 50%; background: repeating-linear-gradient(180deg, transparent, transparent 15px, var(--bg-color) 15px, var(--bg-color) 20px); border-radius: 0 0 150px 150px; z-index: 2;}
+        
+        .synth-grid { position: absolute; bottom: -50%; left: -50%; width: 200%; height: 100%; background-image: linear-gradient(var(--neon-cyan) 2px, transparent 2px), linear-gradient(90deg, var(--neon-cyan) 2px, transparent 2px); background-size: 50px 50px; transform: perspective(600px) rotateX(75deg); animation: gridScroll 1s linear infinite; z-index: 3; box-shadow: inset 0 100px 100px var(--bg-color);}
+        @keyframes gridScroll { from { transform: perspective(600px) rotateX(75deg) translateY(0); } to { transform: perspective(600px) rotateX(75deg) translateY(50px); } }
+
+        .scanlines { position: fixed; inset: 0; z-index: 999; pointer-events: none; background: linear-gradient(rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0.25) 50%); background-size: 100% 4px; box-shadow: inset 0 0 150px rgba(0,0,0,0.9); }
+
+        .sound-toggle { position: absolute; top: 15px; right: 15px; background: rgba(0,0,0,0.8); border: 2px solid var(--neon-cyan); border-radius: 8px; width: 45px; height: 45px; font-size: 20px; display: flex; justify-content: center; align-items: center; cursor: pointer; z-index: 1000; box-shadow: 0 0 15px var(--neon-cyan); transition: all 0.2s; color: var(--neon-cyan);}
+        .sound-toggle:active { transform: scale(0.9); box-shadow: 0 0 5px var(--neon-cyan); }
+
+        /* PANTALLA DE INSTRUCCIONES */
+        #instructions-screen { position: absolute; inset: 0; z-index: 600; display: flex; flex-direction: column; justify-content: center; align-items: center; background: rgba(9,0,20,0.9); backdrop-filter: blur(5px); }
+        .instructions-card { background: var(--panel-bg); padding: 40px; border-radius: 10px; border: 2px solid var(--neon-magenta); max-width: 90%; width: 600px; display: flex; flex-direction: column; gap: 20px; box-shadow: 0 0 50px rgba(255,0,255,0.3); position: relative; z-index: 10;}
+        .instructions-card h1 { font-family: 'Righteous', cursive; font-size: 40px; color: transparent; -webkit-text-stroke: 1px var(--neon-cyan); text-shadow: 4px 4px 0 var(--neon-magenta); margin: 0; text-align: center; letter-spacing: 2px;}
+        .instruction-step { display: flex; gap: 15px; align-items: center; font-size: 16px; background: rgba(255,0,255,0.05); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,0,255,0.2);}
+        .instruction-icon { font-size: 28px; flex-shrink: 0; filter: drop-shadow(0 0 5px var(--neon-cyan));}
+        .instruction-text code { color: var(--neon-yellow); font-weight: bold; background: rgba(0,0,0,0.5); padding: 2px 6px; border-radius: 4px;}
+        .start-btn { background: var(--neon-magenta); border: none; padding: 15px 40px; font-size: 22px; color: #fff; border-radius: 5px; text-transform: uppercase; font-family: 'Righteous', cursive; cursor:pointer; transition: all 0.1s; align-self: center; box-shadow: 0 0 20px var(--neon-magenta); letter-spacing: 2px; text-shadow: 2px 2px 0px #000;}
+        .start-btn:active { transform: scale(0.95); box-shadow: 0 0 10px var(--neon-magenta); }
+
+        /* HEADER DEL JUEGO */
+        .game-header { display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 900px; padding: 15px 2vw; z-index: 10; box-sizing: border-box; position: relative;}
+        .back-menu-btn { background: transparent; border: 2px solid var(--neon-magenta); padding: 8px 15px; border-radius: 5px; font-size: 14px; color: #fff; cursor: pointer; transition: all 0.2s; font-family: 'Share Tech Mono', monospace; text-shadow: 0 0 5px var(--neon-magenta); box-shadow: inset 0 0 10px rgba(255,0,255,0.3);}
+        .back-menu-btn:hover { background: var(--neon-magenta); color: #000; text-shadow: none;}
+        
+        .hud-box { background: rgba(0,0,0,0.8); padding: 8px 15px; border-radius: 5px; border: 1px solid var(--neon-cyan); font-size: 18px; color: #fff; box-shadow: 0 0 15px rgba(0,255,255,0.2); backdrop-filter: blur(5px);}
+        .hud-box span { color: var(--neon-cyan); font-weight: bold; font-size: 22px;}
+        .hud-moves { border-color: var(--neon-yellow); box-shadow: 0 0 15px rgba(255,234,0,0.2); margin-left: 15px;}
+        .hud-moves span { color: var(--neon-yellow); }
+
+        .main-layout { display: flex; flex-direction: column; gap: 15px; width: 100%; max-width: 900px; flex: 1; padding: 0 2vw 2vh 2vw; box-sizing: border-box; align-items: center; position: relative; z-index: 10;}
+
+        /* ASISTENTE VIRTUAL (HINTS) */
+        .level-hint-box { width: 100%; background: rgba(0, 255, 255, 0.1); border: 1px dashed var(--neon-cyan); padding: 10px 15px; border-radius: 5px; font-size: 14px; color: #fff; display: flex; align-items: center; gap: 10px; box-sizing: border-box; text-shadow: 0 0 5px rgba(0,255,255,0.5);}
+        .level-hint-box span { color: var(--neon-cyan); font-size: 20px;}
+
+        /* VISUALIZADOR DE ARRAYS */
+        .array-container { width: 100%; background: var(--panel-bg); border: 2px solid var(--neon-purple); border-radius: 10px; padding: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.8), inset 0 0 20px rgba(138,43,226,0.2); backdrop-filter: blur(5px); box-sizing: border-box;}
+        
+        .array-header { font-family: 'Righteous', cursive; font-size: 18px; color: var(--neon-cyan); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid rgba(0,255,255,0.3); padding-bottom: 5px; text-shadow: 0 0 5px var(--neon-cyan);}
+        .target-header { color: var(--neon-magenta); border-bottom-color: rgba(255,0,255,0.3); text-shadow: 0 0 5px var(--neon-magenta);}
+        
+        .array-track { display: flex; gap: 10px; min-height: 70px; align-items: center; padding: 10px; background: rgba(0,0,0,0.6); border-radius: 8px; border: 1px dashed rgba(255,255,255,0.1); overflow-x: auto;}
+        
+        .data-block { width: 50px; height: 50px; background: linear-gradient(135deg, #111, #333); border: 2px solid #555; border-radius: 8px; display: flex; justify-content: center; align-items: center; font-size: 30px; box-shadow: 0 5px 15px rgba(0,0,0,0.8); position: relative; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);}
+        .data-block::before { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(255,255,255,0.1) 0%, transparent 50%); border-radius: 6px;}
+        
+        /* Animaciones */
+        @keyframes popOut { 0% { transform: scale(1) translateY(0); opacity: 1; } 100% { transform: scale(0) translateY(-50px) translateX(50px); opacity: 0; } }
+        @keyframes shiftOut { 0% { transform: scale(1) translateY(0); opacity: 1; } 100% { transform: scale(0) translateY(-50px) translateX(-50px); opacity: 0; } }
+        @keyframes pushIn { 0% { transform: scale(0) translateX(50px); opacity: 0; } 100% { transform: scale(1) translateX(0); opacity: 1; } }
+        @keyframes unshiftIn { 0% { transform: scale(0) translateX(-50px); opacity: 0; } 100% { transform: scale(1) translateX(0); opacity: 1; } }
+
+        .anim-pop { animation: popOut 0.4s forwards; }
+        .anim-shift { animation: shiftOut 0.4s forwards; }
+        .anim-push { animation: pushIn 0.4s forwards; }
+        .anim-unshift { animation: unshiftIn 0.4s forwards; }
+
+        /* CONSOLA DE COMANDOS (BOTONES) */
+        .console-panel { width: 100%; background: var(--panel-bg); border: 2px solid var(--neon-cyan); border-radius: 10px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); backdrop-filter: blur(5px); display: flex; flex-direction: column; gap: 15px; box-sizing: border-box;}
+        
+        .console-title { font-family: 'Share Tech Mono', monospace; color: #fff; font-size: 16px; border-bottom: 1px dashed var(--neon-cyan); padding-bottom: 5px;}
+        
+        .btn-row { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;}
+        
+        .method-group { flex: 1; min-width: 150px; background: rgba(0,0,0,0.6); border: 1px solid #444; border-radius: 8px; padding: 10px; display: flex; flex-direction: column; gap: 8px; position: relative;}
+        
+        .method-btn { width: 100%; background: rgba(0,0,0,0.8); border: 2px solid #555; padding: 12px 10px; border-radius: 6px; color: #fff; font-family: 'Share Tech Mono', monospace; font-size: 16px; cursor: pointer; transition: all 0.1s; display: flex; flex-direction: column; align-items: center; gap: 5px;}
+        .method-btn:hover { background: rgba(255,255,255,0.1); transform: translateY(-2px); }
+        .method-btn:active { transform: translateY(3px); }
+        
+        .method-name { color: var(--neon-yellow); font-weight: bold; font-size: 18px;}
+        .method-desc { font-size: 11px; color: #aaa; text-align: center;}
+
+        /* Colores específicos para botones */
+        .btn-pop { border-color: var(--neon-magenta); } .btn-pop .method-name { color: var(--neon-magenta); }
+        .btn-shift { border-color: var(--neon-magenta); } .btn-shift .method-name { color: var(--neon-magenta); }
+        .btn-push { border-color: var(--neon-green); } .btn-push .method-name { color: var(--neon-green); }
+        .btn-unshift { border-color: var(--neon-green); } .btn-unshift .method-name { color: var(--neon-green); }
+        .btn-rev { border-color: var(--neon-cyan); } .btn-rev .method-name { color: var(--neon-cyan); }
+
+        .item-selector { display: flex; flex-direction: column; align-items: center; gap: 5px; background: #000; padding: 5px; border-radius: 5px; border: 1px solid #333;}
+        .item-selector-title { font-size: 10px; color: #888; text-transform: uppercase;}
+        .item-palette { display: flex; gap: 5px;}
+        .item-btn { width: 35px; height: 35px; background: #222; border: 1px solid #555; border-radius: 4px; font-size: 20px; cursor: pointer; transition: all 0.1s;}
+        .item-btn:hover { border-color: #fff; background: #444;}
+        .item-btn:active { transform: scale(0.9); }
+
+        /* MODAL */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: flex; justify-content: center; align-items: center; z-index: 1000; visibility: hidden; opacity: 0; transition: all 0.3s; backdrop-filter: blur(5px);}
+        .modal-overlay.active { visibility: visible; opacity: 1; }
+        .modal-box { background: var(--bg-color); padding: 40px; border-radius: 12px; text-align: center; max-width: 85%; width: 450px; transform: scale(0.9); transition: transform 0.3s; border: 2px solid var(--neon-cyan); box-shadow: 0 0 50px rgba(0,255,255,0.2);}
+        .modal-overlay.active .modal-box { transform: scale(1); }
+        .modal-title { font-family: 'Righteous', cursive; font-size: 32px; margin-top: 0; margin-bottom: 15px; color: var(--neon-cyan); text-shadow: 0 0 15px var(--neon-cyan);}
+        .modal-msg { font-size: 18px; margin-bottom: 30px; color: #fff; white-space: pre-line; line-height: 1.5; font-family: 'Share Tech Mono', monospace;}
+        .modal-btn { background: transparent; border: 2px solid var(--neon-cyan); color: var(--neon-cyan); padding: 12px 30px; font-size: 18px; border-radius: 6px; text-transform: uppercase; font-weight: bold; cursor:pointer; font-family: 'Share Tech Mono', monospace; transition: all 0.2s;}
+        .modal-btn:hover { background: var(--neon-cyan); color: #000; box-shadow: 0 0 15px var(--neon-cyan);}
+    </style>
+</head>
+<body>
+
+    <audio id="bgm" loop><source src="../assets/musicaFondo/cancion1.mp3" type="audio/mpeg"></audio>
+    
+    <div class="decorations">
+        <div class="retro-sun"><div class="sun-lines"></div></div>
+        <div class="synth-grid"></div>
+        <div class="scanlines"></div>
+    </div>
+    
+    <button id="soundToggle" class="sound-toggle" aria-label="Activar sonido">🔇</button>
+
+    <!-- INSTRUCCIONES -->
+    <div id="instructions-screen">
+        <div class="instructions-card">
+            <h1>VECTOR DRIVE</h1>
+            <div class="instruction-step">
+                <span class="instruction-icon">📼</span>
+                <span class="instruction-text"><b>LA RED:</b> Tienes una secuencia de datos. Debes manipularla hasta que sea exactamente igual a la "Encriptación Objetivo".</span>
+            </div>
+            <div class="instruction-step">
+                <span class="instruction-icon">💻</span>
+                <span class="instruction-text"><b>MÉTODOS DE ARRAY:</b> Usa los comandos literales de JavaScript para mutar tu secuencia.<br>
+                <code>pop()</code>: Borra el ÚLTIMO.<br>
+                <code>shift()</code>: Borra el PRIMERO.<br>
+                <code>push(x)</code>: Añade al FINAL.<br>
+                <code>unshift(x)</code>: Añade al INICIO.
+                </span>
+            </div>
+            <div class="instruction-step">
+                <span class="instruction-icon">🧠</span>
+                <span class="instruction-text"><b>ESTRATEGIA TOTAL:</b> Desde el Sector 1 <b>todos los métodos están desbloqueados</b>. El sistema analiza el puzzle y te dará <b>EXACTAMENTE</b> los ciclos (movimientos) mínimos necesarios. Tendrás que combinar añadir, eliminar e invertir perfectamente.</span>
+            </div>
+            <button class="start-btn" onclick="startGame()">INICIAR CONEXIÓN</button>
+        </div>
+    </div>
+
+    <!-- JUEGO -->
+    <div class="game-header">
+        <button class="back-menu-btn" onclick="loadLevel(currentLevel)">[ REINICIAR SECTOR ]</button>
+        <div style="display:flex;">
+            <div class="hud-box">SECTOR: <span id="level-display">1</span></div>
+            <div class="hud-box hud-moves">CICLOS CPU: <span id="moves-display">5</span></div>
+        </div>
+    </div>
+
+    <div class="main-layout">
+        
+        <!-- SISTEMA DE ASISTENCIA -->
+        <div class="level-hint-box" id="level-hint-box">
+            <span>ℹ️</span> <span id="level-hint-text">Cargando análisis táctico...</span>
+        </div>
+
+        <!-- TARGET ARRAY -->
+        <div class="array-container" style="border-color: var(--neon-magenta); box-shadow: 0 10px 30px rgba(0,0,0,0.8), inset 0 0 20px rgba(255,0,255,0.1);">
+            <div class="array-header target-header">ENCRIPTACIÓN OBJETIVO (Target Array)</div>
+            <div class="array-track" id="target-track"></div>
+        </div>
+
+        <!-- CURRENT ARRAY -->
+        <div class="array-container">
+            <div class="array-header">TU CARGA DE DATOS (Current Array)</div>
+            <div class="array-track" id="current-track"></div>
+        </div>
+
+        <!-- CONSOLA DE MÉTODOS -->
+        <div class="console-panel">
+            <div class="console-title">>_ MÉTODOS DE MUTACIÓN DISPONIBLES</div>
+            
+            <div class="btn-row">
+                <!-- SHIFT -->
+                <div class="method-group">
+                    <button class="method-btn btn-shift" onclick="executeMethod('shift')">
+                        <span class="method-name">array.shift()</span>
+                        <span class="method-desc">Elimina el 1er elemento</span>
+                    </button>
+                </div>
+                
+                <!-- REVERSE -->
+                <div class="method-group">
+                    <button class="method-btn btn-rev" onclick="executeMethod('reverse')">
+                        <span class="method-name">array.reverse()</span>
+                        <span class="method-desc">Invierte todo el orden</span>
+                    </button>
+                </div>
+
+                <!-- POP -->
+                <div class="method-group">
+                    <button class="method-btn btn-pop" onclick="executeMethod('pop')">
+                        <span class="method-name">array.pop()</span>
+                        <span class="method-desc">Elimina el último elemento</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="btn-row">
+                <!-- UNSHIFT -->
+                <div class="method-group">
+                    <div class="method-btn btn-unshift" style="cursor: default;">
+                        <span class="method-name">array.unshift(x)</span>
+                        <span class="method-desc">Añade "x" al INICIO</span>
+                    </div>
+                    <div class="item-selector">
+                        <span class="item-selector-title">Haz clic para inyectar:</span>
+                        <div class="item-palette">
+                            <button class="item-btn" onclick="executeMethod('unshift', '💾')">💾</button>
+                            <button class="item-btn" onclick="executeMethod('unshift', '🕹️')">🕹️</button>
+                            <button class="item-btn" onclick="executeMethod('unshift', '🔋')">🔋</button>
+                            <button class="item-btn" onclick="executeMethod('unshift', '💿')">💿</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PUSH -->
+                <div class="method-group">
+                    <div class="method-btn btn-push" style="cursor: default;">
+                        <span class="method-name">array.push(x)</span>
+                        <span class="method-desc">Añade "x" al FINAL</span>
+                    </div>
+                    <div class="item-selector">
+                        <span class="item-selector-title">Haz clic para inyectar:</span>
+                        <div class="item-palette">
+                            <button class="item-btn" onclick="executeMethod('push', '💾')">💾</button>
+                            <button class="item-btn" onclick="executeMethod('push', '🕹️')">🕹️</button>
+                            <button class="item-btn" onclick="executeMethod('push', '🔋')">🔋</button>
+                            <button class="item-btn" onclick="executeMethod('push', '💿')">💿</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL -->
+    <div class="modal-overlay" id="modal">
+        <div class="modal-box">
+            <h2 class="modal-title" id="m-title">Título</h2>
+            <p class="modal-msg" id="m-msg">Mensaje</p>
+            <button class="modal-btn" id="m-btn" onclick="closeModal()">CONTINUAR</button>
+        </div>
+    </div>
+
+    <script>
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        let audioCtx; let isMuted = true;
+        const bgAudio = document.getElementById('bgm');
+        const soundToggle = document.getElementById('soundToggle');
+
+        soundToggle.addEventListener('click', () => {
+            if (!audioCtx) audioCtx = new AudioContext();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            isMuted = !isMuted;
+            if(isMuted) { bgAudio.pause(); soundToggle.innerText = '🔇'; } 
+            else { bgAudio.volume = 0.25; bgAudio.play().catch(e=>e); soundToggle.innerText = '🔊'; }
+        });
+
+        function playTone(freq, type, duration, vol = 0.1) {
+            if (!audioCtx || isMuted) return;
+            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+            osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gain.gain.setValueAtTime(vol, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+            osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + duration);
+        }
+
+        function sfxClick() { playTone(600, 'square', 0.05, 0.05); }
+        function sfxPush() { playTone(800, 'sine', 0.1, 0.1); setTimeout(()=>playTone(1200, 'sine', 0.15, 0.1), 100); }
+        function sfxPop() { playTone(400, 'sawtooth', 0.1, 0.1); setTimeout(()=>playTone(200, 'sawtooth', 0.15, 0.1), 100); }
+        function sfxReverse() { playTone(500, 'triangle', 0.1, 0.1); setTimeout(()=>playTone(600, 'triangle', 0.1, 0.1), 100); setTimeout(()=>playTone(500, 'triangle', 0.1, 0.1), 200); }
+        function sfxError() { playTone(150, 'sawtooth', 0.3, 0.2); setTimeout(()=>playTone(100, 'sawtooth', 0.4, 0.2), 100); }
+        function sfxWin() { [523.25, 659.25, 783.99, 1046.50].forEach((f, i) => setTimeout(() => playTone(f, 'square', 0.15, 0.1), i * 150)); }
+
+        // DATOS DEL JUEGO
+        let currentLevel = 0;
+        let movesLeft = 0;
+        let isAnimating = false;
+        let targetArray = [];
+        let currentArray = [];
+        let currentLevelDef = null;
+
+        // MOTOR DE BÚSQUEDA BFS (Para calcular la ruta óptima matemáticamente)
+        function getOptimalMoves(startArr, targetArr) {
+            let queue = [{arr: startArr, moves: 0}];
+            let visited = new Set();
+            visited.add(JSON.stringify(startArr));
+            let targetStr = JSON.stringify(targetArr);
+            const items = ['💾', '🕹️', '🔋', '💿'];
+
+            while(queue.length > 0) {
+                let curr = queue.shift();
+                if (JSON.stringify(curr.arr) === targetStr) return curr.moves;
+                if (curr.moves >= 5) continue; // Límite de profundidad (max 5 movimientos por puzzle)
+
+                // Ramificaciones
+                // 1. pop()
+                if (curr.arr.length > 0) {
+                    let next = [...curr.arr]; next.pop();
+                    let str = JSON.stringify(next);
+                    if(!visited.has(str)) { visited.add(str); queue.push({arr: next, moves: curr.moves+1}); }
+                }
+                // 2. shift()
+                if (curr.arr.length > 0) {
+                    let next = [...curr.arr]; next.shift();
+                    let str = JSON.stringify(next);
+                    if(!visited.has(str)) { visited.add(str); queue.push({arr: next, moves: curr.moves+1}); }
+                }
+                // 3. reverse()
+                if (curr.arr.length > 1) {
+                    let next = [...curr.arr].reverse();
+                    let str = JSON.stringify(next);
+                    if(!visited.has(str)) { visited.add(str); queue.push({arr: next, moves: curr.moves+1}); }
+                }
+                // 4. push() / unshift()
+                if (curr.arr.length < 6) {
+                    for(let item of items) {
+                        let nextP = [...curr.arr]; nextP.push(item);
+                        let strP = JSON.stringify(nextP);
+                        if(!visited.has(strP)) { visited.add(strP); queue.push({arr: nextP, moves: curr.moves+1}); }
+
+                        let nextU = [...curr.arr]; nextU.unshift(item);
+                        let strU = JSON.stringify(nextU);
+                        if(!visited.has(strU)) { visited.add(strU); queue.push({arr: nextU, moves: curr.moves+1}); }
+                    }
+                }
+            }
+            return -1; // Sin solución en <= 5 movimientos
+        }
+
+        function generateStrategicLevel(levelIndex) {
+            const items = ['💾', '🕹️', '🔋', '💿'];
+            let size = 3 + Math.floor(levelIndex / 4);
+            if(size > 5) size = 5;
+
+            let tgt = [];
+            let str = [];
+            let minMoves = -1;
+            let attempts = 0;
+            
+            // La dificultad aumenta gradualmente: 3 movimientos en nivel 1, hasta 5 movimientos
+            let targetMoves = Math.min(3 + Math.floor(levelIndex / 2), 5); 
+
+            // Generador de laberinto lógico: Busca un puzzle que tome EXACTAMENTE targetMoves para resolverse
+            while((minMoves < targetMoves) && attempts < 150) {
+                tgt = [];
+                for(let i=0; i<size; i++) tgt.push(items[Math.floor(Math.random()*items.length)]);
+                
+                str = [...tgt];
+                let scrambles = targetMoves + 1;
+                
+                for(let i=0; i<scrambles; i++) {
+                    let op = Math.floor(Math.random() * 5);
+                    if (op === 0 && str.length > 1) str.pop();
+                    else if (op === 1 && str.length > 1) str.shift();
+                    else if (op === 2) str.push(items[Math.floor(Math.random()*items.length)]);
+                    else if (op === 3) str.unshift(items[Math.floor(Math.random()*items.length)]);
+                    else if (op === 4) str.reverse();
+                }
+                
+                minMoves = getOptimalMoves(str, tgt);
+                attempts++;
+            }
+
+            // Fallback en caso de mala suerte en generación aleatoria
+            if (minMoves === -1 || minMoves === 0) {
+                return generateStrategicLevel(levelIndex);
+            }
+
+            let hintTxt = levelIndex === 0 
+                ? `PISTA DE INICIO: El motor de análisis indica que la solución óptima requiere EXACTAMENTE ${minMoves} ciclos. Combina eliminar e inyectar.`
+                : `ANÁLISIS COMPLETADO: Este firewall requiere la combinación perfecta de ${minMoves} ciclos. Usa ingeniería inversa.`;
+
+            return {
+                target: tgt,
+                start: str,
+                moves: minMoves,
+                hint: hintTxt
+            };
+        }
+
+        function startGame() {
+            if (!audioCtx && !isMuted) { audioCtx = new AudioContext(); bgAudio.play().catch(e=>e); }
+            sfxClick();
+            document.getElementById('instructions-screen').style.display = 'none';
+            loadLevel(0);
+        }
+
+        function loadLevel(index) {
+            currentLevel = index;
+            document.getElementById('level-display').innerText = currentLevel + 1;
+            
+            currentLevelDef = generateStrategicLevel(index);
+
+            targetArray = [...currentLevelDef.target];
+            currentArray = [...currentLevelDef.start];
+            movesLeft = currentLevelDef.moves;
+            
+            document.getElementById('level-hint-text').innerText = currentLevelDef.hint;
+
+            updateHUD();
+            renderTarget();
+            renderCurrent(null); 
+        }
+
+        function updateHUD() {
+            let mDisplay = document.getElementById('moves-display');
+            mDisplay.innerText = movesLeft;
+            if (movesLeft <= 1) mDisplay.style.color = "var(--neon-red)";
+            else mDisplay.style.color = "var(--neon-yellow)";
+        }
+
+        function renderTarget() {
+            let track = document.getElementById('target-track');
+            track.innerHTML = '';
+            targetArray.forEach(item => {
+                let block = document.createElement('div');
+                block.className = 'data-block';
+                block.innerText = item;
+                track.appendChild(block);
+            });
+        }
+
+        function renderCurrent(animType) {
+            let track = document.getElementById('current-track');
+            track.innerHTML = '';
+            
+            currentArray.forEach((item, idx) => {
+                let block = document.createElement('div');
+                block.className = 'data-block';
+                block.innerText = item;
+                
+                if (animType === 'push' && idx === currentArray.length - 1) block.classList.add('anim-push');
+                if (animType === 'unshift' && idx === 0) block.classList.add('anim-unshift');
+                if (animType === 'reverse') block.classList.add('anim-push'); 
+                
+                track.appendChild(block);
+            });
+        }
+
+        function renderRemoval(animType) {
+            let track = document.getElementById('current-track');
+            if (track.children.length === 0) return;
+            
+            let blockToRemove;
+            if (animType === 'pop') {
+                blockToRemove = track.lastElementChild;
+                blockToRemove.classList.add('anim-pop');
+            } else if (animType === 'shift') {
+                blockToRemove = track.firstElementChild;
+                blockToRemove.classList.add('anim-shift');
+            }
+
+            setTimeout(() => {
+                renderCurrent(null);
+                finalizeTurn();
+            }, 350);
+        }
+
+        function executeMethod(method, val = null) {
+            if (isAnimating || movesLeft <= 0) return;
+            
+            isAnimating = true;
+            movesLeft--;
+            updateHUD();
+
+            if (method === 'pop') {
+                if (currentArray.length > 0) {
+                    sfxPop();
+                    currentArray.pop();
+                    renderRemoval('pop');
+                    return; 
+                } else { sfxError(); }
+            } 
+            else if (method === 'shift') {
+                if (currentArray.length > 0) {
+                    sfxPop();
+                    currentArray.shift();
+                    renderRemoval('shift');
+                    return;
+                } else { sfxError(); }
+            }
+            else if (method === 'push') {
+                if (currentArray.length < 10) {
+                    sfxPush();
+                    currentArray.push(val);
+                    renderCurrent('push');
+                } else sfxError();
+            }
+            else if (method === 'unshift') {
+                if (currentArray.length < 10) {
+                    sfxPush();
+                    currentArray.unshift(val);
+                    renderCurrent('unshift');
+                } else sfxError();
+            }
+            else if (method === 'reverse') {
+                sfxReverse();
+                currentArray.reverse();
+                renderCurrent('reverse');
+            }
+
+            setTimeout(finalizeTurn, 400); 
+        }
+
+        function finalizeTurn() {
+            isAnimating = false;
+            checkWinState();
+        }
+
+        function checkWinState() {
+            let targetStr = JSON.stringify(targetArray);
+            let currStr = JSON.stringify(currentArray);
+
+            if (targetStr === currStr) {
+                // WIN
+                sfxWin();
+                document.getElementById('m-title').style.color = "var(--neon-cyan)";
+                document.getElementById('m-title').style.textShadow = "0 0 15px var(--neon-cyan)";
+                showModal("¡ACCESO CONCEDIDO! 🔓", "Secuencia de datos sincronizada perfectamente.\nAvanzando al siguiente sector...", () => {
+                    loadLevel(currentLevel + 1);
+                });
+            } else if (movesLeft <= 0) {
+                // LOSE
+                sfxError();
+                document.getElementById('m-title').style.color = "var(--neon-magenta)";
+                document.getElementById('m-title').style.textShadow = "0 0 15px var(--neon-magenta)";
+                showModal("CONEXIÓN PERDIDA ⚠️", "Te has quedado sin Ciclos CPU antes de igualar la secuencia.\nReiniciando el sector actual...", () => {
+                    // Restaurar el array a como estaba al inicio de este nivel
+                    currentArray = [...currentLevelDef.start];
+                    movesLeft = currentLevelDef.moves;
+                    updateHUD();
+                    renderCurrent(null);
+                });
+            }
+        }
+
+        let modalCallback = null;
+        function showModal(title, msg, callback = null) { 
+            document.getElementById('m-title').innerText = title; 
+            document.getElementById('m-msg').innerText = msg; 
+            document.getElementById('modal').classList.add('active'); 
+            modalCallback = callback; 
+        }
+        function closeModal() { 
+            sfxClick(); 
+            document.getElementById('modal').classList.remove('active'); 
+            if(modalCallback) { modalCallback(); modalCallback = null; } 
+        }
+
+    </script>
+</body>
+</html>

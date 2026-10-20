@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Grimorio.js: Academia Arcana 🧙‍♂️</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&family=MedievalSharp&display=swap" rel="stylesheet">
+    
+    <style>
+        :root { 
+            --bg-color: #1a0b2e;
+            --magic-purple: #9b59b6;
+            --magic-glow: #e056fd;
+            --gold: #f1c40f;
+            --gold-dark: #b8860b;
+            --parchment: #f4e4bc;
+            --ink: #2c1e16;
+            --hp-red: #ff4757;
+            --mp-blue: #1e90ff;
+        }
+
+        body, html { 
+            font-family: 'Fira Code', monospace; 
+            display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+            margin: 0; padding: 0; width: 100vw; height: 100vh; 
+            touch-action: manipulation; color: #fff; background-color: var(--bg-color); 
+            overflow: hidden; box-sizing: border-box; user-select: none;
+        }
+
+        /* FONDO MÁGICO */
+        .decorations { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; background: radial-gradient(circle at bottom, #2b124c 0%, #0d0415 100%); }
+        .stars { position: absolute; inset: 0; background-image: radial-gradient(2px 2px at 20px 30px, #eee, rgba(0,0,0,0)), radial-gradient(2px 2px at 40px 70px, #fff, rgba(0,0,0,0)), radial-gradient(2px 2px at 50px 160px, #ddd, rgba(0,0,0,0)); background-repeat: repeat; background-size: 200px 200px; animation: twinkle 4s infinite alternate; opacity: 0.5;}
+        @keyframes twinkle { 0% { opacity: 0.3; } 100% { opacity: 0.8; } }
+
+        .sound-toggle { position: absolute; top: 15px; right: 15px; background: rgba(0,0,0,0.6); border: 2px solid var(--gold); border-radius: 50%; width: 45px; height: 45px; font-size: 20px; display: flex; justify-content: center; align-items: center; cursor: pointer; z-index: 1000; box-shadow: 0 0 10px rgba(241,196,15,0.4); transition: all 0.2s; color: var(--gold);}
+        .sound-toggle:active { transform: scale(0.9); }
+
+        /* PANTALLA DE INSTRUCCIONES */
+        #instructions-screen { position: absolute; inset: 0; z-index: 600; display: flex; flex-direction: column; justify-content: center; align-items: center; background: rgba(13,4,21,0.9); backdrop-filter: blur(5px); }
+        .instructions-card { background: var(--parchment); padding: 40px; border-radius: 10px; border: 4px solid var(--gold-dark); max-width: 90%; width: 550px; display: flex; flex-direction: column; gap: 20px; color: var(--ink); box-shadow: 0 10px 30px rgba(0,0,0,0.8); position: relative;}
+        
+        .instructions-card h1 { font-family: 'MedievalSharp', cursive; font-size: 36px; color: #4b0082; margin: 0; text-align: center; text-shadow: 1px 1px 0px rgba(0,0,0,0.2);}
+        .instruction-step { display: flex; gap: 15px; align-items: center; font-size: 16px; line-height: 1.4; background: rgba(0,0,0,0.05); padding: 12px; border-radius: 5px; border: 1px solid rgba(0,0,0,0.1); font-family: 'Fira Code', monospace;}
+        .instruction-icon { font-size: 28px; flex-shrink: 0; }
+        .instruction-text b { color: #4b0082; }
+        .instruction-text b.warn { color: #c0392b; }
+        
+        .start-btn { background: #4b0082; border: 2px solid var(--gold); padding: 15px 40px; font-size: 20px; color: var(--gold); border-radius: 5px; text-transform: uppercase; font-weight: bold; font-family: 'MedievalSharp', cursive; cursor:pointer; margin-top: 10px; transition: all 0.1s; align-self: center; box-shadow: 0 4px 0 var(--gold-dark), 0 10px 20px rgba(0,0,0,0.5); letter-spacing: 1px;}
+        .start-btn:active { transform: translateY(4px); box-shadow: 0 0 0 var(--gold-dark), 0 5px 10px rgba(0,0,0,0.5); }
+
+        /* HEADER DEL JUEGO */
+        .game-header { display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 900px; padding: 15px 2vw; z-index: 10; box-sizing: border-box;}
+        .back-menu-btn { background: rgba(0,0,0,0.5); border: 1px solid var(--gold); padding: 8px 15px; border-radius: 5px; font-size: 14px; color: var(--gold); cursor: pointer; transition: all 0.1s; font-family: 'Fira Code', monospace;}
+        .back-menu-btn:hover { background: rgba(241,196,15,0.2); }
+        
+        .stats-container { display: flex; gap: 20px; }
+        .stat-box { background: rgba(0,0,0,0.6); padding: 8px 15px; border-radius: 5px; border: 2px solid #555; font-size: 16px; font-weight: bold; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 0 rgba(0,0,0,0.5);}
+        .stat-hp { border-color: var(--hp-red); color: #fff; }
+        .stat-hp span { color: var(--hp-red); }
+        .stat-mp { border-color: var(--mp-blue); color: #fff; }
+        .stat-mp span { color: var(--mp-blue); }
+        .stat-wave { border-color: var(--gold); color: var(--gold); font-family: 'MedievalSharp', cursive; font-size: 18px;}
+
+        .main-layout { display: flex; flex-direction: column; gap: 15px; width: 100%; max-width: 900px; flex: 1; padding: 0 2vw 2vh 2vw; box-sizing: border-box; overflow: hidden; align-items: stretch;}
+
+        /* CAMPO DE BATALLA */
+        .battle-arena { flex: 1; min-height: 200px; background: rgba(0,0,0,0.3); border: 2px solid rgba(155,89,182,0.4); border-radius: 10px; position: relative; box-shadow: inset 0 0 50px rgba(0,0,0,0.8); display: flex; justify-content: space-between; align-items: center; padding: 0 40px; overflow: hidden;}
+        
+        .floor-line { position: absolute; bottom: 20%; left: 0; width: 100%; height: 2px; background: rgba(155,89,182,0.3); box-shadow: 0 0 10px var(--magic-purple); z-index: 1;}
+
+        .wizard { font-size: 80px; z-index: 5; position: relative; filter: drop-shadow(0 0 15px var(--magic-purple)); animation: floatWiz 3s ease-in-out infinite;}
+        @keyframes floatWiz { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+        .monster-wrapper { display: flex; flex-direction: column; align-items: center; z-index: 5; position: relative; transition: all 0.3s; transform: translateX(200px); opacity: 0;}
+        .monster-wrapper.active { transform: translateX(0); opacity: 1;}
+        .monster { font-size: 90px; filter: drop-shadow(0 0 20px rgba(255,0,0,0.5)); animation: breathe 2s infinite alternate; cursor: pointer;}
+        @keyframes breathe { from { transform: scale(1); } to { transform: scale(1.05); } }
+        
+        /* Tooltip del monstruo */
+        .monster-info { background: rgba(0,0,0,0.8); border: 2px solid #555; border-radius: 8px; padding: 10px; text-align: center; margin-bottom: 15px; box-shadow: 0 0 15px rgba(0,0,0,0.5); font-family: 'Fira Code', monospace; min-width: 150px;}
+        .m-name { color: #fff; font-weight: bold; font-size: 16px; margin-bottom: 5px; border-bottom: 1px dashed #555; padding-bottom: 5px;}
+        .m-stat { font-size: 14px; color: #ccc; margin: 3px 0; display: flex; justify-content: space-between;}
+        .m-stat span { font-weight: bold; }
+        .m-hp { color: var(--hp-red); }
+        .m-weak { color: #a55eea; }
+
+        /* Efectos visuales de magia */
+        .spell-projectile { position: absolute; left: 120px; font-size: 50px; z-index: 10; opacity: 0; filter: drop-shadow(0 0 20px #fff); pointer-events: none;}
+        @keyframes shootSpell { 
+            0% { left: 120px; opacity: 1; transform: scale(0.5) rotate(0deg); } 
+            80% { left: calc(100% - 150px); opacity: 1; transform: scale(1.5) rotate(360deg); }
+            100% { left: calc(100% - 130px); opacity: 0; transform: scale(2) rotate(400deg); }
+        }
+        .anim-shoot { animation: shootSpell 0.8s ease-in forwards; }
+
+        @keyframes damageShake { 0%, 100% { transform: translateX(0); filter: brightness(1); } 20%, 60% { transform: translateX(-15px); filter: brightness(2) drop-shadow(0 0 30px red); } 40%, 80% { transform: translateX(15px); filter: brightness(2) drop-shadow(0 0 30px red); } }
+        .shake-damage { animation: damageShake 0.4s both; }
+        
+        @keyframes explosion { 0% { transform: scale(1); filter: brightness(1) drop-shadow(0 0 0px red); } 50% { transform: scale(1.2); filter: brightness(3) drop-shadow(0 0 50px yellow); } 100% { transform: scale(1); filter: brightness(1) drop-shadow(0 0 0px red); } }
+        .overload-explosion { animation: explosion 0.5s both; }
+
+        /* GRIMORIO (EDITOR DE CÓDIGO) */
+        .grimoire-editor { flex: 0 0 auto; background: var(--parchment); border: 6px solid var(--gold-dark); border-radius: 10px; padding: 25px; box-shadow: inset 0 0 40px rgba(0,0,0,0.5), 0 10px 30px rgba(0,0,0,0.8); display: flex; flex-direction: column; gap: 15px; position: relative; color: var(--ink);}
+        
+        .code-title { font-family: 'MedievalSharp', cursive; font-size: 22px; color: #4b0082; border-bottom: 2px solid #4b0082; padding-bottom: 5px; margin-bottom: 5px;}
+        
+        .code-line { font-size: clamp(16px, 3vh, 22px); display: flex; align-items: center; flex-wrap: wrap; gap: 8px; line-height: 1.6;}
+        .keyword { color: #0000ff; font-weight: bold; }
+        .object { color: #8a2be2; font-weight: bold; }
+        .method { color: #8b0000; font-weight: bold; }
+        .punctuation { color: #333; font-weight: bold; }
+        
+        .doc-block { background: rgba(0,0,0,0.05); border-left: 4px solid #008000; padding: 8px; margin-bottom: 10px; font-size: 14px;}
+        .comment { color: #008000; font-style: italic; }
+
+        select { background: #fff; color: #000; border: 2px solid #555; padding: 6px 10px; font-family: 'Fira Code', monospace; font-size: clamp(14px, 2.5vh, 18px); border-radius: 4px; cursor: pointer; outline: none; box-shadow: inset 0 2px 5px rgba(0,0,0,0.1); font-weight: bold;}
+        select:focus { border-color: #4b0082; box-shadow: 0 0 8px rgba(75,0,130,0.5); }
+        .string-val { color: #a31515; }
+        .num-val { color: #098658; }
+
+        .controls { display: flex; justify-content: flex-end; margin-top: 10px;}
+        .run-btn { background: #4b0082; border: none; padding: 15px 35px; font-size: 18px; color: var(--gold); border-radius: 5px; text-transform: uppercase; font-weight: bold; font-family: 'MedievalSharp', cursive; cursor:pointer; transition: all 0.1s; box-shadow: 0 5px 0 #2a004d; letter-spacing: 1px;}
+        .run-btn:active { transform: translateY(5px); box-shadow: none; }
+        .run-btn:disabled { background: #666; color: #aaa; box-shadow: none; cursor: not-allowed; transform: none;}
+
+        /* MODAL */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: flex; justify-content: center; align-items: center; z-index: 1000; visibility: hidden; opacity: 0; transition: all 0.3s; }
+        .modal-overlay.active { visibility: visible; opacity: 1; }
+        .modal-box { background: var(--bg-color); padding: 40px; border-radius: 10px; text-align: center; max-width: 85%; width: 450px; transform: scale(0.9); transition: transform 0.3s; border: 2px solid var(--magic-purple); box-shadow: 0 0 30px var(--magic-purple);}
+        .modal-overlay.active .modal-box { transform: scale(1); }
+        .modal-title { font-family: 'MedievalSharp', cursive; font-size: 32px; margin-top: 0; margin-bottom: 15px; color: var(--gold); text-shadow: 2px 2px 4px #000;}
+        .modal-msg { font-size: 18px; margin-bottom: 30px; color: #fff; white-space: pre-line; line-height: 1.5; font-family: 'Fira Code', monospace;}
+        .modal-btn { background: transparent; border: 2px solid var(--gold); color: var(--gold); padding: 12px 30px; font-size: 18px; border-radius: 5px; text-transform: uppercase; font-weight: bold; cursor:pointer; font-family: 'MedievalSharp', cursive; transition: all 0.2s;}
+        .modal-btn:hover { background: var(--gold); color: #000; }
+    </style>
+</head>
+<body>
+
+    <audio id="bgm" loop><source src="../assets/musicaFondo/cancion1.mp3" type="audio/mpeg"></audio>
+    <div class="decorations"><div class="stars"></div></div>
+    <button id="soundToggle" class="sound-toggle" aria-label="Activar sonido">🔇</button>
+
+    <!-- INSTRUCCIONES -->
+    <div id="instructions-screen">
+        <div class="instructions-card">
+            <h1>ACADEMIA ARCANA</h1>
+            <div class="instruction-step">
+                <span class="instruction-icon">📖</span>
+                <span class="instruction-text"><b>LA FUNCIÓN:</b> Eres un objeto <code>mago</code>. Para defenderte llamas al método <code>mago.lanzarHechizo(elemento, mana);</code></span>
+            </div>
+            <div class="instruction-step">
+                <span class="instruction-icon">🕵️</span>
+                <span class="instruction-text"><b>LA LÓGICA:</b> La debilidad del monstruo ya no está a la vista. Lee la documentación (comentarios) para deducir qué elemento vence a qué Tipo de monstruo.</span>
+            </div>
+            <div class="instruction-step">
+                <span class="instruction-icon">💥</span>
+                <span class="instruction-text"><b class="warn">EXCEPCIÓN DE SOBRECARGA:</b> El parámetro de maná debe ser <b>EXACTAMENTE IGUAL</b> al HP del monstruo. Si le pasas de más, ocurrirá un <i>Overflow</i>: la energía te explotará y sufrirás daño crítico.</span>
+            </div>
+            <button class="start-btn" onclick="startGame()">ABRIR GRIMORIO</button>
+        </div>
+    </div>
+
+    <!-- JUEGO -->
+    <div class="game-header">
+        <button class="back-menu-btn" onclick="location.reload()">[ ABANDONAR ]</button>
+        <div class="stats-container">
+            <div class="stat-box stat-hp">❤️ <span id="hp-display">100</span>/100</div>
+            <div class="stat-box stat-mp">🧪 <span id="mp-display">200</span>/200</div>
+            <div class="stat-box stat-wave">OLEADA <span id="wave-display">1</span></div>
+        </div>
+    </div>
+
+    <div class="main-layout">
+        
+        <!-- CAMPO DE BATALLA -->
+        <div class="battle-arena" id="arena">
+            <div class="floor-line"></div>
+            
+            <div class="wizard" id="wizard">🧙‍♂️</div>
+            
+            <div class="spell-projectile" id="spell-fx">🔥</div>
+
+            <div class="monster-wrapper" id="monster-wrapper">
+                <div class="monster-info">
+                    <div class="m-name" id="m-name">Golem de Hielo</div>
+                    <div class="m-stat">Salud: <span class="m-hp" id="m-hp">40 HP</span></div>
+                    <div class="m-stat">Clase: <span class="m-weak" id="m-type">"Glacial"</span></div>
+                </div>
+                <div class="monster" id="monster-emoji">⛄</div>
+            </div>
+        </div>
+
+        <!-- EDITOR DE CÓDIGO (GRIMORIO) -->
+        <div class="grimoire-editor">
+            <div class="code-title">Grimorio.js</div>
+            
+            <div class="doc-block">
+                <div class="comment">/**</div>
+                <div class="comment"> * BESTIARIO: TABLA DE DEBILIDADES ELEMENTALES</div>
+                <div class="comment"> * Fuego 🔥 vence a la Clase Glacial ❄️</div>
+                <div class="comment"> * Agua 💧 vence a la Clase Volcánica 🌋</div>
+                <div class="comment"> * Rayo ⚡ vence a la Clase Abismal 🌊</div>
+                <div class="comment"> * Tierra 🪨 vence a la Clase Aérea 🦇</div>
+                <div class="comment"> *</div>
+                <div class="comment"> * @param {String} elemento - Debe coincidir con la debilidad de la clase.</div>
+                <div class="comment"> * @param {Number} mana - Debe ser EXACTAMENTE igual a la Salud (HP) del objetivo.</div>
+                <div class="comment"> */</div>
+            </div>
+
+            <div class="code-line">
+                <span class="object">mago</span><span class="punctuation">.</span><span class="method">lanzarHechizo</span><span class="punctuation">(</span>
+                
+                <!-- Argumento 1: String -->
+                <select id="arg-elemento" class="string-val">
+                    <option value="Fuego">"Fuego"</option>
+                    <option value="Agua">"Agua"</option>
+                    <option value="Rayo">"Rayo"</option>
+                    <option value="Tierra">"Tierra"</option>
+                </select>
+                <span class="punctuation">,</span>
+
+                <!-- Argumento 2: Number -->
+                <select id="arg-mana" class="num-val">
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                    <option value="30">30</option>
+                    <option value="40">40</option>
+                    <option value="50">50</option>
+                    <option value="60">60</option>
+                    <option value="70">70</option>
+                    <option value="80">80</option>
+                    <option value="90">90</option>
+                    <option value="100">100</option>
+                </select>
+
+                <span class="punctuation">);</span>
+            </div>
+
+            <div class="controls">
+                <button class="run-btn" id="run-btn" onclick="castSpell()">🪄 EJECUTAR</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL -->
+    <div class="modal-overlay" id="modal">
+        <div class="modal-box">
+            <h2 class="modal-title" id="m-title">Título</h2>
+            <p class="modal-msg" id="m-msg">Mensaje</p>
+            <button class="modal-btn" id="m-btn" onclick="closeModal()">CONTINUAR</button>
+        </div>
+    </div>
+
+    <script>
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        let audioCtx; let isMuted = true;
+        const bgAudio = document.getElementById('bgm');
+        const soundToggle = document.getElementById('soundToggle');
+
+        soundToggle.addEventListener('click', () => {
+            if (!audioCtx) audioCtx = new AudioContext();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            isMuted = !isMuted;
+            if(isMuted) { bgAudio.pause(); soundToggle.innerText = '🔇'; } 
+            else { bgAudio.volume = 0.25; bgAudio.play().catch(e=>e); soundToggle.innerText = '🔊'; }
+        });
+
+        function playTone(freq, type, duration, vol = 0.1) {
+            if (!audioCtx || isMuted) return;
+            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+            osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gain.gain.setValueAtTime(vol, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+            osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + duration);
+        }
+
+        function sfxClick() { playTone(600, 'sine', 0.05, 0.05); }
+        function sfxCast() { playTone(400, 'sine', 0.1, 0.1); setTimeout(()=>playTone(800, 'sine', 0.3, 0.1), 100); }
+        function sfxHit() { playTone(150, 'sawtooth', 0.1, 0.2); setTimeout(()=>playTone(100, 'sawtooth', 0.2, 0.2), 100); }
+        function sfxEnemyHit() { playTone(200, 'square', 0.1, 0.1); setTimeout(()=>playTone(150, 'square', 0.2, 0.1), 100); }
+        function sfxExplosion() { playTone(100, 'sawtooth', 0.5, 0.3); setTimeout(()=>playTone(80, 'sawtooth', 0.5, 0.3), 100); }
+        function sfxWin() { [523.25, 659.25, 783.99].forEach((f, i) => setTimeout(() => playTone(f, 'square', 0.15, 0.1), i * 150)); }
+        function sfxGameOver() { [300, 250, 200, 150].forEach((f, i) => setTimeout(() => playTone(f, 'sawtooth', 0.3, 0.2), i * 300)); }
+
+        // DATOS DEL JUEGO
+        let playerHP = 100;
+        let playerMP = 200;
+        let maxMP = 200;
+        let wave = 1;
+        let currentMonster = null;
+        let isCasting = false;
+
+        const monsterDB = [
+            { name: "Golem de Hielo", emoji: "⛄", type: "Glacial", weak: "Fuego" },
+            { name: "Dragón Infernal", emoji: "🐉", type: "Volcánica", weak: "Agua" },
+            { name: "Kraken del Abismo", emoji: "🦑", type: "Abismal", weak: "Rayo" },
+            { name: "Gárgola Alada", emoji: "🦇", type: "Aérea", weak: "Tierra" },
+            { name: "Lobo Invernal", emoji: "🐺", type: "Glacial", weak: "Fuego" },
+            { name: "Elemental de Magma", emoji: "🌋", type: "Volcánica", weak: "Agua" },
+            { name: "Sirena Oscura", emoji: "🧜‍♀️", type: "Abismal", weak: "Rayo" },
+            { name: "Espectro del Viento", emoji: "🌪️", type: "Aérea", weak: "Tierra" }
+        ];
+
+        const spellEmojis = { "Fuego": "🔥", "Agua": "💧", "Rayo": "⚡", "Tierra": "🪨" };
+
+        document.querySelectorAll('select').forEach(sel => sel.addEventListener('change', sfxClick));
+
+        function updateHUD() {
+            document.getElementById('hp-display').innerText = Math.max(0, playerHP);
+            document.getElementById('mp-display').innerText = Math.max(0, playerMP);
+            document.getElementById('wave-display').innerText = wave;
+        }
+
+        function startGame() {
+            if (!audioCtx && !isMuted) { audioCtx = new AudioContext(); bgAudio.play().catch(e=>e); }
+            sfxClick();
+            document.getElementById('instructions-screen').style.display = 'none';
+            playerHP = 100;
+            playerMP = 200;
+            wave = 1;
+            updateHUD();
+            spawnMonster();
+        }
+
+        function spawnMonster() {
+            let wrapper = document.getElementById('monster-wrapper');
+            wrapper.classList.remove('active');
+            
+            setTimeout(() => {
+                let template = monsterDB[Math.floor(Math.random() * monsterDB.length)];
+                
+                // HP balanceado en multiplos de 10
+                let hpOptions = [20, 30, 40, 50];
+                if (wave > 3) hpOptions.push(60, 70);
+                if (wave > 7) hpOptions.push(80, 90, 100);
+                
+                let mHP = hpOptions[Math.floor(Math.random() * hpOptions.length)];
+
+                currentMonster = { ...template, hp: mHP };
+
+                document.getElementById('m-name').innerText = currentMonster.name;
+                document.getElementById('m-hp').innerText = currentMonster.hp + " HP";
+                document.getElementById('m-type').innerText = `"${currentMonster.type}"`;
+                document.getElementById('monster-emoji').innerText = currentMonster.emoji;
+
+                wrapper.classList.add('active');
+                isCasting = false;
+                document.getElementById('run-btn').disabled = false;
+            }, 500);
+        }
+
+        function castSpell() {
+            if (isCasting) return;
+            sfxClick();
+            
+            let selectedElement = document.getElementById('arg-elemento').value;
+            let selectedMana = parseInt(document.getElementById('arg-mana').value);
+
+            if (playerMP < selectedMana) {
+                showModal("Error de Compilación ⚠️", "No tienes suficiente Maná (MP) en tus variables.\nEspera a recuperar energía o reinicia el sistema.", null);
+                return;
+            }
+
+            isCasting = true;
+            document.getElementById('run-btn').disabled = true;
+
+            // Restar Maná
+            playerMP -= selectedMana;
+            updateHUD();
+
+            // Animación del hechizo
+            sfxCast();
+            let fx = document.getElementById('spell-fx');
+            fx.innerText = spellEmojis[selectedElement];
+            fx.classList.add('anim-shoot');
+
+            setTimeout(() => {
+                fx.classList.remove('anim-shoot');
+                evaluateHit(selectedElement, selectedMana);
+            }, 800);
+        }
+
+        function evaluateHit(element, mana) {
+            let mEmoji = document.getElementById('monster-emoji');
+            
+            let elementCorrect = (element === currentMonster.weak);
+            let manaExact = (mana === currentMonster.hp);
+
+            if (elementCorrect && manaExact) {
+                // EXITO TOTAL
+                sfxEnemyHit();
+                mEmoji.classList.add('shake-damage');
+                setTimeout(() => {
+                    mEmoji.classList.remove('shake-damage');
+                    sfxWin();
+                    playerMP = Math.min(maxMP, playerMP + 40); // Recuperar MP por eficiencia
+                    wave++;
+                    updateHUD();
+                    showModal("¡Ejecución Perfecta! ✨", `¡El código funcionó! Has destruido al ${currentMonster.name}.\n\nRecuperas +40 MP por optimizar recursos.`, spawnMonster);
+                }, 500);
+
+            } else {
+                // FALLO LÓGICO
+                let errorTitle = "¡Excepción no controlada! ❌";
+                let errorMsg = "";
+                
+                if (!elementCorrect) {
+                    sfxEnemyHit();
+                    errorMsg = `El monstruo es de la Clase "${currentMonster.type}".\nEs inmune al argumento "${element}". Revisa la documentación.`;
+                    
+                    showModal(errorTitle, errorMsg + "\n\nEl monstruo contraataca.", () => {
+                        monsterAttack();
+                    });
+
+                } else if (mana > currentMonster.hp) {
+                    // OVERFLOW (SOBRECARGA)
+                    sfxExplosion();
+                    let wizard = document.getElementById('wizard');
+                    wizard.classList.add('overload-explosion');
+                    
+                    // Daño extra por sobrecarga antes del ataque del monstruo
+                    playerHP -= 15;
+                    updateHUD();
+
+                    errorMsg = `¡OVERFLOW (SOBRECARGA)! 💥\n\nPasaste ${mana} de Maná como argumento, pero el objetivo solo tiene ${currentMonster.hp} HP. ¡La diferencia de ${mana - currentMonster.hp} MP explotó en tu varita! (-15 HP)`;
+                    
+                    setTimeout(() => {
+                        wizard.classList.remove('overload-explosion');
+                        showModal(errorTitle, errorMsg + "\n\nComo el hechizo se descontroló, el monstruo sobrevive y contraataca.", () => {
+                            monsterAttack();
+                        });
+                    }, 500);
+
+                } else if (mana < currentMonster.hp) {
+                    // UNDERFLOW (MUY DÉBIL)
+                    sfxEnemyHit();
+                    errorMsg = `¡UNDERFLOW (FALTA ENERGÍA)!\n\nPasaste ${mana} MP, pero la función requería EXACTAMENTE ${currentMonster.hp} MP. El hechizo no le hizo daño.`;
+                    
+                    showModal(errorTitle, errorMsg + "\n\nEl monstruo contraataca.", () => {
+                        monsterAttack();
+                    });
+                }
+            }
+        }
+
+        function monsterAttack() {
+            setTimeout(() => {
+                sfxHit();
+                let wizard = document.getElementById('wizard');
+                wizard.classList.add('shake-damage');
+                
+                playerHP -= 25; // Daño base del monstruo
+                updateHUD();
+
+                setTimeout(() => {
+                    wizard.classList.remove('shake-damage');
+                    
+                    if (playerHP <= 0) {
+                        sfxGameOver();
+                        document.getElementById('m-title').style.color = "var(--hp-red)";
+                        showModal("SISTEMA CAÍDO 💀", `Has sido derrotado en la Oleada ${wave}.\n\nRecuerda revisar siempre la documentación de tus funciones y cuidar tu salud (HP).`, () => {
+                            document.getElementById('m-title').style.color = "var(--gold)";
+                            document.getElementById('instructions-screen').style.display = 'flex';
+                        });
+                    } else {
+                        isCasting = false;
+                        document.getElementById('run-btn').disabled = false;
+                    }
+                }, 400);
+            }, 300);
+        }
+
+        let modalCallback = null;
+        function showModal(title, msg, callback = null) { 
+            document.getElementById('m-title').innerText = title; 
+            document.getElementById('m-msg').innerText = msg; 
+            document.getElementById('modal').classList.add('active'); 
+            modalCallback = callback; 
+        }
+        function closeModal() { 
+            sfxClick(); 
+            document.getElementById('modal').classList.remove('active'); 
+            if(modalCallback) { modalCallback(); modalCallback = null; } 
+        }
+
+    </script>
+</body>
+</html>

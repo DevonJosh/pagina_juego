@@ -46,9 +46,38 @@
         .sound-toggle { position: absolute; top: 15px; right: 15px; background: rgba(0, 0, 0, 0.8); border: 2px solid var(--neon-cyan); border-radius: 8px; width: 45px; height: 45px; font-size: 20px; display: flex; justify-content: center; align-items: center; cursor: pointer; z-index: 1000; box-shadow: 0 0 15px rgba(0,255,255,0.4); transition: all 0.2s; color: var(--neon-cyan);}
         .sound-toggle:active { transform: scale(0.9); box-shadow: none; }
 
-        /* LOBBY */
+        /* ============================================================
+           PANTALLA DE INSTRUCCIONES
+           ============================================================ */
+        #instructions-screen {
+            position: absolute; inset: 0; z-index: 600; display: flex; flex-direction: column; justify-content: center; align-items: center;
+            background: rgba(0,0,0,0.85); backdrop-filter: blur(10px);
+        }
+
+        .instructions-card {
+            background: rgba(5, 5, 12, 0.95); padding: 40px; border-radius: 15px;
+            box-shadow: 0 0 50px rgba(0,255,255,0.2), inset 0 0 20px rgba(0,255,255,0.1); border: 2px solid var(--neon-cyan);
+            max-width: 90%; width: 550px; display: flex; flex-direction: column; gap: 20px; color: #ddd;
+        }
+
+        .instructions-card h1 { font-family: 'Share Tech Mono', monospace; font-size: 32px; color: var(--neon-cyan); margin: 0; text-align: center; text-shadow: 0 0 15px var(--neon-cyan);}
+        
+        .instruction-step { display: flex; gap: 15px; align-items: flex-start; font-size: 18px; line-height: 1.4; background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);}
+        .instruction-icon { font-size: 28px; flex-shrink: 0; text-shadow: 0 0 10px rgba(255,255,255,0.3);}
+        .instruction-text b { color: var(--neon-cyan); font-weight: bold; }
+        .instruction-text b.danger { color: var(--neon-pink); }
+        .instruction-text b.warn { color: var(--neon-yellow); }
+
+        .continue-btn {
+            background: var(--neon-cyan); border: none; box-shadow: 0 0 25px rgba(0,255,255,0.5); padding: 15px 40px; font-size: 22px; color: #000; border-radius: 5px; text-transform: uppercase; font-weight: bold; font-family: 'Share Tech Mono', monospace; cursor:pointer; margin-top: 10px; transition: all 0.1s; letter-spacing: 2px; align-self: center;
+        }
+        .continue-btn:active { transform: scale(0.95); box-shadow: 0 0 10px rgba(0,255,255,0.3); }
+
+        /* ============================================================
+           LOBBY DE CONFIGURACIÓN
+           ============================================================ */
         #setup-screen {
-            position: absolute; inset: 0; z-index: 500; display: flex; flex-direction: column; justify-content: center; align-items: center;
+            position: absolute; inset: 0; z-index: 500; display: none; flex-direction: column; justify-content: center; align-items: center;
             background: rgba(0,0,0,0.7); backdrop-filter: blur(10px);
         }
 
@@ -138,6 +167,32 @@
     <button id="soundToggle" class="sound-toggle" aria-label="Activar sonido">🔇</button>
 
     <div class="decorations"><div class="grid"></div></div>
+
+    <!-- PANTALLA DE INSTRUCCIONES -->
+    <div id="instructions-screen" style="display: flex;">
+        <div class="instructions-card">
+            <h1>CÓMO JUGAR</h1>
+            
+            <div class="instruction-step">
+                <span class="instruction-icon">🎯</span>
+                <span class="instruction-text"><b>OBJETIVO:</b> Fíjate en el grupo químico solicitado en la parte superior y busca el elemento correcto que orbita en la pantalla.</span>
+            </div>
+            <div class="instruction-step">
+                <span class="instruction-icon">⭕</span>
+                <span class="instruction-text"><b>MECÁNICA:</b> Toca la pantalla y <b>dibuja círculos continuos</b> alrededor del elemento sin soltar el dedo para capturarlo.</span>
+            </div>
+            <div class="instruction-step">
+                <span class="instruction-icon">☠️</span>
+                <span class="instruction-text"><b class="danger">PELIGRO:</b> Evita la Anti-Materia roja. Si la encierras en tu lazo por error, explotará y perderás integridad de escudo.</span>
+            </div>
+            <div class="instruction-step">
+                <span class="instruction-icon">⚠️</span>
+                <span class="instruction-text"><b class="warn">TÁCTICA:</b> En el instante que empieces a trazar un lazo sobre el objetivo correcto, la Anti-Materia intentará empujarlo. ¡Sé rápido aislando el elemento!</span>
+            </div>
+
+            <button class="continue-btn" onclick="showSetup()">ENTENDIDO</button>
+        </div>
+    </div>
 
     <!-- LOBBY -->
     <div id="setup-screen">
@@ -267,6 +322,13 @@
 
         function resizeCanvas() { canvas.width = canvasWrapper.offsetWidth; canvas.height = canvasWrapper.offsetHeight; }
         window.addEventListener('resize', resizeCanvas);
+
+        // NAVEGACIÓN
+        function showSetup() {
+            sfxClick();
+            document.getElementById('instructions-screen').style.display = 'none';
+            document.getElementById('setup-screen').style.display = 'flex';
+        }
 
         function selectDiff(level) { sfxClick(); currentDifficulty = level; document.querySelectorAll('#setup-diff-1, #setup-diff-2').forEach(btn => btn.classList.remove('active')); document.getElementById('setup-diff-' + level).classList.add('active'); }
         function selectTargetCount(count) { sfxClick(); targetCount = count; document.querySelectorAll('#setup-target-5, #setup-target-10').forEach(btn => btn.classList.remove('active')); document.getElementById('setup-target-' + count).classList.add('active'); }
@@ -647,6 +709,7 @@
             }
 
             for(let i=particles.length-1; i>=0; i--) { particles[i].update(); particles[i].draw(ctx); if(particles[i].life<=0) particles.splice(i,1); }
+            requestAnimationFrame(gameLoop);
         }
 
         function endGame(isTimeout) {
@@ -661,15 +724,7 @@
         function closeModal() { sfxClick(); document.getElementById('modal').classList.remove('active'); if(modalCallback) { modalCallback(); modalCallback = null; } }
 
         function resetGame() { 
-            score = 0; 
-            document.getElementById('score-display').innerText = `${score} / ${targetCount}`; 
-            
-            let valLives = parseInt(document.getElementById('setup-lives').value);
-            let initialLives = (isNaN(valLives) || valLives < 0) ? 3 : valLives;
-            infiniteLives = (initialLives === 0);
-            lives = initialLives;
-            document.getElementById('lives-display').innerText = infiniteLives ? "∞" : lives;
-            
+            score = 0; lives = 3; document.getElementById('score-display').innerText = `${score} / ${targetCount}`; document.getElementById('lives-display').innerText = lives;
             nodes = []; particles = []; trail = []; isDrawing = false;
             setupTimer(); isGameActive = true; generateRound(); 
             

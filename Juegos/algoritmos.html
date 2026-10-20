@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Neon Coder: Algoritmos 💻</title>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root { 
+            --bg-color: #050a15;
+            --cyber-cyan: #00f3ff;
+            --cyber-pink: #ff0055;
+            --cyber-green: #39ff14;
+            --cyber-yellow: #f1c40f;
+            --cyber-orange: #ff6a00;
+            --grid-bg: #0d1326;
+            --cell-border: #1e3a8a;
+        }
+
+        body, html { 
+            font-family: 'Share Tech Mono', monospace; 
+            display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+            margin: 0; padding: 0; width: 100vw; height: 100vh; 
+            touch-action: manipulation; color: #fff; background-color: var(--bg-color); 
+            overflow: hidden; box-sizing: border-box; user-select: none;
+        }
+
+        /* EFECTOS CRT */
+        .decorations { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; background: radial-gradient(circle at center, #0a1024 0%, #000 100%); }
+        .scanlines { position: fixed; inset: 0; z-index: 999; pointer-events: none; background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%); background-size: 100% 4px; box-shadow: inset 0 0 100px rgba(0,0,0,0.9); }
+        .sound-toggle { position: absolute; top: 15px; right: 15px; background: rgba(0,0,0,0.8); border: 2px solid var(--cyber-cyan); border-radius: 8px; width: 45px; height: 45px; font-size: 20px; display: flex; justify-content: center; align-items: center; cursor: pointer; z-index: 1000; box-shadow: 0 0 10px rgba(0,243,255,0.3); transition: all 0.2s; color: var(--cyber-cyan);}
+        .sound-toggle:active { transform: scale(0.9); }
+
+        /* PANTALLA DE INSTRUCCIONES */
+        #instructions-screen { position: absolute; inset: 0; z-index: 600; display: flex; flex-direction: column; justify-content: center; align-items: center; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); }
+        .instructions-card { background: rgba(5, 5, 12, 0.95); padding: 40px; border-radius: 15px; box-shadow: 0 0 50px rgba(0,243,255,0.2), inset 0 0 20px rgba(0,243,255,0.1); border: 2px solid var(--cyber-cyan); max-width: 90%; width: 550px; display: flex; flex-direction: column; gap: 20px; color: #ddd; }
+        .instructions-card h1 { font-size: 32px; color: var(--cyber-cyan); margin: 0; text-align: center; text-shadow: 0 0 15px var(--cyber-cyan);}
+        .instruction-step { display: flex; gap: 15px; align-items: flex-start; font-size: 16px; line-height: 1.4; background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);}
+        .instruction-icon { font-size: 28px; flex-shrink: 0; }
+        .instruction-text b { color: var(--cyber-cyan); font-weight: bold; }
+        .instruction-text b.warn { color: var(--cyber-yellow); }
+        .instruction-text b.err { color: var(--cyber-pink); }
+        .start-btn { background: var(--cyber-cyan); border: none; box-shadow: 0 0 20px rgba(0,243,255,0.4); padding: 15px 40px; font-size: 20px; color: #000; border-radius: 5px; text-transform: uppercase; font-weight: bold; font-family: 'Share Tech Mono', monospace; cursor:pointer; margin-top: 10px; transition: all 0.1s; align-self: center;}
+        .start-btn:active { transform: scale(0.95); }
+
+        /* HEADER DEL JUEGO */
+        .game-header { display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 1000px; padding: 15px 2vw; z-index: 10; box-sizing: border-box;}
+        .back-menu-btn { background: transparent; border: 1px solid var(--cyber-cyan); padding: 6px 15px; border-radius: 5px; font-size: 14px; color: var(--cyber-cyan); cursor: pointer; transition: all 0.2s; font-family: 'Share Tech Mono', monospace;}
+        .back-menu-btn:active { background: var(--cyber-cyan); color: #000; }
+        .hud-box { background: rgba(0,0,0,0.8); padding: 8px 15px; border-radius: 5px; border: 1px solid var(--cyber-green); font-size: 18px; color: #fff; box-shadow: 0 0 10px rgba(57,255,20,0.2); }
+        .hud-box span { color: var(--cyber-green); font-weight: bold; }
+
+        /* CONTENEDOR PRINCIPAL: TABLERO + CÓDIGO */
+        .main-layout { display: flex; flex-direction: row; gap: 20px; width: 100%; max-width: 1000px; flex: 1; padding: 0 2vw 2vh 2vw; box-sizing: border-box; overflow: hidden; align-items: stretch;}
+        @media (max-width: 768px) { .main-layout { flex-direction: column; } }
+
+        /* TABLERO (IZQUIERDA) */
+        .board-container { flex: 1; display: flex; justify-content: center; align-items: center; background: rgba(0,0,0,0.4); border: 2px solid rgba(0,243,255,0.3); border-radius: 10px; padding: 15px; box-shadow: inset 0 0 30px rgba(0,0,0,0.8); position: relative;}
+        .grid-board { display: grid; gap: 4px; background: var(--cell-border); border: 4px solid var(--cell-border); border-radius: 8px; }
+        .cell { width: clamp(30px, 6vw, 60px); height: clamp(30px, 6vw, 60px); background: var(--grid-bg); border-radius: 4px; display: flex; justify-content: center; align-items: center; font-size: clamp(20px, 4vw, 35px); position: relative; }
+        
+        .cell.wall { background: #111; box-shadow: inset 0 0 10px rgba(255,0,85,0.3); border: 1px solid rgba(255,0,85,0.2); }
+        .cell.wall::after { content: '🧱'; opacity: 0.5; }
+        
+        /* Núcleo (Target) */
+        .cell.target { background: rgba(57,255,20,0.1); box-shadow: inset 0 0 15px rgba(57,255,20,0.4); }
+        .cell.target::before { content: '💠'; position: absolute; text-shadow: 0 0 10px var(--cyber-green); animation: float 2s infinite; z-index: 1;}
+
+        /* Candado cerrado sobre el núcleo */
+        .cell.door { background: rgba(255, 0, 85, 0.15) !important; box-shadow: inset 0 0 15px rgba(255, 0, 85, 0.5) !important; border: 1px solid var(--cyber-pink) !important; }
+        .cell.door::after { content: '🔒'; position: absolute; text-shadow: 0 0 10px var(--cyber-pink); z-index: 2;}
+        .cell.target.door::before { opacity: 0; } /* Oculta el núcleo si el candado está cerrado */
+
+        /* Candado abierto */
+        .cell.door-open { background: transparent !important; box-shadow: none !important; border-color: transparent !important;}
+        .cell.door-open::after { content: '🔓'; position: absolute; opacity: 0.3; font-size: 60%; top: 5px; right: 5px; z-index: 2;}
+
+        /* Llave (Switch) */
+        .cell.switch { background: rgba(241, 196, 15, 0.1); box-shadow: inset 0 0 15px rgba(241, 196, 15, 0.4); border: 1px solid var(--cyber-yellow);}
+        .cell.switch::after { content: '⚡'; text-shadow: 0 0 10px var(--cyber-yellow); animation: pulse 1s infinite alternate; position: absolute; z-index: 1;}
+        .cell.switch-active { background: rgba(57, 255, 20, 0.1); border-color: var(--cyber-green); }
+        .cell.switch-active::after { content: '✔️'; color: var(--cyber-green); position: absolute;}
+        
+        .drone { position: absolute; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 10; font-size: clamp(24px, 5vw, 40px); filter: drop-shadow(0 0 8px var(--cyber-cyan));}
+        
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+        @keyframes pulse { 0% { opacity: 0.7; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1.1); } }
+
+        /* EDITOR DE CÓDIGO (DERECHA) */
+        .code-panel { width: 340px; display: flex; flex-direction: column; background: rgba(10,15,30,0.9); border: 2px solid #333; border-radius: 10px; overflow: hidden; box-shadow: 0 0 20px rgba(0,0,0,0.8); }
+        @media (max-width: 768px) { .code-panel { width: 100%; height: 40vh;} }
+        
+        .code-header { background: #1a2035; padding: 10px; text-align: center; border-bottom: 2px solid #333; color: var(--text-gray); font-size: 14px; letter-spacing: 1px; display: flex; justify-content: space-between;}
+        .mem-indicator { color: var(--cyber-green); font-weight: bold; }
+        .mem-indicator.full { color: var(--cyber-pink); animation: pulse 0.5s infinite; }
+
+        /* BOTONES DE COMANDO */
+        .command-palette { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; padding: 12px; border-bottom: 2px solid #333; background: rgba(0,0,0,0.5); }
+        .cmd-btn { background: #1f2937; border: 1px solid #4b5563; padding: 8px 4px; border-radius: 6px; color: #fff; font-family: 'Share Tech Mono', monospace; font-size: 11px; cursor: pointer; transition: all 0.1s; display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center;}
+        .cmd-btn:active { transform: translateY(2px); }
+        .cmd-btn .icon { font-size: 18px; color: var(--cyber-cyan); }
+        .cmd-btn:hover { border-color: var(--cyber-cyan); background: #2d3748; }
+        .cmd-btn:disabled { opacity: 0.5; filter: grayscale(1); cursor: not-allowed; border-color: #333; }
+
+        /* LISTA DE EJECUCIÓN */
+        .code-queue { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 6px; }
+        .code-line { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 8px 12px; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; font-size: 14px; color: #ccc; animation: slideIn 0.2s ease-out;}
+        .code-line.active { background: rgba(0,243,255,0.2); border-color: var(--cyber-cyan); color: #fff; box-shadow: 0 0 10px rgba(0,243,255,0.3); }
+        .code-line.error { background: rgba(255,0,85,0.2); border-color: var(--cyber-pink); color: var(--cyber-pink); }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
+        
+        .delete-btn { background: transparent; border: none; color: #888; cursor: pointer; font-size: 16px; padding: 0 5px; transition: color 0.2s;}
+        .delete-btn:hover { color: var(--cyber-pink); }
+
+        /* CONTROLES DE EJECUCIÓN */
+        .run-controls { display: flex; padding: 15px; gap: 10px; background: rgba(0,0,0,0.8); border-top: 2px solid #333; }
+        .run-btn { flex: 2; background: var(--cyber-green); border: none; color: #000; font-weight: bold; padding: 12px; border-radius: 5px; font-family: 'Share Tech Mono', monospace; font-size: 16px; cursor: pointer; transition: all 0.2s; box-shadow: 0 0 15px rgba(57,255,20,0.3);}
+        .run-btn:active { transform: scale(0.95); }
+        .run-btn:disabled { background: #444; color: #777; cursor: not-allowed; box-shadow: none; }
+        .clear-btn { flex: 1; background: transparent; border: 1px solid var(--cyber-pink); color: var(--cyber-pink); border-radius: 5px; cursor: pointer; font-family: 'Share Tech Mono', monospace;}
+        .clear-btn:hover { background: rgba(255,0,85,0.1); }
+
+        /* MODAL */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: flex; justify-content: center; align-items: center; z-index: 1000; visibility: hidden; opacity: 0; transition: all 0.3s; backdrop-filter: blur(4px);}
+        .modal-overlay.active { visibility: visible; opacity: 1; }
+        .modal-box { background: #050510; padding: 30px; border-radius: 10px; text-align: center; max-width: 85%; width: 400px; transform: scale(0.9); transition: transform 0.3s; border: 2px solid var(--cyber-cyan); box-shadow: 0 0 30px rgba(0,243,255,0.3);}
+        .modal-overlay.active .modal-box { transform: scale(1); }
+        .modal-title { font-size: 28px; margin-top: 0; margin-bottom: 10px; color: var(--cyber-cyan); text-shadow: 0 0 10px var(--cyber-cyan);}
+        .modal-msg { font-size: 16px; margin-bottom: 20px; color: #ddd; white-space: pre-line; line-height: 1.5; font-family: 'Rajdhani', sans-serif;}
+        .modal-btn { background: transparent; border: 2px solid var(--cyber-cyan); color: var(--cyber-cyan); padding: 10px 25px; font-size: 16px; border-radius: 5px; text-transform: uppercase; font-weight: bold; cursor:pointer; font-family: 'Share Tech Mono', monospace;}
+        .modal-btn:hover { background: var(--cyber-cyan); color: #000; }
+
+        @keyframes damageShake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-10px); } 40%, 80% { transform: translateX(10px); } }
+        .shake { animation: damageShake 0.4s both; }
+    </style>
+</head>
+<body>
+
+    <audio id="bgm" loop><source src="../assets/musicaFondo/cancion1.mp3" type="audio/mpeg"></audio>
+    <div class="decorations"><div class="scanlines"></div></div>
+    <button id="soundToggle" class="sound-toggle" aria-label="Activar sonido">🔇</button>
+
+    <!-- INSTRUCCIONES -->
+    <div id="instructions-screen">
+        <div class="instructions-card">
+            <h1>ALGORITMOS AVANZADOS</h1>
+            <div class="instruction-step">
+                <span class="instruction-icon">🚀</span>
+                <span class="instruction-text"><b>OBJETIVO:</b> Guía al Dron de Datos hasta el Núcleo (💠).</span>
+            </div>
+            <div class="instruction-step">
+                <span class="instruction-icon">🔒</span>
+                <span class="instruction-text"><b>LLAVE Y CANDADO:</b> El núcleo está protegido por un Firewall. Debes recoger la Llave (⚡) primero para que el candado se abra y puedas entrar a la meta.</span>
+            </div>
+            <div class="instruction-step">
+                <span class="instruction-icon">💾</span>
+                <span class="instruction-text"><b class="warn">MEMORIA LIMITADA:</b> La RAM máxima es de 15 bloques. Usa los multiplicadores (<b>BUCLES</b>) para repetir comandos y optimizar tu código.</span>
+            </div>
+            <div class="instruction-step">
+                <span class="instruction-icon">🧱</span>
+                <span class="instruction-text"><b class="err">CUIDADO:</b> Chocar contra paredes, intentar entrar al candado cerrado o salir de la cuadrícula corromperá tu ejecución.</span>
+            </div>
+            <button class="start-btn" onclick="startGame()">INICIAR SISTEMA</button>
+        </div>
+    </div>
+
+    <!-- JUEGO -->
+    <div class="game-header">
+        <button class="back-menu-btn" onclick="generateAndLoadLevel()">[ SALTAR NIVEL ]</button>
+        <div class="hud-box">HACKEOS: <span id="level-display">0</span></div>
+    </div>
+
+    <div class="main-layout">
+        <!-- TABLERO -->
+        <div class="board-container">
+            <div class="grid-board" id="board" style="grid-template-columns: repeat(6, 1fr); grid-template-rows: repeat(6, 1fr);">
+                <!-- Celdas generadas por JS -->
+            </div>
+        </div>
+
+        <!-- EDITOR DE CÓDIGO -->
+        <div class="code-panel">
+            <div class="code-header">
+                <span>>_ SECUENCIA</span>
+                <span class="mem-indicator" id="mem-indicator">MEMORIA: 0/15</span>
+            </div>
+            
+            <div class="command-palette">
+                <button class="cmd-btn" id="btn-avz" onclick="addCommand('AVANZAR')"><span class="icon">⬆️</span> AVANZAR</button>
+                <button class="cmd-btn" id="btn-izq" onclick="addCommand('GIRAR_IZQ')"><span class="icon">↩️</span> GIRAR IZQ</button>
+                <button class="cmd-btn" id="btn-der" onclick="addCommand('GIRAR_DER')"><span class="icon">↪️</span> GIRAR DER</button>
+                <button class="cmd-btn" id="btn-bx2" style="border-color:var(--cyber-purple)" onclick="addCommand('BUCLE_X2')"><span class="icon" style="color:var(--cyber-purple)">🔁</span> BUCLE x2</button>
+                <button class="cmd-btn" id="btn-bx3" style="border-color:var(--cyber-purple)" onclick="addCommand('BUCLE_X3')"><span class="icon" style="color:var(--cyber-purple)">🔁</span> BUCLE x3</button>
+                <button class="cmd-btn" id="btn-bx5" style="border-color:var(--cyber-purple)" onclick="addCommand('BUCLE_X5')"><span class="icon" style="color:var(--cyber-purple)">🔁</span> BUCLE x5</button>
+            </div>
+
+            <div class="code-queue" id="code-queue">
+                <!-- Comandos aquí -->
+            </div>
+
+            <div class="run-controls">
+                <button class="clear-btn" onclick="clearCode()">[ BORRAR ]</button>
+                <button class="run-btn" id="run-btn" onclick="runCode()">▶ EJECUTAR</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL -->
+    <div class="modal-overlay" id="modal">
+        <div class="modal-box">
+            <h2 class="modal-title" id="m-title">Título</h2>
+            <p class="modal-msg" id="m-msg">Mensaje</p>
+            <button class="modal-btn" id="m-btn" onclick="closeModal()">ACEPTAR</button>
+        </div>
+    </div>
+
+    <script>
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        let audioCtx; let isMuted = true;
+        const bgAudio = document.getElementById('bgm');
+        const soundToggle = document.getElementById('soundToggle');
+
+        soundToggle.addEventListener('click', () => {
+            if (!audioCtx) audioCtx = new AudioContext();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            isMuted = !isMuted;
+            if(isMuted) { bgAudio.pause(); soundToggle.innerText = '🔇'; } 
+            else { bgAudio.volume = 0.25; bgAudio.play().catch(e=>e); soundToggle.innerText = '🔊'; }
+        });
+
+        function playTone(freq, type, duration, vol = 0.1) {
+            if (!audioCtx || isMuted) return;
+            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+            osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gain.gain.setValueAtTime(vol, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+            osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + duration);
+        }
+
+        function sfxClick() { playTone(800, 'square', 0.05, 0.05); }
+        function sfxAdd() { playTone(1200, 'sine', 0.05, 0.05); }
+        function sfxDelete() { playTone(300, 'triangle', 0.1, 0.05); }
+        function sfxMove() { playTone(400, 'square', 0.1, 0.05); }
+        function sfxTurn() { playTone(600, 'sawtooth', 0.1, 0.05); }
+        function sfxUnlock() { playTone(900, 'sine', 0.1, 0.1); setTimeout(()=>playTone(1200, 'sine', 0.2, 0.1), 100); }
+        function sfxError() { playTone(150, 'sawtooth', 0.3, 0.2); setTimeout(()=>playTone(100, 'sawtooth', 0.4, 0.2), 100); }
+        function sfxSuccess() { [523.25, 659.25, 783.99, 1046.50].forEach((f, i) => setTimeout(() => playTone(f, 'square', 0.15, 0.1), i * 150)); }
+
+        // ESTADO DEL JUEGO
+        let levelsCompleted = 0;
+        let isRunning = false;
+        let codeSequence = [];
+        let executionIndex = 0;
+        
+        let drone = { x: 0, y: 0, dir: 1 };
+        let droneElement = null;
+        let activeDoors = [];
+        let triggeredSwitches = [];
+        
+        // El nivel actual generado dinámicamente
+        let currentLevelDef = null;
+
+        // GENERADOR PROCEDURAL DE NIVELES
+        function createProceduralLevel() {
+            let size = 6;
+            const rnd = () => Math.floor(Math.random() * size);
+            
+            let start, target, sw;
+            
+            // Garantizar posiciones distintas
+            do { start = {x: rnd(), y: rnd(), dir: Math.floor(Math.random()*4)}; } while(false);
+            do { sw = {x: rnd(), y: rnd()}; } while(sw.x===start.x && sw.y===start.y);
+            do { target = {x: rnd(), y: rnd()}; } while((target.x===start.x && target.y===start.y) || (target.x===sw.x && target.y===sw.y));
+
+            // Rastrear ruta segura para no bloquearla con muros
+            let safePath = new Set();
+            safePath.add(`${start.x},${start.y}`);
+            safePath.add(`${sw.x},${sw.y}`);
+            safePath.add(`${target.x},${target.y}`);
+            
+            // Trazar ruta L-shape
+            function tracePath(a, b) {
+                let cx = a.x, cy = a.y;
+                if (Math.random() > 0.5) {
+                    while(cx !== b.x) { cx += Math.sign(b.x - cx); safePath.add(`${cx},${cy}`); }
+                    while(cy !== b.y) { cy += Math.sign(b.y - cy); safePath.add(`${cx},${cy}`); }
+                } else {
+                    while(cy !== b.y) { cy += Math.sign(b.y - cy); safePath.add(`${cx},${cy}`); }
+                    while(cx !== b.x) { cx += Math.sign(b.x - cx); safePath.add(`${cx},${cy}`); }
+                }
+            }
+            tracePath(start, sw);
+            tracePath(sw, target);
+
+            // Generar muros aleatorios evitando la ruta segura
+            let walls = [];
+            let numWalls = Math.floor(Math.random() * 4) + 4; // 4 a 7 muros
+            for(let i=0; i<100 && walls.length < numWalls; i++) {
+                let wx = rnd(), wy = rnd();
+                if(!safePath.has(`${wx},${wy}`)) {
+                    walls.push({x: wx, y: wy});
+                    safePath.add(`${wx},${wy}`); // para no duplicar
+                }
+            }
+
+            return {
+                size: 6,
+                maxCmds: 15, // Límite estricto para forzar optimización y bucles
+                start: start,
+                target: target,
+                walls: walls,
+                switches: [{x: sw.x, y: sw.y, id: 1}],
+                doors: [{x: target.x, y: target.y, id: 1}] // Candado exactamente encima del target
+            };
+        }
+
+        function startGame() {
+            if (!audioCtx && !isMuted) { audioCtx = new AudioContext(); bgAudio.play().catch(e=>e); }
+            sfxClick();
+            document.getElementById('instructions-screen').style.display = 'none';
+            generateAndLoadLevel();
+        }
+
+        function generateAndLoadLevel() {
+            currentLevelDef = createProceduralLevel();
+            document.getElementById('level-display').innerText = levelsCompleted;
+            
+            drone = { ...currentLevelDef.start };
+            activeDoors = [...currentLevelDef.doors];
+            triggeredSwitches = [];
+            
+            let board = document.getElementById('board');
+            board.innerHTML = '';
+
+            for(let y=0; y<currentLevelDef.size; y++) {
+                for(let x=0; x<currentLevelDef.size; x++) {
+                    let cell = document.createElement('div');
+                    cell.className = 'cell';
+                    cell.id = `cell-${x}-${y}`;
+                    
+                    // Si es target, añade clase. Si tiene candado, se superpondrá visualmente.
+                    if (currentLevelDef.target.x === x && currentLevelDef.target.y === y) cell.classList.add('target');
+                    if (currentLevelDef.walls.some(w => w.x === x && w.y === y)) cell.classList.add('wall');
+                    
+                    if (currentLevelDef.switches.some(s => s.x === x && s.y === y)) {
+                        cell.classList.add('switch');
+                        cell.dataset.switchId = currentLevelDef.switches.find(s => s.x === x && s.y === y).id;
+                    }
+                    if (activeDoors.some(d => d.x === x && d.y === y)) {
+                        cell.classList.add('door');
+                        cell.dataset.doorId = activeDoors.find(d => d.x === x && d.y === y).id;
+                    }
+                    
+                    board.appendChild(cell);
+                }
+            }
+
+            if (!droneElement) {
+                droneElement = document.createElement('div');
+                droneElement.className = 'drone';
+                droneElement.innerText = '🛸';
+                document.querySelector('.board-container').appendChild(droneElement);
+            }
+            updateDroneVisuals(true);
+            
+            clearCode();
+        }
+
+        function updateDroneVisuals(instant = false) {
+            if(!droneElement) return;
+            let cell = document.getElementById(`cell-${drone.x}-${drone.y}`);
+            if(cell) {
+                let rect = cell.getBoundingClientRect();
+                let containerRect = document.querySelector('.board-container').getBoundingClientRect();
+                
+                let left = rect.left - containerRect.left + (rect.width/2) - 20; 
+                let top = rect.top - containerRect.top + (rect.height/2) - 20;
+
+                droneElement.style.transition = instant ? 'none' : 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+                droneElement.style.left = `${left}px`;
+                droneElement.style.top = `${top}px`;
+                
+                let rot = drone.dir * 90;
+                droneElement.style.transform = `rotate(${rot}deg)`;
+            }
+        }
+
+        // --- SISTEMA DE CÓDIGO ---
+        const cmdConfig = {
+            'AVANZAR': { text: 'Avanzar 1 celda', color: '#fff', icon: '⬆️' },
+            'GIRAR_IZQ': { text: 'Girar a la Izquierda', color: '#fff', icon: '↩️' },
+            'GIRAR_DER': { text: 'Girar a la Derecha', color: '#fff', icon: '↪️' },
+            'BUCLE_X2': { text: 'Repetir bloque x2', color: 'var(--cyber-purple)', icon: '🔁' },
+            'BUCLE_X3': { text: 'Repetir bloque x3', color: 'var(--cyber-purple)', icon: '🔁' },
+            'BUCLE_X5': { text: 'Repetir bloque x5', color: 'var(--cyber-purple)', icon: '🔁' }
+        };
+
+        function updateMemoryIndicator() {
+            if(!currentLevelDef) return;
+            let max = currentLevelDef.maxCmds;
+            let current = codeSequence.length;
+            let ind = document.getElementById('mem-indicator');
+            ind.innerText = `MEMORIA: ${current}/${max}`;
+            
+            let isFull = current >= max;
+            if(isFull) ind.classList.add('full'); else ind.classList.remove('full');
+            
+            document.querySelectorAll('.cmd-btn').forEach(btn => {
+                btn.disabled = isFull;
+            });
+        }
+
+        function addCommand(cmd) {
+            if (isRunning || codeSequence.length >= currentLevelDef.maxCmds) { 
+                if(codeSequence.length >= currentLevelDef.maxCmds) sfxError();
+                return; 
+            }
+            sfxAdd();
+            codeSequence.push(cmd);
+            renderQueue();
+        }
+
+        function removeCommand(index) {
+            if (isRunning) return;
+            sfxDelete();
+            codeSequence.splice(index, 1);
+            renderQueue();
+        }
+
+        function clearCode() {
+            if (isRunning) return;
+            sfxDelete();
+            codeSequence = [];
+            renderQueue();
+        }
+
+        function renderQueue() {
+            let q = document.getElementById('code-queue');
+            q.innerHTML = '';
+            
+            updateMemoryIndicator();
+
+            if(codeSequence.length === 0) {
+                q.innerHTML = '<div style="color:#555; text-align:center; margin-top:20px; font-size:12px;">// Memoria RAM limpia.<br>// Agrega comandos para compilar.</div>';
+                document.getElementById('run-btn').disabled = true;
+                return;
+            }
+            
+            document.getElementById('run-btn').disabled = false;
+
+            codeSequence.forEach((cmd, index) => {
+                let conf = cmdConfig[cmd];
+                let line = document.createElement('div');
+                line.className = 'code-line';
+                line.id = `line-${index}`;
+                
+                let extraText = "";
+                if(cmd.startsWith('BUCLE')) {
+                    if(index > 0 && !codeSequence[index-1].startsWith('BUCLE')) {
+                        extraText = ` <span style="font-size:10px; opacity:0.7">(${cmdConfig[codeSequence[index-1]].text})</span>`;
+                    } else {
+                        extraText = ` <span style="font-size:10px; color:var(--cyber-pink); opacity:0.7">(SINTAXIS INVÁLIDA)</span>`;
+                    }
+                }
+
+                line.innerHTML = `
+                    <div><span style="opacity:0.5; margin-right:8px;">${index+1}.</span> 
+                    <span style="color:${conf.color}">${conf.icon} ${conf.text}</span> ${extraText}</div>
+                    <button class="delete-btn" onclick="removeCommand(${index})">✖</button>
+                `;
+                q.appendChild(line);
+            });
+            q.scrollTop = q.scrollHeight;
+        }
+
+        // --- MOTOR DE EJECUCIÓN ---
+        function runCode() {
+            if(codeSequence.length === 0 || isRunning) return;
+            sfxClick();
+            isRunning = true;
+            document.getElementById('run-btn').disabled = true;
+            document.querySelectorAll('.cmd-btn').forEach(btn => btn.disabled = true);
+            
+            // Restablecer posición y elementos para la ejecución limpia
+            drone = { ...currentLevelDef.start };
+            activeDoors = [...currentLevelDef.doors];
+            triggeredSwitches = [];
+            
+            // Restaurar visuales de puertas
+            document.querySelectorAll('.cell.door-open').forEach(el => {
+                el.classList.remove('door-open');
+                el.classList.add('door');
+            });
+            document.querySelectorAll('.cell.switch-active').forEach(el => {
+                el.classList.remove('switch-active');
+            });
+            updateDroneVisuals(true);
+            
+            document.querySelectorAll('.code-line').forEach(el => { el.classList.remove('active'); el.classList.remove('error'); });
+
+            // Generar lista de ejecución plana (desenrollando bucles)
+            let flatExecution = [];
+            for(let i=0; i<codeSequence.length; i++) {
+                let cmd = codeSequence[i];
+                if (cmd.startsWith('BUCLE_X')) {
+                    let multiplier = parseInt(cmd.replace('BUCLE_X', ''));
+                    if (i > 0 && !codeSequence[i-1].startsWith('BUCLE')) {
+                        for(let k=1; k < multiplier; k++) {
+                            flatExecution.push({ cmd: codeSequence[i-1], lineIdx: i });
+                        }
+                    } else {
+                        flatExecution.push({ cmd: 'NOP', lineIdx: i }); // Syntax Error
+                    }
+                } else {
+                    flatExecution.push({ cmd: cmd, lineIdx: i });
+                }
+            }
+
+            executionIndex = 0;
+            setTimeout(() => executeStep(flatExecution), 400);
+        }
+
+        function executeStep(flatExecution) {
+            if (executionIndex >= flatExecution.length) {
+                checkWinCondition();
+                return;
+            }
+
+            let step = flatExecution[executionIndex];
+            
+            document.querySelectorAll('.code-line').forEach(el => el.classList.remove('active'));
+            let lineEl = document.getElementById(`line-${step.lineIdx}`);
+            if(lineEl) { lineEl.classList.add('active'); lineEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
+
+            let error = false;
+
+            if (step.cmd === 'AVANZAR') {
+                sfxMove();
+                let nx = drone.x; let ny = drone.y;
+                if (drone.dir === 0) ny--; else if (drone.dir === 1) nx++; else if (drone.dir === 2) ny++; else if (drone.dir === 3) nx--;
+                
+                // Colisiones (Límites, Paredes o Puertas cerradas)
+                if (nx < 0 || nx >= currentLevelDef.size || ny < 0 || ny >= currentLevelDef.size || 
+                    currentLevelDef.walls.some(w => w.x === nx && w.y === ny) ||
+                    activeDoors.some(d => d.x === nx && d.y === ny)) {
+                    error = true;
+                } else {
+                    drone.x = nx; drone.y = ny;
+                }
+            } 
+            else if (step.cmd === 'GIRAR_IZQ') { sfxTurn(); drone.dir = (drone.dir + 3) % 4; } 
+            else if (step.cmd === 'GIRAR_DER') { sfxTurn(); drone.dir = (drone.dir + 1) % 4; }
+
+            updateDroneVisuals();
+
+            // Interacción con Llaves después de moverse
+            if (!error) {
+                let onSwitch = currentLevelDef.switches.find(s => s.x === drone.x && s.y === drone.y);
+                if (onSwitch && !triggeredSwitches.includes(onSwitch.id)) {
+                    triggeredSwitches.push(onSwitch.id);
+                    activeDoors = activeDoors.filter(d => d.id !== onSwitch.id);
+                    sfxUnlock();
+                    
+                    // Actualizar visuales DOM
+                    document.querySelectorAll(`.cell.door[data-door-id="${onSwitch.id}"]`).forEach(el => {
+                        el.classList.remove('door');
+                        el.classList.add('door-open');
+                    });
+                    document.getElementById(`cell-${drone.x}-${drone.y}`).classList.add('switch-active');
+                }
+            }
+
+            if (error) {
+                sfxError();
+                if(lineEl) lineEl.classList.add('error');
+                document.querySelector('.board-container').classList.add('shake');
+                setTimeout(() => document.querySelector('.board-container').classList.remove('shake'), 400);
+                
+                setTimeout(() => {
+                    document.getElementById('m-title').style.color = "var(--cyber-pink)";
+                    document.getElementById('m-title').style.textShadow = "0 0 10px var(--cyber-pink)";
+                    showModal("CORRUPCIÓN CRÍTICA 💥", "El dron ha chocado contra un muro, intentó entrar a un candado cerrado o ha salido de la red.\nDepura tu código.", resetExecutionState);
+                }, 500);
+                return;
+            }
+
+            executionIndex++;
+            setTimeout(() => executeStep(flatExecution), 500);
+        }
+
+        function checkWinCondition() {
+            if (drone.x === currentLevelDef.target.x && drone.y === currentLevelDef.target.y) {
+                sfxSuccess();
+                levelsCompleted++;
+                document.getElementById('m-title').style.color = "var(--cyber-green)";
+                document.getElementById('m-title').style.textShadow = "0 0 10px var(--cyber-green)";
+                showModal("¡COMPILACIÓN EXITOSA! ⚡", "Núcleo de datos desbloqueado.\nPreparando el siguiente laberinto procedural...", () => { 
+                    resetExecutionState(); 
+                    generateAndLoadLevel(); 
+                });
+            } else {
+                sfxError();
+                document.getElementById('m-title').style.color = "var(--cyber-yellow)";
+                document.getElementById('m-title').style.textShadow = "0 0 10px var(--cyber-yellow)";
+                showModal("INCOMPLETO ⚠️", "El programa terminó su ejecución, pero el dron no logró llegar al núcleo.\nReescribe el algoritmo.", resetExecutionState);
+            }
+        }
+
+        function resetExecutionState() {
+            isRunning = false;
+            document.getElementById('run-btn').disabled = false;
+            updateMemoryIndicator(); 
+            document.querySelectorAll('.code-line').forEach(el => { el.classList.remove('active'); el.classList.remove('error'); });
+            
+            // Restaurar visuales de puertas
+            document.querySelectorAll('.cell.door-open').forEach(el => {
+                el.classList.remove('door-open');
+                el.classList.add('door');
+            });
+            document.querySelectorAll('.cell.switch-active').forEach(el => {
+                el.classList.remove('switch-active');
+            });
+
+            // Volver dron al inicio
+            drone = { ...currentLevelDef.start };
+            updateDroneVisuals(true);
+        }
+
+        // MODAL
+        let modalCallback = null;
+        function showModal(title, msg, callback = null) { 
+            document.getElementById('m-title').innerText = title; 
+            document.getElementById('m-msg').innerText = msg; 
+            document.getElementById('modal').classList.add('active'); 
+            modalCallback = callback; 
+        }
+        function closeModal() { 
+            sfxClick(); 
+            document.getElementById('modal').classList.remove('active'); 
+            if(modalCallback) { modalCallback(); modalCallback = null; } 
+        }
+
+        window.addEventListener('resize', () => { if(!isRunning) updateDroneVisuals(true); });
+    </script>
+</body>
+</html>
