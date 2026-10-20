@@ -59,7 +59,7 @@ const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)
    3. SISTEMA DE AUDIO SINTETIZADO (Web Audio API)
    ============================================================ */
 const Sound = (() => {
-    let enabled = store.get('bee_sound_enabled', true);
+    let enabled = !store.get('bee_muted_global', false);
     let audioCtx = null;
 
     function getContext() {
@@ -68,7 +68,7 @@ const Sound = (() => {
             if (!AC) return null;
             audioCtx = new AC();
         }
-        if (audioCtx.state === 'suspended') audioCtx.resume();
+        if (audioCtx.state === 'suspended') audioCtx.resume().catch(() => {});
         return audioCtx;
     }
 
@@ -91,18 +91,27 @@ const Sound = (() => {
         } catch {}
     }
 
-    function click()   { tone(660, 0.05, 'square', 0.07); }
-    function hover()   { tone(880, 0.03, 'sine', 0.03); }
+    function click() {
+        tone(660, 0.09, 'triangle', 0.18);
+        setTimeout(() => tone(990, 0.07, 'sine', 0.11), 45);
+    }
+    let lastHover = 0;
+    function hover() {
+        const now = performance.now();
+        if (now - lastHover < 220) return;
+        lastHover = now;
+        tone(880, 0.045, 'sine', 0.055);
+    }
 
     function filterSelect() {
-        tone(720, 0.06, 'triangle', 0.10);
-        setTimeout(() => tone(880, 0.08, 'triangle', 0.10), 50);
+        tone(720, 0.09, 'triangle', 0.18);
+        setTimeout(() => tone(880, 0.11, 'triangle', 0.17), 50);
     }
 
     function openGame() {
-        tone(523.25, 0.10, 'triangle', 0.14);
-        setTimeout(() => tone(659.25, 0.10, 'triangle', 0.14), 90);
-        setTimeout(() => tone(783.99, 0.16, 'triangle', 0.14), 180);
+        tone(523.25, 0.10, 'triangle', 0.19);
+        setTimeout(() => tone(659.25, 0.10, 'triangle', 0.19), 90);
+        setTimeout(() => tone(783.99, 0.18, 'triangle', 0.19), 180);
     }
 
     function beebotGreeting() {
@@ -111,9 +120,9 @@ const Sound = (() => {
     }
 
     function beebotGiggle() {
-        tone(1046, 0.06, 'triangle', 0.09);
-        setTimeout(() => tone(1318, 0.06, 'triangle', 0.09), 70);
-        setTimeout(() => tone(1568, 0.10, 'triangle', 0.09), 140);
+        tone(1046, 0.08, 'triangle', 0.16);
+        setTimeout(() => tone(1318, 0.08, 'triangle', 0.16), 70);
+        setTimeout(() => tone(1568, 0.12, 'triangle', 0.17), 140);
     }
 
     function comingSoon() {
@@ -123,9 +132,10 @@ const Sound = (() => {
 
     return {
         isEnabled: () => enabled,
+        setEnabled(value) { enabled = Boolean(value); store.set('bee_muted_global', !enabled); },
         toggle() {
             enabled = !enabled;
-            store.set('bee_sound_enabled', enabled);
+            store.set('bee_muted_global', !enabled);
             return enabled;
         },
         click, hover, filterSelect, openGame,
@@ -142,90 +152,44 @@ const Sound = (() => {
    ============================================================ */
 const BGM = (() => {
     const audio = $('#bgm');
-    if (!audio) return {
-        play: () => {}, pause: () => {}, resume: () => {},
-        pauseForGame: () => {}, resumeFromGame: () => {},
-        mute: () => {}, unmute: () => {},
-        isPaused: () => true
-    };
-
-    audio.volume = 0.28;
-    audio.loop   = true;
-
-    let pausedByGame = false;
-    let pausedByUser = false;
-
-    function play() {
-        audio.play().catch(() => {});
+    let inGame = false;
+    function sync() {
+        if (!audio) return;
+        if (inGame || !Sound.isEnabled()) { audio.pause(); return; }
+        audio.volume = .28;
+        if (audio.paused) audio.play().catch(() => {});
     }
-    function pause() {
-        if (!audio.paused) audio.pause();
-    }
-    function resume() {
-        if (audio.paused && !pausedByUser && !pausedByGame) {
-            audio.play().catch(() => {});
-        }
-    }
-
-    function pauseForGame() {
-        pausedByGame = true;
-        pause();
-    }
-    function resumeFromGame() {
-        pausedByGame = false;
-        resume();
-    }
-
-    function mute() {
-        pausedByUser = true;
-        pause();
-    }
-    function unmute() {
-        pausedByUser = false;
-        play();
-    }
-
     return {
-        play, pause, resume,
-        pauseForGame, resumeFromGame,
-        mute, unmute,
-        isPaused: () => audio.paused
+        play: sync, resume: sync,
+        pause() { audio?.pause(); },
+        pauseForGame() { inGame = true; audio?.pause(); },
+        resumeFromGame() { inGame = false; sync(); },
+        mute() { Sound.setEnabled(false); sync(); },
+        unmute() { Sound.setEnabled(true); sync(); },
+        isPaused: () => !audio || audio.paused
     };
 })();
-
-
-/* ============================================================
-   5. BOTÓN FLOTANTE DE SONIDO
-   ============================================================ */
 (function initSoundToggle() {
-    const btn = $('#soundToggle');
-    if (!btn) return;
-
-    let isMuted = store.get('bee_muted_global', false);
-    applyState();
-
-    btn.addEventListener('click', () => {
-        isMuted = !isMuted;
-        store.set('bee_muted_global', isMuted);
-        applyState();
-
-        if (!isMuted) {
-            Sound.tone(880, 0.12, 'sine', 0.12);
-            BGM.unmute();
-        } else {
-            BGM.mute();
-        }
-    });
-
-    function applyState() {
-        if (isMuted) {
-            btn.classList.add('is-muted');
-            btn.innerHTML = '<span class="sound-icon sound-off">🔇</span>';
-        } else {
-            btn.classList.remove('is-muted');
-            btn.innerHTML = '<span class="sound-icon sound-on">🔊</span>';
-        }
+    const button = $('#soundToggle');
+    if (!button) return;
+    function render() {
+        const on = Sound.isEnabled();
+        button.setAttribute('aria-pressed', String(on));
+        button.setAttribute('aria-label', on ? 'Silenciar sonido' : 'Activar sonido');
+        button.title = on ? 'Silenciar sonido' : 'Activar sonido';
     }
+    button.addEventListener('click', () => {
+        const on = Sound.toggle(); render(); BGM.resume();
+        if (on) Sound.tone(880, .12, 'sine', .12);
+    });
+    function unlock(event) {
+        if (event.target.closest?.('#soundToggle, .game-card-link')) return;
+        BGM.resume();
+    }
+    document.addEventListener('pointerdown', unlock);
+    document.addEventListener('keydown', unlock);
+    window.addEventListener('pagehide', () => BGM.pause());
+    render(); BGM.resume();
 })();
 
 
@@ -247,11 +211,12 @@ const BGM = (() => {
 
         if (progress) {
             const docH = document.documentElement.scrollHeight - window.innerHeight;
+            document.documentElement.style.setProperty('--bee-header-height', header.offsetHeight + 'px');
             const pct  = docH > 0 ? (y / docH) * 100 : 0;
             progress.style.width = pct + '%';
         }
 
-        if (y > 400 && y > lastScrollY + 10) {
+        if (!header.classList.contains('menu-is-open') && y > 400 && y > lastScrollY + 10) {
             header.style.transform = 'translateY(-140%)';
         } else if (y < lastScrollY - 10 || y < 400) {
             header.style.transform = 'translateY(0)';
@@ -283,6 +248,8 @@ const BGM = (() => {
 
     function close() {
         mainNav.classList.remove('is-open');
+        $('#siteHeader')?.classList.remove('menu-is-open');
+        toggleBtn.setAttribute('aria-label', 'Abrir menú');
         toggleBtn.setAttribute('aria-expanded', 'false');
     }
 
@@ -290,9 +257,13 @@ const BGM = (() => {
         e.stopPropagation();
         const isOpen = mainNav.classList.toggle('is-open');
         toggleBtn.setAttribute('aria-expanded', String(isOpen));
+        $('#siteHeader')?.classList.toggle('menu-is-open', isOpen);
+        toggleBtn.setAttribute('aria-label', isOpen ? 'Cerrar menú' : 'Abrir menú');
+        if (isOpen) $('#siteHeader').style.transform = 'translateY(0)';
         Sound.click();
     });
 
+    matchMedia('(max-width: 1100px)').addEventListener('change', close);
     $$('.nav-btn', mainNav).forEach(link => link.addEventListener('click', close));
 
     document.addEventListener('click', (e) => {
@@ -301,7 +272,7 @@ const BGM = (() => {
     });
 
     document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') close();
+        if (e.key === 'Escape' && mainNav.classList.contains('is-open')) { close(); toggleBtn.focus(); }
     });
 })();
 
@@ -382,7 +353,7 @@ const BGM = (() => {
         if (getComputedStyle(button).position === 'static') {
             button.style.position = 'relative';
         }
-        button.style.overflow = 'hidden';
+        if (!button.classList.contains('menu-toggle')) button.style.overflow = 'hidden';
         button.appendChild(span);
 
         requestAnimationFrame(() => {
@@ -401,6 +372,22 @@ const BGM = (() => {
     });
 })();
 
+
+/* Respuestas sonoras de navegación y controles del visor. */
+(function initExtraButtonSounds() {
+    $$('.nav-btn, .footer-nav-link').forEach(link => {
+        const href = link.getAttribute('href') || '';
+        if (!href.startsWith('#')) link.addEventListener('click', () => Sound.click());
+    });
+    $$('#visorContinue, #visorFullscreen, #visorConfirmExit').forEach(button => {
+        button.addEventListener('click', () => Sound.click());
+    });
+    if (matchMedia('(hover: hover) and (pointer: fine)').matches) {
+        $$('.game-card:not(.is-coming-soon) .game-card-link').forEach(link => {
+            link.addEventListener('mouseenter', () => Sound.hover());
+        });
+    }
+})();
 
 /* ============================================================
    10. REVEAL ESCALONADO AL HACER SCROLL
@@ -435,9 +422,9 @@ const BGM = (() => {
 /* ============================================================
    PORTADAS DINÁMICAS SILENCIOSAS
    ------------------------------------------------------------
-   Cada miniatura carga el HTML real del juego, pero el sandbox
-   impide ejecutar sus scripts. Como protección adicional, todo
-   audio/video encontrado dentro de la vista previa se silencia.
+   Cada miniatura conserva el HTML real del juego y su renderizado.
+   La política del iframe bloquea autoplay y los elementos de audio
+   y video se silencian como protección adicional.
    ============================================================ */
 (function initSilentDynamicPreviews() {
     const PREVIEW_W = 1920;
@@ -494,37 +481,28 @@ const BGM = (() => {
 
     if (!filterBtns.length || !sections.length) return;
 
+    const cards = $$('.game-card');
+    const keys = card => (card.dataset.courses || card.dataset.category || '').split(/\s+/).filter(Boolean);
     function updateCounters() {
-        const counts = { all: 0 };
-
-        sections.forEach(sec => {
-            const category = sec.dataset.section;
-            const numGames = $$('.game-card', sec).length;
-            counts[category] = numGames;
-            counts.all += numGames;
-        });
-
-        $$('[data-count]').forEach(el => {
-            const key = el.dataset.count;
-            el.textContent = counts[key] ?? 0;
-        });
+        const counts = { all: cards.length };
+        cards.forEach(card => new Set(keys(card)).forEach(key => { counts[key] = (counts[key] || 0) + 1; }));
+        $$('[data-count]').forEach(el => el.textContent = counts[el.dataset.count] || 0);
     }
-
     function applyFilter(filter) {
-        let visibleSections = 0;
-
-        sections.forEach(sec => {
-            const isTarget = (filter === 'all') || (sec.dataset.section === filter);
-            sec.classList.toggle('is-hidden', !isTarget);
-            if (isTarget) visibleSections++;
+        cards.forEach(card => { card.hidden = filter !== 'all' && !keys(card).includes(filter); });
+        let found = 0;
+        sections.forEach(section => {
+            const visible = $$('.game-card', section).filter(card => !card.hidden).length;
+            section.classList.toggle('is-hidden', visible === 0);
+            const counter = $('.games-section-count-num', section);
+            if (counter) counter.textContent = visible;
+            if (visible) found++;
         });
-
-        if (gamesEmpty) gamesEmpty.hidden = visibleSections > 0;
-
-        filterBtns.forEach(btn => {
-            const isActive = btn.dataset.filter === filter;
-            btn.classList.toggle('is-active', isActive);
-            btn.setAttribute('aria-selected', String(isActive));
+        if (gamesEmpty) gamesEmpty.hidden = found > 0;
+        filterBtns.forEach(button => {
+            const active = button.dataset.filter === filter;
+            button.classList.toggle('is-active', active);
+            button.setAttribute('aria-pressed', String(active));
         });
     }
 
@@ -662,10 +640,10 @@ const BGM = (() => {
     let isReacting = false;
 
     function react() {
-        if (isReacting || prefersReducedMotion) return;
-        isReacting = true;
-
+        if (isReacting) return;
         Sound.beebotGiggle();
+        if (prefersReducedMotion) return;
+        isReacting = true;
 
         if (display) {
             display.classList.add('is-reacting');
@@ -729,6 +707,7 @@ const BGM = (() => {
     if (!visor || !frame) return;
 
     let juegoActivo = false;
+    let launchLink = null;
     const tab = $('#visorExitTab');
     const panel = $('#visorExitPanel');
     const continuar = $('#visorContinue');
@@ -785,6 +764,7 @@ const BGM = (() => {
         if (!url) return;
 
         BGM.pauseForGame();
+        document.body.classList.add('bee-game-open');
         Sound.openGame();
 
         frame.src = url;
@@ -813,7 +793,9 @@ const BGM = (() => {
         if (tab) tab.setAttribute('aria-expanded', 'false');
         frame.src = '';
         juegoActivo = false;
+        launchLink?.focus({ preventScroll: true });
 
+        document.body.classList.remove('bee-game-open');
         BGM.resumeFromGame();
     };
 
@@ -837,6 +819,7 @@ const BGM = (() => {
                 const url = link.getAttribute('href');
                 if (!url) return;
                 e.preventDefault();
+                launchLink = link;
                 abrirJuego(url);
             });
         }
@@ -898,7 +881,7 @@ window.BeeBotPortal = {
    17. LOG DE BIENVENIDA
    ============================================================ */
 console.log(
-    '%c 🐝 AVENTURAS DE BEEBOT %c 27 juegos · 5 categorías · Música de fondo activa',
+    '%c 🐝 AVENTURAS DE BEEBOT %c 28 juegos enlazados · 7 cursos y retos integrados · Música de fondo activa',
     'background: linear-gradient(90deg, #ffd93d, #ffb800, #7ed957); color: #3d1f00; padding: 6px 14px; border-radius: 8px; font-weight: 900; font-family: sans-serif;',
     'color: #7ed957; font-weight: 700; padding: 4px 8px; font-family: sans-serif;'
 );
@@ -945,23 +928,3 @@ console.log(
     });
 })();
 
-/* Arranque de la canción 19: se intenta al cargar y se garantiza
-   en la primera interacción permitida por el navegador. */
-(function initPortalMusicStart() {
-    const audio = document.getElementById('bgm');
-    if (!audio) return;
-    audio.volume = 0.28;
-    const start = () => {
-        audio.play().then(() => {
-            const btn = document.getElementById('soundToggle');
-            if (btn) {
-                btn.classList.remove('is-muted');
-                btn.innerHTML = '<span class="sound-icon sound-on">🔊</span>';
-            }
-            try { localStorage.setItem('bee_muted_global', 'false'); } catch (_) {}
-        }).catch(() => {});
-    };
-    start();
-    document.addEventListener('pointerdown', start, { once: true, passive: true });
-    document.addEventListener('keydown', start, { once: true });
-})();
