@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Autómata: Arena de IA 🤖</title>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@500;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root { 
+            --bg-color: #020617;
+            --panel-bg: rgba(15, 23, 42, 0.85);
+            --panel-border: #1e293b;
+            --neon-blue: #0ea5e9;
+            --neon-green: #10b981;
+            --neon-red: #ef4444;
+            --neon-amber: #f59e0b;
+            --grid-line: #1e293b;
+            --cell-bg: #0b1120;
+        }
+
+        body, html { 
+            font-family: 'Rajdhani', sans-serif; 
+            display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+            margin: 0; padding: 0; width: 100vw; height: 100vh; 
+            color: #f8fafc; background-color: var(--bg-color); 
+            overflow: hidden; box-sizing: border-box; user-select: none;
+        }
+
+        /* EFECTOS DE FONDO SCI-FI */
+        .decorations { position: fixed; inset: 0; z-index: -1; pointer-events: none; background: radial-gradient(circle at 50% 0%, #0f172a 0%, #020617 100%); overflow: hidden;}
+        .bg-grid { position: absolute; inset: -50%; background-image: linear-gradient(rgba(14, 165, 233, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(14, 165, 233, 0.05) 1px, transparent 1px); background-size: 50px 50px; transform: perspective(1000px) rotateX(60deg) translateY(-100px); animation: gridScroll 20s linear infinite; }
+        @keyframes gridScroll { from { transform: perspective(1000px) rotateX(60deg) translateY(0); } to { transform: perspective(1000px) rotateX(60deg) translateY(50px); } }
+        .scanlines { position: fixed; inset: 0; z-index: 999; pointer-events: none; background: linear-gradient(rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0.2) 50%); background-size: 100% 4px; }
+
+        .sound-toggle { position: absolute; top: 15px; right: 15px; background: rgba(15,23,42,0.8); border: 2px solid var(--neon-blue); border-radius: 8px; width: 45px; height: 45px; font-size: 20px; display: flex; justify-content: center; align-items: center; cursor: pointer; z-index: 1000; box-shadow: 0 0 15px rgba(14,165,233,0.3); transition: all 0.2s; color: var(--neon-blue); backdrop-filter: blur(4px);}
+        .sound-toggle:active { transform: scale(0.9); }
+
+        /* PANTALLA DE INSTRUCCIONES */
+        #instructions-screen { position: absolute; inset: 0; z-index: 600; display: flex; flex-direction: column; justify-content: center; align-items: center; background: rgba(2,6,23,0.85); backdrop-filter: blur(8px); }
+        .instructions-card { background: var(--panel-bg); padding: 40px; border-radius: 12px; border: 1px solid var(--neon-blue); max-width: 90%; width: 600px; display: flex; flex-direction: column; gap: 20px; box-shadow: 0 0 50px rgba(14,165,233,0.15), inset 0 0 20px rgba(14,165,233,0.05); }
+        .instructions-card h1 { font-family: 'Share Tech Mono', monospace; font-size: 36px; color: var(--neon-blue); margin: 0; text-align: center; text-shadow: 0 0 15px rgba(14,165,233,0.5);}
+        .instruction-step { display: flex; gap: 15px; align-items: flex-start; font-size: 18px; background: rgba(255,255,255,0.03); padding: 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);}
+        .instruction-icon { font-size: 28px; flex-shrink: 0; filter: drop-shadow(0 0 5px rgba(255,255,255,0.5));}
+        .instruction-text b { color: var(--neon-amber); }
+        .start-btn { background: linear-gradient(135deg, #0ea5e9, #0284c7); border: none; padding: 15px 40px; font-size: 22px; color: #fff; border-radius: 6px; text-transform: uppercase; font-weight: bold; font-family: 'Share Tech Mono', monospace; cursor:pointer; transition: all 0.2s; align-self: center; box-shadow: 0 0 20px rgba(14,165,233,0.4); letter-spacing: 2px;}
+        .start-btn:hover { filter: brightness(1.2); transform: translateY(-2px); box-shadow: 0 5px 25px rgba(14,165,233,0.6);}
+        .start-btn:active { transform: scale(0.95); }
+
+        /* HEADER */
+        .game-header { display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 1200px; padding: 15px 2vw; z-index: 10; box-sizing: border-box;}
+        .back-menu-btn { background: rgba(14,165,233,0.1); border: 1px solid var(--neon-blue); padding: 8px 15px; border-radius: 6px; font-size: 14px; color: var(--neon-blue); cursor: pointer; transition: all 0.2s; font-family: 'Share Tech Mono', monospace; text-transform: uppercase; font-weight: bold;}
+        .back-menu-btn:hover { background: var(--neon-blue); color: #000; }
+        .hud-box { background: var(--panel-bg); padding: 8px 20px; border-radius: 6px; border: 1px solid var(--neon-green); font-size: 20px; color: #fff; box-shadow: 0 0 15px rgba(16,185,129,0.2); font-family: 'Share Tech Mono', monospace; backdrop-filter: blur(4px);}
+        .hud-box span { color: var(--neon-green); font-weight: bold; font-size: 24px;}
+
+        .main-layout { display: flex; flex-direction: row; gap: 25px; width: 100%; max-width: 1200px; flex: 1; padding: 0 2vw 2vh 2vw; box-sizing: border-box; overflow: hidden; align-items: stretch;}
+        @media (max-width: 900px) { .main-layout { flex-direction: column; } }
+
+        /* =========================================================
+           TABLERO (ARENA VISUAL)
+           ========================================================= */
+        .board-container { flex: 1.2; display: flex; justify-content: center; align-items: center; background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: 12px; padding: 20px; position: relative; box-shadow: inset 0 0 60px rgba(0,0,0,0.8), 0 10px 30px rgba(0,0,0,0.5); backdrop-filter: blur(8px);}
+        
+        .grid-board { display: grid; background: var(--grid-line); border: 4px solid var(--grid-line); gap: 2px; border-radius: 8px; overflow: hidden;}
+        
+        .cell { width: clamp(25px, 4vw, 50px); height: clamp(25px, 4vw, 50px); background: var(--cell-bg); display: flex; justify-content: center; align-items: center; position: relative; transition: background 0.3s;}
+        
+        /* Muro */
+        .cell.wall { background: #334155; }
+        .cell.wall::after { content: ''; position: absolute; inset: 2px; border: 2px solid #475569; background: repeating-linear-gradient(45deg, #1e293b, #1e293b 5px, #334155 5px, #334155 10px); opacity: 0.8;}
+        
+        /* Meta (Batería / Núcleo) */
+        .cell.target { background: rgba(16,185,129,0.05); }
+        .cell.target::before { content: ''; position: absolute; width: 60%; height: 60%; background: var(--neon-green); clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); box-shadow: 0 0 20px var(--neon-green); animation: pulseCore 1.5s infinite alternate; z-index: 2;}
+        .cell.target::after { content: ''; position: absolute; inset: 0; box-shadow: inset 0 0 15px rgba(16,185,129,0.3); border: 1px solid rgba(16,185,129,0.5);}
+
+        /* Enemigo (Virus) */
+        .cell.enemy { background: rgba(239,68,68,0.05); }
+        .cell.enemy::before { content: ''; position: absolute; width: 60%; height: 60%; background: radial-gradient(circle, #fff 10%, var(--neon-red) 50%, #7f1d1d 100%); border-radius: 50%; box-shadow: 0 0 15px var(--neon-red); animation: pulseEnemy 0.8s infinite alternate; z-index: 2;}
+
+        /* Autómata (Dron) */
+        .bot { position: absolute; transition: all 0.2s linear; z-index: 10; display: flex; justify-content: center; align-items: center; pointer-events: none;}
+        .bot-body { width: 70%; height: 70%; background: var(--neon-blue); clip-path: polygon(50% 0%, 100% 100%, 50% 80%, 0% 100%); box-shadow: 0 0 20px var(--neon-blue); position: relative; filter: drop-shadow(0 0 8px rgba(14,165,233,0.8));}
+        .bot-body::after { content: ''; position: absolute; top: 30%; left: 50%; transform: translate(-50%, -50%); width: 30%; height: 30%; background: #fff; border-radius: 50%; box-shadow: 0 0 10px #fff;}
+
+        /* Láser */
+        .laser-beam { position: absolute; background: #fff; z-index: 15; box-shadow: 0 0 10px #fff, 0 0 20px var(--neon-red), 0 0 30px var(--neon-red); transition: all 0.1s; opacity: 0; pointer-events: none; border-radius: 2px;}
+
+        @keyframes pulseCore { 0% { transform: scale(0.8); opacity: 0.8; filter: drop-shadow(0 0 5px var(--neon-green));} 100% { transform: scale(1.1); opacity: 1; filter: drop-shadow(0 0 20px var(--neon-green));} }
+        @keyframes pulseEnemy { 0% { transform: scale(0.9); filter: hue-rotate(-10deg); } 100% { transform: scale(1.1); filter: hue-rotate(10deg); } }
+        
+        @keyframes explode { 0% { transform: scale(0.5); opacity: 1; filter: brightness(2); background: #fff;} 50% { transform: scale(2); opacity: 0.8; filter: brightness(1.5); background: var(--neon-amber);} 100% { transform: scale(2.5); opacity: 0; filter: brightness(0); background: var(--neon-red);} }
+        .exploding::before { animation: explode 0.4s forwards !important; border-radius: 50%; clip-path: none;}
+
+        /* =========================================================
+           EDITOR DE REGLAS (DERECHA)
+           ========================================================= */
+        .ai-panel { flex: 1; display: flex; flex-direction: column; background: var(--panel-bg); border: 1px solid var(--panel-border); border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5); backdrop-filter: blur(8px);}
+        
+        .ai-header { background: rgba(15,23,42,0.9); padding: 15px; text-align: center; border-bottom: 1px solid var(--panel-border); color: #fff; font-family: 'Share Tech Mono', monospace; display: flex; flex-direction: column; gap: 5px;}
+        .ai-header-title { font-size: 20px; font-weight: bold; color: var(--neon-blue); display: flex; align-items: center; justify-content: center; gap: 10px;}
+        .ai-subtitle { font-size: 13px; color: #94a3b8; font-family: 'Rajdhani', sans-serif;}
+
+        .rules-container { flex: 1; padding: 20px; display: flex; flex-direction: column; gap: 12px; overflow-y: auto;}
+        
+        .rule-row { background: rgba(30,41,59,0.5); border: 1px solid #334155; border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 10px; transition: all 0.2s;}
+        .rule-row.active { background: rgba(16,185,129,0.1); border-color: var(--neon-green); box-shadow: 0 0 20px rgba(16,185,129,0.2), inset 0 0 10px rgba(16,185,129,0.1); transform: translateX(5px); z-index: 5;}
+        .rule-row.error { background: rgba(239,68,68,0.1); border-color: var(--neon-red); box-shadow: 0 0 20px rgba(239,68,68,0.2);}
+
+        .rule-header { display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: #94a3b8; font-weight: bold; font-family: 'Share Tech Mono', monospace;}
+        .rule-num { background: #0f172a; padding: 4px 10px; border-radius: 4px; color: var(--neon-blue); border: 1px solid #1e293b;}
+        .rule-logic { display: flex; align-items: center; gap: 10px; flex-wrap: wrap;}
+        
+        select { background: #0f172a; color: #f8fafc; border: 1px solid #334155; padding: 10px; font-family: 'Rajdhani', sans-serif; font-weight: bold; font-size: 16px; border-radius: 6px; cursor: pointer; outline: none; flex: 1; min-width: 140px; transition: border-color 0.2s;}
+        select:focus { border-color: var(--neon-blue); box-shadow: 0 0 10px rgba(14,165,233,0.3); }
+        select.action-sel { border-color: rgba(245,158,11,0.5); color: var(--neon-amber); }
+        select.action-sel:focus { border-color: var(--neon-amber); box-shadow: 0 0 10px rgba(245,158,11,0.3); }
+
+        .controls { display: flex; padding: 20px; gap: 15px; background: rgba(15,23,42,0.9); border-top: 1px solid var(--panel-border); }
+        .run-btn { flex: 2; background: linear-gradient(135deg, #10b981, #059669); border: none; color: #fff; font-weight: bold; padding: 15px; border-radius: 6px; font-family: 'Share Tech Mono', monospace; font-size: 18px; cursor: pointer; transition: all 0.2s; box-shadow: 0 5px 15px rgba(16,185,129,0.3); text-shadow: 0 2px 4px rgba(0,0,0,0.5);}
+        .run-btn:hover { filter: brightness(1.1); transform: translateY(-2px); }
+        .run-btn:active { transform: translateY(0); }
+        .run-btn.stop { background: linear-gradient(135deg, #ef4444, #dc2626); box-shadow: 0 5px 15px rgba(239,68,68,0.3); }
+        
+        .step-btn { flex: 1; background: transparent; border: 2px solid var(--neon-amber); color: var(--neon-amber); border-radius: 6px; cursor: pointer; font-family: 'Share Tech Mono', monospace; font-size: 14px; font-weight: bold; display: flex; justify-content: center; align-items: center; transition: all 0.2s;}
+        .step-btn:hover { background: rgba(245,158,11,0.1); }
+        .step-btn:disabled { opacity: 0.3; cursor: not-allowed; border-color: #64748b; color: #64748b;}
+
+        /* MODAL */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(2,6,23,0.85); display: flex; justify-content: center; align-items: center; z-index: 1000; visibility: hidden; opacity: 0; transition: all 0.3s; backdrop-filter: blur(8px);}
+        .modal-overlay.active { visibility: visible; opacity: 1; }
+        .modal-box { background: var(--panel-bg); padding: 40px; border-radius: 12px; text-align: center; max-width: 85%; width: 450px; transform: scale(0.9); transition: transform 0.3s; border: 1px solid var(--neon-blue); box-shadow: 0 0 50px rgba(14,165,233,0.2), inset 0 0 20px rgba(14,165,233,0.05);}
+        .modal-overlay.active .modal-box { transform: scale(1); }
+        .modal-title { font-family: 'Share Tech Mono', monospace; font-size: 30px; margin-top: 0; margin-bottom: 15px; color: var(--neon-blue); text-shadow: 0 0 15px rgba(14,165,233,0.5);}
+        .modal-msg { font-size: 18px; margin-bottom: 30px; color: #e2e8f0; white-space: pre-line; line-height: 1.5; }
+        .modal-btn { background: transparent; border: 2px solid var(--neon-blue); color: var(--neon-blue); padding: 12px 30px; font-size: 16px; border-radius: 6px; text-transform: uppercase; font-weight: bold; cursor:pointer; font-family: 'Share Tech Mono', monospace; transition: all 0.2s;}
+        .modal-btn:hover { background: var(--neon-blue); color: #000; box-shadow: 0 0 15px rgba(14,165,233,0.5);}
+
+        @keyframes damageShake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-10px); } 40%, 80% { transform: translateX(10px); } }
+        .shake { animation: damageShake 0.4s both; }
+    </style>
+</head>
+<body>
+
+    <audio id="bgm" loop><source src="../assets/musicaFondo/cancion1.mp3" type="audio/mpeg"></audio>
+    <div class="decorations"><div class="bg-grid"></div><div class="scanlines"></div></div>
+    <button id="soundToggle" class="sound-toggle" aria-label="Activar sonido">🔇</button>
+
+    <!-- INSTRUCCIONES -->
+    <div id="instructions-screen">
+        <div class="instructions-card">
+            <h1>CEREBRO AUTÓMATA</h1>
+            <div class="instruction-step">
+                <span class="instruction-icon">🛸</span>
+                <span class="instruction-text"><b>EL RETO:</b> No puedes mover al dron con un control. Tienes que <b>programar su núcleo lógico</b> antes de encenderlo.</span>
+            </div>
+            <div class="instruction-step">
+                <span class="instruction-icon">🧠</span>
+                <span class="instruction-text"><b>PRIORIDAD LÓGICA:</b> El dron lee las reglas de <b>ARRIBA hacia ABAJO</b>. Si la Regla 1 se cumple, la ejecuta e ignora el resto. ¡El orden de las instrucciones es la clave de la victoria!</span>
+            </div>
+            <div class="instruction-step">
+                <span class="instruction-icon">🎯</span>
+                <span class="instruction-text"><b>OBJETIVO:</b> Configura la IA para que navegue hasta la Batería (Núcleo Verde) destruyendo o esquivando los Virus (Núcleos Rojos). Los laberintos se generan de forma procedimental.</span>
+            </div>
+            <button class="start-btn" onclick="startGame()">SISTEMA EN LÍNEA</button>
+        </div>
+    </div>
+
+    <!-- JUEGO -->
+    <div class="game-header">
+        <button class="back-menu-btn" onclick="generateProceduralMap()">[ Siguiente Laberinto ]</button>
+        <div class="hud-box">SISTEMAS VULNERADOS: <span id="score-display">0</span></div>
+    </div>
+
+    <div class="main-layout">
+        <!-- TABLERO -->
+        <div class="board-container" id="board-container">
+            <div class="grid-board" id="board"></div>
+            <div class="laser-beam" id="laser"></div>
+        </div>
+
+        <!-- EDITOR DE IA -->
+        <div class="ai-panel">
+            <div class="ai-header">
+                <div class="ai-header-title">⚙️ PARÁMETROS DE IA</div>
+                <div class="ai-subtitle">Evaluación de Prioridad Descendente</div>
+            </div>
+            
+            <div class="rules-container" id="rules-container">
+                <!-- 4 Reglas -->
+                <script>
+                    for(let i=1; i<=4; i++) {
+                        document.write(`
+                            <div class="rule-row" id="rule-${i}">
+                                <div class="rule-header">
+                                    <span class="rule-num">REGLA ${i}</span>
+                                    <span>SI (Condición) ➞ ENTONCES</span>
+                                </div>
+                                <div class="rule-logic">
+                                    <select class="cond-sel" id="cond-${i}">
+                                        <option value="NONE">[ Condición... ]</option>
+                                        <option value="ENEMY_FRONT">Detecto Virus al frente</option>
+                                        <option value="WALL_FRONT">Detecto Muro al frente</option>
+                                        <option value="TARGET_FRONT">Detecto Batería al frente</option>
+                                        <option value="CLEAR_FRONT">Camino libre al frente</option>
+                                        <option value="ALWAYS">Siempre (Por defecto)</option>
+                                    </select>
+                                    <select class="action-sel" id="act-${i}">
+                                        <option value="NONE">[ Acción... ]</option>
+                                        <option value="MOVE">Avanzar 1 Sector</option>
+                                        <option value="TURN_L">Girar a la Izquierda</option>
+                                        <option value="TURN_R">Girar a la Derecha</option>
+                                        <option value="SHOOT">Disparar Láser</option>
+                                        <option value="IDLE">Entrar en Reposo</option>
+                                    </select>
+                                </div>
+                            </div>
+                        `);
+                    }
+                </script>
+            </div>
+
+            <div class="controls">
+                <button class="step-btn" id="step-btn" onclick="executeTick(true)">PASO A PASO</button>
+                <button class="run-btn" id="run-btn" onclick="toggleRun()">▶ EJECUTAR IA</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL -->
+    <div class="modal-overlay" id="modal">
+        <div class="modal-box">
+            <h2 class="modal-title" id="m-title">Título</h2>
+            <p class="modal-msg" id="m-msg">Mensaje</p>
+            <button class="modal-btn" id="m-btn" onclick="closeModal()">ACEPTAR</button>
+        </div>
+    </div>
+
+    <script>
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        let audioCtx; let isMuted = true;
+        const bgAudio = document.getElementById('bgm');
+        const soundToggle = document.getElementById('soundToggle');
+
+        soundToggle.addEventListener('click', () => {
+            if (!audioCtx) audioCtx = new AudioContext();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            isMuted = !isMuted;
+            if(isMuted) { bgAudio.pause(); soundToggle.innerText = '🔇'; } 
+            else { bgAudio.volume = 0.25; bgAudio.play().catch(e=>e); soundToggle.innerText = '🔊'; }
+        });
+
+        function playTone(freq, type, duration, vol = 0.1) {
+            if (!audioCtx || isMuted) return;
+            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+            osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gain.gain.setValueAtTime(vol, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+            osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + duration);
+        }
+
+        function sfxClick() { playTone(800, 'square', 0.05, 0.05); }
+        function sfxMove() { playTone(300, 'sine', 0.1, 0.05); setTimeout(()=>playTone(350, 'sine', 0.1, 0.05), 50); }
+        function sfxTurn() { playTone(500, 'triangle', 0.1, 0.05); }
+        function sfxLaser() { playTone(1500, 'sawtooth', 0.1, 0.1); setTimeout(()=>playTone(800, 'sawtooth', 0.2, 0.1), 50); }
+        function sfxExplosion() { playTone(100, 'sawtooth', 0.3, 0.2); setTimeout(()=>playTone(80, 'sawtooth', 0.4, 0.2), 100); }
+        function sfxError() { playTone(200, 'square', 0.3, 0.2); setTimeout(()=>playTone(150, 'square', 0.3, 0.2), 150);}
+        function sfxWin() { [523.25, 659.25, 783.99, 1046.50].forEach((f, i) => setTimeout(() => playTone(f, 'square', 0.15, 0.1), i * 150)); }
+
+        // ESTADO DEL JUEGO
+        const GRID_SIZE = 10;
+        let map = []; // 0: vacio, 1: muro, 2: enemigo, 3: target
+        let bot = { x: 0, y: 0, dir: 1 }; // 0: N, 1: E, 2: S, 3: W
+        let botElement = null;
+        
+        let isRunning = false;
+        let runInterval = null;
+        let score = 0;
+        let executionSteps = 0;
+
+        document.querySelectorAll('select').forEach(sel => sel.addEventListener('change', sfxClick));
+
+        function startGame() {
+            if (!audioCtx && !isMuted) { audioCtx = new AudioContext(); bgAudio.play().catch(e=>e); }
+            sfxClick();
+            document.getElementById('instructions-screen').style.display = 'none';
+            generateProceduralMap();
+        }
+
+        // GENERADOR DE MAPAS PROCEDURALES
+        function generateProceduralMap() {
+            stopRun();
+            document.querySelectorAll('.rule-row').forEach(r => r.classList.remove('active', 'error'));
+            
+            map = Array(GRID_SIZE).fill().map(() => Array(GRID_SIZE).fill(1)); // Todo muro
+            
+            let cx = 1, cy = 1;
+            bot = { x: 1, y: 1, dir: 1 };
+            map[cy][cx] = 0;
+            
+            let path = [{x:cx, y:cy}];
+            let steps = Math.floor(Math.random() * 15) + 15;
+            
+            for(let i=0; i<steps; i++) {
+                let dirs = [{dx:0,dy:-1}, {dx:1,dy:0}, {dx:0,dy:1}, {dx:-1,dy:0}];
+                dirs = dirs.filter(d => {
+                    let nx = cx + d.dx*2; let ny = cy + d.dy*2;
+                    return nx > 0 && nx < GRID_SIZE-1 && ny > 0 && ny < GRID_SIZE-1;
+                });
+                if(dirs.length === 0) break;
+                
+                let chosen = dirs[Math.floor(Math.random() * dirs.length)];
+                cx += chosen.dx; cy += chosen.dy; map[cy][cx] = 0; path.push({x:cx, y:cy});
+                cx += chosen.dx; cy += chosen.dy; map[cy][cx] = 0; path.push({x:cx, y:cy});
+            }
+
+            // Target
+            let endNode = path[path.length-1];
+            map[endNode.y][endNode.x] = 3;
+
+            // Enemigos
+            let numEnemies = Math.floor(Math.random() * 3) + 1;
+            for(let i=0; i<numEnemies; i++) {
+                let p = path[Math.floor(Math.random() * (path.length-2)) + 1];
+                if(map[p.y][p.x] === 0 && (p.x !== bot.x || p.y !== bot.y)) {
+                    map[p.y][p.x] = 2;
+                }
+            }
+
+            renderMap();
+        }
+
+        function renderMap() {
+            let board = document.getElementById('board');
+            board.style.gridTemplateColumns = `repeat(${GRID_SIZE}, 1fr)`;
+            board.style.gridTemplateRows = `repeat(${GRID_SIZE}, 1fr)`;
+            board.innerHTML = '';
+
+            for(let y=0; y<GRID_SIZE; y++) {
+                for(let x=0; x<GRID_SIZE; x++) {
+                    let cell = document.createElement('div');
+                    cell.className = 'cell';
+                    cell.id = `cell-${x}-${y}`;
+                    
+                    if (map[y][x] === 1) cell.classList.add('wall');
+                    else if (map[y][x] === 2) cell.classList.add('enemy');
+                    else if (map[y][x] === 3) cell.classList.add('target');
+                    
+                    board.appendChild(cell);
+                }
+            }
+
+            if (!botElement) {
+                botElement = document.createElement('div');
+                botElement.className = 'bot';
+                document.getElementById('board-container').appendChild(botElement);
+            }
+            updateBotVisuals(true);
+        }
+
+        function updateBotVisuals(instant = false) {
+            if(!botElement) return;
+            let cell = document.getElementById(`cell-${bot.x}-${bot.y}`);
+            if(cell) {
+                let rect = cell.getBoundingClientRect();
+                let containerRect = document.getElementById('board-container').getBoundingClientRect();
+                
+                let left = rect.left - containerRect.left; 
+                let top = rect.top - containerRect.top;
+
+                botElement.style.transition = instant ? 'none' : 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)';
+                botElement.style.left = `${left}px`;
+                botElement.style.top = `${top}px`;
+                botElement.style.width = `${rect.width}px`;
+                botElement.style.height = `${rect.height}px`;
+                
+                let rot = bot.dir * 90;
+                botElement.innerHTML = `<div class="bot-body" style="transform: rotate(${rot}deg); transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);"></div>`;
+            }
+        }
+
+        // --- SISTEMA DE EVALUACIÓN DE IA ---
+        
+        function getCellInFront() {
+            let nx = bot.x; let ny = bot.y;
+            if (bot.dir === 0) ny--; else if (bot.dir === 1) nx++; else if (bot.dir === 2) ny++; else if (bot.dir === 3) nx--;
+            
+            if (nx < 0 || nx >= GRID_SIZE || ny < 0 || ny >= GRID_SIZE) return 1; // Pared
+            return map[ny][nx];
+        }
+
+        function evaluateCondition(cond) {
+            let front = getCellInFront();
+            switch(cond) {
+                case 'ENEMY_FRONT': return front === 2;
+                case 'WALL_FRONT': return front === 1;
+                case 'TARGET_FRONT': return front === 3;
+                case 'CLEAR_FRONT': return front === 0 || front === 3;
+                case 'ALWAYS': return true;
+                default: return false;
+            }
+        }
+
+        function executeTick(isManualStep = false) {
+            if (executionSteps > 150) {
+                stopRun();
+                sfxError();
+                showModal("BUCLE INFINITO ⚠️", "El dron ha ejecutado 150 pasos sin alcanzar el núcleo.\nRevisa tu lógica de prioridades.", null);
+                return;
+            }
+
+            document.querySelectorAll('.rule-row').forEach(r => r.classList.remove('active', 'error'));
+            
+            let ruleFired = -1;
+
+            // EVALUACIÓN TOP-DOWN
+            for(let i=1; i<=4; i++) {
+                let cond = document.getElementById(`cond-${i}`).value;
+                let act = document.getElementById(`act-${i}`).value;
+
+                if (cond !== 'NONE' && act !== 'NONE') {
+                    if (evaluateCondition(cond)) {
+                        ruleFired = i;
+                        performAction(act);
+                        break; 
+                    }
+                }
+            }
+
+            if (ruleFired !== -1) {
+                let rEl = document.getElementById(`rule-${ruleFired}`);
+                rEl.classList.add('active');
+                if(isManualStep) setTimeout(() => rEl.classList.remove('active'), 400);
+            } else {
+                sfxError();
+                stopRun();
+                showModal("SISTEMA DETENIDO ⚠️", "Ninguna de las reglas programadas se cumplió en este escenario.\nEl dron no sabe qué hacer.", null);
+                return;
+            }
+
+            executionSteps++;
+            checkGameState();
+        }
+
+        function performAction(act) {
+            if (act === 'MOVE') {
+                let nx = bot.x; let ny = bot.y;
+                if (bot.dir === 0) ny--; else if (bot.dir === 1) nx++; else if (bot.dir === 2) ny++; else if (bot.dir === 3) nx--;
+                
+                let front = getCellInFront();
+                if (front === 1 || front === 2) {
+                    sfxError();
+                    stopRun();
+                    document.getElementById('board-container').classList.add('shake');
+                    setTimeout(() => document.getElementById('board-container').classList.remove('shake'), 400);
+                    showModal("COLISIÓN CRÍTICA 💥", "El dron se estrelló contra un obstáculo.\nAsegúrate de evaluar lo que hay al frente antes de avanzar.", null);
+                } else {
+                    sfxMove();
+                    bot.x = nx; bot.y = ny;
+                    updateBotVisuals();
+                }
+            }
+            else if (act === 'TURN_L') { sfxTurn(); bot.dir = (bot.dir + 3) % 4; updateBotVisuals(); }
+            else if (act === 'TURN_R') { sfxTurn(); bot.dir = (bot.dir + 1) % 4; updateBotVisuals(); }
+            else if (act === 'SHOOT') {
+                sfxLaser();
+                
+                let laser = document.getElementById('laser');
+                let cell = document.getElementById(`cell-${bot.x}-${bot.y}`);
+                let rect = cell.getBoundingClientRect();
+                let contRect = document.getElementById('board-container').getBoundingClientRect();
+                
+                let lw = 6, lh = rect.height;
+                if(bot.dir === 1 || bot.dir === 3) { lw = rect.width; lh = 6; }
+                
+                laser.style.width = `${lw}px`; laser.style.height = `${lh}px`;
+                let lx = rect.left - contRect.left + rect.width/2 - lw/2;
+                let ly = rect.top - contRect.top + rect.height/2 - lh/2;
+                
+                if (bot.dir === 0) { ly -= rect.height; }
+                else if (bot.dir === 1) { lx += rect.width; }
+                else if (bot.dir === 2) { ly += rect.height; }
+                else if (bot.dir === 3) { lx -= rect.width; }
+
+                laser.style.left = `${lx}px`; laser.style.top = `${ly}px`;
+                laser.style.opacity = '1';
+                setTimeout(() => laser.style.opacity = '0', 200);
+
+                let front = getCellInFront();
+                if (front === 2) {
+                    let nx = bot.x; let ny = bot.y;
+                    if (bot.dir === 0) ny--; else if (bot.dir === 1) nx++; else if (bot.dir === 2) ny++; else if (bot.dir === 3) nx--;
+                    
+                    map[ny][nx] = 0; 
+                    let eCell = document.getElementById(`cell-${nx}-${ny}`);
+                    eCell.classList.remove('enemy');
+                    eCell.classList.add('exploding');
+                    sfxExplosion();
+                    setTimeout(()=> eCell.classList.remove('exploding'), 450);
+                }
+            }
+            else if (act === 'IDLE') {
+                // Wait
+            }
+        }
+
+        function checkGameState() {
+            if (map[bot.y][bot.x] === 3) {
+                stopRun();
+                sfxWin();
+                score++;
+                document.getElementById('score-display').innerText = score;
+                document.getElementById('m-title').style.color = "var(--neon-green)";
+                document.getElementById('m-title').style.textShadow = "0 0 15px rgba(16,185,129,0.5)";
+                showModal("¡EXTRACCIÓN EXITOSA! 🔋", "La lógica de tu IA funcionó a la perfección.\nIniciando siguiente laberinto...", () => {
+                    generateProceduralMap();
+                    document.getElementById('m-title').style.textShadow = "0 0 10px var(--neon-blue)";
+                    document.getElementById('m-title').style.color = "var(--neon-blue)";
+                });
+            }
+        }
+
+        function toggleRun() {
+            let btn = document.getElementById('run-btn');
+            let sBtn = document.getElementById('step-btn');
+            if (isRunning) {
+                stopRun();
+            } else {
+                sfxClick();
+                let hasRules = false;
+                for(let i=1; i<=4; i++) { if(document.getElementById(`cond-${i}`).value !== 'NONE' && document.getElementById(`act-${i}`).value !== 'NONE') hasRules = true; }
+                if(!hasRules) { sfxError(); showModal("ERROR LÓGICO", "Debes configurar al menos una regla válida.", null); return; }
+
+                isRunning = true;
+                executionSteps = 0;
+                btn.classList.add('stop');
+                btn.innerHTML = '⏹ DETENER IA';
+                sBtn.disabled = true;
+                
+                bot = { x: 1, y: 1, dir: 1 };
+                
+                runInterval = setInterval(() => {
+                    executeTick();
+                }, 300);
+            }
+        }
+
+        function stopRun() {
+            isRunning = false;
+            clearInterval(runInterval);
+            let btn = document.getElementById('run-btn');
+            btn.classList.remove('stop');
+            btn.innerHTML = '▶ EJECUTAR IA';
+            document.getElementById('step-btn').disabled = false;
+        }
+
+        // MODAL
+        let modalCallback = null;
+        function showModal(title, msg, callback = null) { 
+            document.getElementById('m-title').innerText = title; 
+            document.getElementById('m-msg').innerText = msg; 
+            document.getElementById('modal').classList.add('active'); 
+            modalCallback = callback; 
+        }
+        function closeModal() { 
+            sfxClick(); 
+            document.getElementById('modal').classList.remove('active'); 
+            if(modalCallback) { modalCallback(); modalCallback = null; } 
+        }
+
+        window.addEventListener('resize', () => { if(!isRunning) updateBotVisuals(true); });
+    </script>
+</body>
+</html>
