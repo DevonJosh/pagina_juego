@@ -1959,3 +1959,1421 @@ body.world-portal {
 #visor-juego .visor-exit-actions button:hover { filter:brightness(.9); }
 #visor-juego button:focus-visible { outline:3px solid #00e5ff; outline-offset:3px; }
 .nav-robot-img { width:22px; height:22px; object-fit:contain; flex-shrink:0; }
+
+/* ============================================================
+   LUDIO LAB · CIUDAD DE IDEAS
+   Navegación, escenario y centro de misiones adaptables.
+   ============================================================ */
+.portal-secundaria {
+    --lab-cyan:#4de8ff;
+    --lab-pink:#ff62d6;
+    --lab-purple:#a575ff;
+    --lab-ink:#171236;
+    --font-body:'Nunito',sans-serif;
+    }
+.portal-secundaria * {
+    box-sizing:border-box;
+    }
+.portal-secundaria {
+    margin:0;
+    font-family:var(--font-body);
+    color:#eef3ff;
+    background:#100e29;
+    }
+.portal-secundaria a {
+    text-decoration:none;
+    }
+.portal-secundaria button {
+    font-family:inherit;
+    cursor:pointer;
+    }
+.portal-secundaria [hidden] {
+    display:none!important;
+    }
+.portal-secundaria :is(a,button,[tabindex]):focus-visible {
+    outline:3px solid #ffdc75;
+    outline-offset:5px;
+    }
+.portal-secundaria .site-header {
+    position:fixed;
+    inset:14px 20px auto;
+    width:auto;
+    height:auto;
+    z-index:10000;
+    background:#1c1744;
+    border:1px solid #7764c4;
+    border-bottom:3px solid #7965db;
+    border-radius:22px;
+    box-shadow:0 6px 0 #09071d55;
+    overflow:visible!important;
+    contain:none;
+    transform:none!important;
+}
+.portal-secundaria .header-inner {
+    position:relative;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:24px;
+    width:min(1500px,100%);
+    height:auto;
+    min-height:86px;
+    margin:auto;
+    padding:12px 24px;
+    overflow:visible!important;
+    }
+.portal-secundaria .brand {
+    display:flex;
+    align-items:center;
+    gap:12px;
+    flex-shrink:0;
+    }
+.portal-secundaria .brand-logo {
+    display:grid;
+    place-items:center;
+    width:54px;
+    height:54px;
+    padding:5px;
+    flex-shrink:0;
+    border:1px solid #7cecff;
+    border-radius:15px;
+    background:linear-gradient(145deg,#4269d6,#6b39bc)!important;
+    box-shadow:0 4px 0 #100b2c!important;
+    }
+.portal-secundaria .brand-logo::before,.portal-secundaria .brand-logo-glow {
+    display:none;
+    }
+.portal-secundaria .nav-robot-image {
+    width:30px;
+    height:30px;
+    object-fit:contain;
+    }
+.portal-secundaria .brand-logo .nav-robot-image {
+    width:100%;
+    height:100%;
+    }
+.portal-secundaria .nav-overline {
+    display:block;
+    color:#aba6dc;
+    letter-spacing:.14em;
+    font-size:.51rem;
+    font-weight:900;
+    margin-bottom:4px;
+    }
+.portal-secundaria .brand-name {
+    margin:0;
+    font:700 1.55rem 'Fredoka',sans-serif;
+    letter-spacing:.02em;
+    color:#f8f5ff;
+    background:none;
+    -webkit-text-fill-color:currentColor;
+    -webkit-text-stroke:0;
+    text-shadow:none;
+    line-height:1.1;
+    }
+.portal-secundaria .brand-name span {
+    color:#4de8ff;
+    }
+.portal-secundaria .brand-tagline {
+    color:#c5bfee;
+    font-size:.65rem;
+    margin:5px 0 0;
+    }
+.portal-secundaria .main-nav {
+    position:relative;
+    display:flex;
+    gap:7px;
+    padding:0;
+    background:none;
+    border:0;
+    overflow:visible;
+    }
+.portal-secundaria .nav-btn {
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:7px;
+    min-height:46px;
+    padding:9px 15px;
+    color:#e9e5ff;
+    border:1px solid #65518f;
+    border-bottom:3px solid #55407d;
+    background:#302454;
+    border-radius:12px;
+    font-weight:900;
+    font-size:.8rem;
+    text-shadow:none;
+    transition:transform .2s,background .2s;
+    }
+.portal-secundaria .nav-btn:hover {
+    background:#573a8c;
+    transform:translateY(-3px);
+    }
+.portal-secundaria .nav-btn.is-active {
+    color:#102c42;
+    background:#4de8ff;
+    border-color:#91f3ff;
+    border-bottom-color:#21a5c3;
+    box-shadow:none;
+    }
+.portal-secundaria .nav-indicator {
+    display:none;
+    }
+.portal-secundaria .menu-toggle {
+    display:none;
+    }
+.portal-secundaria .scroll-progress {
+    position:absolute;
+    left:15px;
+    bottom:-3px;
+    height:3px;
+    max-width:calc(100% - 30px);
+    background:#ff74df;
+    border-radius:5px;
+    }
+.portal-secundaria .sound-toggle {
+    position:fixed;
+    top:118px;
+    right:24px;
+    bottom:auto;
+    left:auto;
+    z-index:9900;
+    display:grid;
+    place-items:center;
+    width:46px;
+    height:46px;
+    padding:10px;
+    border:1px solid #aa8df4;
+    border-bottom:3px solid #6c4baf;
+    border-radius:14px;
+    background:#29204e;
+    color:#b9f7ff;
+    box-shadow:none;
+    }
+.portal-secundaria .sound-toggle .sound-cross {
+    display:none;
+    }
+.portal-secundaria .sound-toggle.is-muted .sound-cross {
+    display:block;
+    }
+.portal-secundaria .sound-toggle.is-muted .sound-waves {
+    display:none;
+    }
+.portal-secundaria.ludio-game-open {
+    overflow:hidden;
+    }
+.portal-secundaria.ludio-game-open .sound-toggle {
+    display:none;
+    }
+
+/* Un skyline local, pistas de luz y un escenario para el robot. */
+.portal-secundaria .hero-secundaria {
+    position:relative;
+    isolation:isolate;
+    min-height:max(800px,100svh);
+    padding:160px 40px 125px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+    background:radial-gradient(ellipse at 12% 15%,#754ac0 0,transparent 45%),radial-gradient(ellipse at 85% 15%,#174e99 0,transparent 50%),linear-gradient(180deg,#211442,#272665 65%,#11204e);
+    }
+.portal-secundaria .portal-hero-bg {
+    z-index:-3;
+    opacity:.3;
+    }
+.portal-secundaria .data-panel,.portal-secundaria .holo {
+    display:none;
+    }
+.portal-secundaria .ludio-city {
+    position:absolute;
+    inset:auto 0 0;
+    height:68%;
+    z-index:-2;
+    pointer-events:none;
+    }
+.portal-secundaria .ludio-city svg {
+    width:100%;
+    height:100%;
+    display:block;
+    }
+.portal-secundaria .portal-hero-content {
+    width:min(1360px,100%);
+    max-width:1360px;
+    margin:0 auto;
+    display:grid;
+    grid-template-columns:1fr 1.05fr;
+    gap:70px;
+    align-items:center;
+    }
+.portal-secundaria .hero-character {
+    position:relative;
+    min-height:470px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    }
+.portal-secundaria .hero-character .robot-display {
+    max-width:370px;
+    width:78%;
+    background:none;
+    }
+.portal-secundaria .hero-character .robot-img {
+    position:relative;
+    z-index:3;
+    width:100%;
+    height:100%;
+    object-fit:contain;
+    max-height:430px;
+    filter:drop-shadow(0 12px 0 #17143d44);
+    }
+.portal-secundaria .hero-character .robot-display::before,.portal-secundaria .hero-character .robot-display::after {
+    display:none;
+    }
+.portal-secundaria .ludio-orbit {
+    position:absolute;
+    inset:1% 3% 3%;
+    border:1px solid #8cb6ff88;
+    border-radius:50%;
+    transform:rotate(-15deg);
+    background:radial-gradient(circle,#7875ff22 50%,transparent 51%);
+    }
+.portal-secundaria .ludio-orbit::before {
+    content:'';
+    position:absolute;
+    inset:20px;
+    border:2px dashed #99d7ff55;
+    border-radius:50%;
+    }
+.portal-secundaria .ludio-orbit::after {
+    content:'✦';
+    position:absolute;
+    right:8%;
+    top:8%;
+    font-size:40px;
+    color:#ffdc75;
+    }
+.portal-secundaria .platform-cyber {
+    bottom:2%;
+    width:86%;
+    height:105px;
+    max-width:460px;
+    background:linear-gradient(180deg,#5570c6,#392373);
+    border:3px solid #80e8ff;
+    border-bottom:13px solid #6540ac;
+    box-shadow:0 12px 0 #1d1848;
+    filter:none;
+    animation:none;
+    }
+.portal-secundaria .orbit-label {
+    position:absolute;
+    z-index:4;
+    background:#251a52;
+    padding:12px 16px;
+    border:1px solid #a78be2;
+    border-radius:12px;
+    font-size:.64rem;
+    letter-spacing:.07em;
+    font-weight:900;
+    box-shadow:0 4px 0 #13152c;
+    }
+.portal-secundaria .orbit-label-one {
+    top:8%;
+    left:-2%;
+    color:#8cf2ff;
+    transform:rotate(-5deg);
+    }
+.portal-secundaria .orbit-label-two {
+    right:-2%;
+    bottom:12%;
+    color:#ffd5f5;
+    transform:rotate(5deg);
+    }
+.portal-secundaria .hero-text {
+    position:relative;
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    gap:22px;
+    }
+.portal-secundaria .hero-badge {
+    margin:0;
+    padding:9px 14px;
+    background:#172649;
+    border:1px solid #68d9f8;
+    color:#a2f2ff;
+    font-size:.7rem;
+    }
+.portal-secundaria .portal-hero-title {
+    font-family:'Fredoka',sans-serif;
+    font-size:clamp(4rem,7.2vw,7.4rem);
+    line-height:.95;
+    letter-spacing:-.03em;
+    margin:0;
+    text-align:left;
+    }
+.portal-secundaria .portal-hero-title-line {
+    display:block;
+    font-size:.32em;
+    letter-spacing:.07em;
+    color:#eee8ff;
+    background:none;
+    -webkit-text-fill-color:currentColor;
+    text-shadow:none;
+    margin-bottom:12px;
+    }
+.portal-secundaria .portal-hero-title-accent {
+    font-size:1em;
+    letter-spacing:-.03em;
+    color:#62eaff;
+    text-shadow:0 6px 0 #2d316f,4px 6px 0 #e26cd1;
+    }
+.portal-secundaria .ludio-dialogue {
+    position:relative;
+    max-width:100%;
+    border-left:3px solid #ed74df;
+    background:#211a4acc;
+    border-radius:0 14px 14px 0;
+    padding:14px 18px;
+    color:#edeaff;
+    font-size:.91rem;
+    line-height:1.7;
+    }
+.portal-secundaria .ludio-dialogue .bubble-text {
+    margin:0;
+    }
+.portal-secundaria .ludio-dialogue .bubble-tail {
+    display:none;
+    }
+.portal-secundaria .glitch-text {
+    display:block;
+    color:#8aefff;
+    font:800 .66rem 'Nunito',sans-serif;
+    letter-spacing:.1em;
+    margin-bottom:4px;
+    animation:none;
+    }
+.portal-secundaria .hero-text .portal-hero-subtitle {
+    margin:0!important;
+    padding:0!important;
+    color:#ede9ff!important;
+    background:none!important;
+    box-shadow:none!important;
+    border:0;
+    border-radius:0;
+    font-size:1rem;
+    line-height:1.8;
+    text-align:left;
+    max-width:480px;
+    }
+.portal-secundaria .hero-actions {
+    margin:0;
+    }
+.portal-secundaria .btn-hero-secundaria {
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:18px;
+    padding:18px 24px;
+    border:1px solid #b3fbff;
+    border-bottom:5px solid #2399bb;
+    color:#112b49;
+    background:#51e0ff;
+    border-radius:14px;
+    box-shadow:0 5px 0 #1f285b;
+    font-size:.9rem;
+    font-weight:900;
+    text-shadow:none;
+    }
+.portal-secundaria .btn-hero-secundaria:hover {
+    background:#a0f4ff;
+    transform:translateY(-3px);
+    }
+.portal-secundaria .btn-glow {
+    display:none;
+    }
+.portal-secundaria .ludio-hero-strip {
+    position:absolute;
+    bottom:40px;
+    left:50%;
+    transform:translateX(-50%);
+    display:flex;
+    gap:40px;
+    width:max-content;
+    max-width:calc(100% - 30px);
+    font-size:.68rem;
+    font-weight:900;
+    letter-spacing:.12em;
+    color:#d6d6ff;
+    padding:15px 30px;
+    border:1px solid #7a6ab3;
+    background:#18183ee8;
+    border-radius:30px;
+    }
+.portal-secundaria .scroll-hint {
+    display:none;
+    }
+
+/* Centro de misiones: grandes superficies de color, sin texto flotante. */
+.portal-secundaria .games-area {
+    position:relative;
+    background:radial-gradient(ellipse at 0 0,#4b2d9255,transparent 32%),radial-gradient(ellipse at 100% 40%,#19476755,transparent 35%),#13102d;
+    padding:70px 32px;
+    scroll-margin-top:110px;
+    }
+.portal-secundaria .games-header {
+    max-width:1360px;
+    margin:0 auto 28px;
+    text-align:left;
+    }
+.portal-secundaria .mission-overline {
+    display:block;
+    color:#bd9fff;
+    font-size:.64rem;
+    letter-spacing:.18em;
+    font-weight:900;
+    margin-bottom:15px;
+    }
+.portal-secundaria .section-title {
+    display:flex;
+    justify-content:flex-start;
+    align-items:center;
+    gap:16px;
+    font:600 clamp(1.8rem,3.5vw,3.2rem) 'Fredoka',sans-serif;
+    color:#f1edff;
+    }
+.portal-secundaria .section-title-txt {
+    background:none;
+    -webkit-text-fill-color:currentColor;
+    text-shadow:none;
+    }
+.portal-secundaria .section-title-ico {
+    display:grid;
+    place-items:center;
+    width:54px;
+    height:54px;
+    flex-shrink:0;
+    background:#4d3492;
+    border:1px solid #ad8ee7;
+    border-radius:16px;
+    font-size:1.6rem;
+    }
+.portal-secundaria .section-subtitle {
+    color:#beb9df;
+    margin:15px 0 0;
+    max-width:700px;
+    line-height:1.8;
+    }
+.portal-secundaria .mission-dashboard {
+    max-width:1360px;
+    margin:0 auto 35px;
+    display:grid;
+    grid-template-columns:repeat(3,1fr) 1.5fr;
+    border:1px solid #675591;
+    border-radius:20px;
+    background:linear-gradient(115deg,#302251,#232249);
+    overflow:hidden;
+    }
+.portal-secundaria .mission-dashboard>div {
+    padding:23px;
+    border-right:1px solid #6c589255;
+    display:flex;
+    flex-direction:column;
+    gap:7px;
+    }
+.portal-secundaria .mission-dashboard b {
+    font:500 2.1rem 'Fredoka',sans-serif;
+    color:#7deaff;
+    }
+.portal-secundaria .mission-dashboard>div:nth-child(2) b {
+    color:#dba6ff;
+    }
+.portal-secundaria .mission-dashboard>div:nth-child(3) b {
+    color:#ffcc81;
+    }
+.portal-secundaria .mission-dashboard div span {
+    font-size:.58rem;
+    font-weight:900;
+    letter-spacing:.1em;
+    color:#c5bce5;
+    }
+.portal-secundaria .mission-dashboard p {
+    margin:0;
+    padding:25px;
+    font-size:.8rem;
+    line-height:1.8;
+    color:#bab6df;
+    }
+.portal-secundaria .mission-dashboard strong {
+    color:#f1eaff;
+    }
+.portal-secundaria .mission-status-dot {
+    display:inline-block;
+    width:7px;
+    height:7px;
+    margin-right:7px;
+    border-radius:50%;
+    background:#76f4c4;
+    }
+.portal-secundaria .filters {
+    display:grid;
+    grid-template-columns:repeat(6,minmax(0,1fr));
+    gap:12px;
+    max-width:1360px;
+    margin:0 auto 45px;
+    padding:0;
+    background:none;
+    border:0;
+    }
+.portal-secundaria .filter-btn {
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    justify-content:center;
+    gap:9px;
+    min-width:0;
+    min-height:76px;
+    padding:14px 10px;
+    background:#262044;
+    border:1px solid #655081;
+    border-bottom:4px solid #513d70;
+    border-radius:16px;
+    color:#dad4f2;
+    font-size:.76rem;
+    font-weight:900;
+    box-shadow:none;
+    }
+.portal-secundaria .filter-btn.is-active {
+    background:#543394;
+    border-color:#ba8dff;
+    border-bottom-color:#8e5ec4;
+    color:#fff;
+    box-shadow:none;
+    }
+.portal-secundaria .filter-btn:hover {
+    background:#403066;
+    transform:translateY(-3px);
+    }
+.portal-secundaria .filter-count {
+    background:#110e2c;
+    border:1px solid #75618f;
+    color:#d6c8ff;
+    border-radius:7px;
+    padding:3px 6px;
+    font-size:.61rem;
+    }
+.portal-secundaria .games-section {
+    --area:#69e4ff;
+    --area-dark:#1c3e61;
+    max-width:1360px;
+    margin:0 auto 55px;
+    padding:25px;
+    border:1px solid #526587;
+    border-top:3px solid var(--area);
+    border-radius:24px;
+    background:linear-gradient(145deg,var(--area-dark),#1b1936 55%);
+    }
+.portal-secundaria .games-section[data-section='programacion'] {
+    --area:#ce99ff;
+    --area-dark:#40265e;
+    }
+.portal-secundaria .games-section[data-section='ciencias'] {
+    --area:#63edbb;
+    --area-dark:#194b47;
+    }
+.portal-secundaria .games-section[data-section='historia'] {
+    --area:#ffc476;
+    --area-dark:#4e3541;
+    }
+.portal-secundaria .games-section[data-section='retos'] {
+    --area:#ff8ac5;
+    --area-dark:#4f2448;
+    }
+.portal-secundaria .games-section-head {
+    display:flex;
+    align-items:center;
+    gap:16px;
+    padding:0 0 22px;
+    margin:0 0 25px;
+    background:none;
+    border:0;
+    border-bottom:1px solid #9e9bca44;
+    box-shadow:none;
+    border-radius:0;
+    }
+.portal-secundaria .games-section-ico {
+    display:grid;
+    place-items:center;
+    width:52px;
+    height:52px;
+    flex-shrink:0;
+    background:var(--area-dark);
+    color:var(--area);
+    border:1px solid var(--area);
+    box-shadow:none;
+    border-radius:15px;
+    font-size:1.5rem;
+    }
+.portal-secundaria .games-section-info {
+    flex:1;
+    min-width:0;
+    }
+.portal-secundaria .games-section-title {
+    color:#f1edff;
+    margin:0;
+    font:500 clamp(1.3rem,2vw,1.8rem) 'Fredoka',sans-serif;
+    }
+.portal-secundaria .games-section-desc {
+    color:#c0bdd9;
+    font-size:.8rem;
+    line-height:1.7;
+    margin:7px 0 0;
+    }
+.portal-secundaria .games-section-count {
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    min-width:60px;
+    background:var(--area-dark);
+    color:var(--area);
+    border:1px solid var(--area);
+    border-radius:12px;
+    padding:8px 12px;
+    }
+.portal-secundaria .games-grid {
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:24px;
+    }
+.portal-secundaria .game-card {
+    min-width:0;
+    background:#231e42;
+    border:1px solid #79709d;
+    border-top:3px solid var(--area);
+    border-radius:18px;
+    box-shadow:0 5px 0 #09091d55;
+    overflow:hidden;
+    transition:transform .2s,border-color .2s;
+    }
+.portal-secundaria .game-card:hover {
+    transform:translateY(-6px);
+    border-color:var(--area);
+    box-shadow:0 7px 0 #09091d66;
+    }
+.portal-secundaria .game-card-link {
+    display:flex;
+    height:100%;
+    flex-direction:column;
+    color:inherit;
+    }
+.portal-secundaria .game-card-thumb {
+    height:auto;
+    aspect-ratio:16/9;
+    width:100%;
+    border-bottom:1px solid #6e6190;
+    background:radial-gradient(circle at 25% 30%,var(--area-dark),#16162e);
+    }
+.portal-secundaria .game-card-thumb:has(.dynamic-thumb) .game-thumb-bg {
+    display:none;
+    }
+.portal-secundaria .dynamic-thumb {
+    width:1920px;
+    height:1080px;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%) scale(var(--thumb-scale,.18));
+    transform-origin:center;
+    }
+.portal-secundaria .game-card-body {
+    display:flex;
+    flex-direction:column;
+    gap:0;
+    flex:1;
+    padding:22px;
+    background:linear-gradient(145deg,#30254f,#221f3b);
+    }
+.portal-secundaria .game-card-top {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:8px;
+    }
+.portal-secundaria .game-category-tag {
+    color:var(--area);
+    background:var(--area-dark);
+    border:1px solid #b4a5ce44;
+    border-radius:8px;
+    padding:5px 8px;
+    font-size:.61rem;
+    }
+.portal-secundaria .game-age {
+    color:#c6bfdd;
+    font-size:.61rem;
+    }
+.portal-secundaria .game-title {
+    color:#fff2ff;
+    font:500 1.35rem 'Fredoka',sans-serif;
+    margin:16px 0 10px;
+    background:none;
+    -webkit-text-fill-color:currentColor;
+    }
+.portal-secundaria .game-desc {
+    color:#cbc4df;
+    font-size:.85rem;
+    line-height:1.7;
+    margin:0 0 22px;
+    flex:1;
+    }
+.portal-secundaria .game-card-bottom {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    margin-top:auto;
+    }
+.portal-secundaria .game-play {
+    display:flex;
+    align-items:center;
+    gap:9px;
+    padding:10px 15px;
+    border-radius:10px;
+    background:var(--area);
+    color:#18182e;
+    border-bottom:3px solid #0b142555;
+    font-weight:900;
+    font-size:.77rem;
+    box-shadow:none;
+    }
+.portal-secundaria .game-card.disabled {
+    opacity:1!important;
+    filter:none!important;
+    cursor:default;
+    border-top-color:#9680ba;
+    }
+.portal-secundaria .game-card.disabled:hover {
+    transform:none;
+    }
+.portal-secundaria .game-card.disabled .game-card-link {
+    cursor:default;
+    }
+.portal-secundaria .placeholder-overlay {
+    background:repeating-linear-gradient(135deg,#ffffff04 0 2px,transparent 2px 20px),radial-gradient(circle,#5d3c86,#272040);
+    backdrop-filter:none;
+    }
+.portal-secundaria .placeholder-text {
+    transform:none;
+    border:1px solid #d6aaff;
+    border-bottom:3px solid #ab77d4;
+    background:#3f285a;
+    color:#f2d7ff;
+    border-radius:12px;
+    padding:13px 17px;
+    font-size:.93rem;
+    letter-spacing:.06em;
+    text-shadow:none;
+    }
+.portal-secundaria .disabled .game-play {
+    background:#42385d;
+    color:#ded0ef;
+    border:1px solid #77648f;
+    }
+.portal-secundaria .game-number {
+    background:#15152de8;
+    color:#d8e9ff;
+    border:1px solid #99b9dd66;
+    }
+.portal-secundaria .help-section {
+    background:linear-gradient(135deg,#362262,#1e2549);
+    border-top:1px solid #7661ae;
+    padding:65px 32px;
+    }
+.portal-secundaria .help-inner {
+    max-width:1360px;
+    margin:auto;
+    }
+.portal-secundaria .help-grid {
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:20px;
+    }
+.portal-secundaria .help-card {
+    background:#2b224c;
+    border:1px solid #8671b1;
+    border-radius:18px;
+    padding:24px;
+    box-shadow:none;
+    }
+.portal-secundaria .help-card-title {
+    color:#eee6ff;
+    }
+.portal-secundaria .help-card-desc,.portal-secundaria .help-subtitle {
+    color:#c9c1df;
+    line-height:1.8;
+    }
+.portal-secundaria .help-title {
+    color:#f8edff;
+    }
+.portal-secundaria .site-footer {
+    background:#151127;
+    border-top:1px solid #5d4b85;
+    padding:40px 24px;
+    }
+.portal-secundaria .footer-nav-link {
+    color:#c9b9ec;
+    }
+.portal-secundaria #visor-juego {
+    position:fixed;
+    inset:0;
+    width:100%;
+    height:100dvh;
+    z-index:1000000;
+    display:none;
+    background:#000;
+    }
+.portal-secundaria #visor-juego.activo {
+    display:block;
+    }
+.portal-secundaria #frame-juego {
+    width:100%;
+    height:100%;
+    border:0;
+    display:block;
+    background:#fff;
+    }
+.portal-secundaria .ludio-exit-game {
+    position:absolute;
+    z-index:2;
+    right:max(12px,env(safe-area-inset-right));
+    top:max(10px,env(safe-area-inset-top));
+    border:1px solid #ac91e9;
+    border-bottom:3px solid #62438c;
+    border-radius:10px;
+    padding:10px 14px;
+    color:#fff;
+    background:#30204beF;
+    font-size:.72rem;
+    font-weight:900;
+    }
+
+@media (min-width:1800px) {
+    .portal-secundaria .portal-hero-content {
+    max-width:1500px;
+    gap:110px;
+    } .portal-secundaria .hero-character {
+    min-height:540px;
+    } .portal-secundaria .hero-character .robot-display {
+    max-width:430px;
+    } }
+@media (max-width:1100px) {
+    .portal-secundaria .menu-toggle {
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    gap:5px;
+    flex:none;
+    width:44px;
+    height:44px;
+    padding:9px;
+    border:1px solid #9f7bd1;
+    border-radius:12px;
+    background:#422d69;
+    }
+    .portal-secundaria .menu-toggle span {
+    display:block;
+    width:22px;
+    height:3px;
+    margin:0;
+    background:#e7d5ff;
+    border-radius:3px;
+    }
+    .portal-secundaria .menu-toggle[aria-expanded='true'] span:first-child {
+    transform:translateY(8px) rotate(45deg);
+    }
+    .portal-secundaria .menu-toggle[aria-expanded='true'] span:nth-child(2) {
+    opacity:0;
+    }
+    .portal-secundaria .menu-toggle[aria-expanded='true'] span:last-child {
+    transform:translateY(-8px) rotate(-45deg);
+    }
+    .portal-secundaria .main-nav {
+    position:absolute!important;
+    inset:calc(100% + 10px) 0 auto auto!important;
+    width:min(440px,100%);
+    max-height:calc(100dvh - 130px);
+    overflow-y:auto;
+    display:none;
+    flex-direction:column;
+    padding:13px;
+    border:1px solid #a886de;
+    border-bottom:4px solid #7752b0;
+    border-radius:18px;
+    background:#22193f;
+    box-shadow:0 9px 0 #100b2455;
+    }
+    .portal-secundaria .main-nav.is-open {
+    display:flex;
+    }
+    .portal-secundaria .main-nav .nav-btn {
+    justify-content:flex-start;
+    min-height:48px;
+    }
+    .portal-secundaria .portal-hero-content {
+    gap:30px;
+    }
+    .portal-secundaria .filters {
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    }
+    .portal-secundaria .games-grid {
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    }
+    .portal-secundaria .help-grid {
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    }
+}
+@media (max-width:800px) {
+    .portal-secundaria .hero-secundaria {
+    padding:140px 28px 100px;
+    min-height:100svh;
+    }
+    .portal-secundaria .portal-hero-content {
+    display:flex;
+    flex-direction:column;
+    gap:35px;
+    }
+    .portal-secundaria .hero-character {
+    width:min(400px,100%);
+    min-height:350px;
+    }
+    .portal-secundaria .hero-character .robot-display {
+    max-width:280px;
+    }
+    .portal-secundaria .hero-text {
+    align-items:center;
+    text-align:center;
+    max-width:550px;
+    }
+    .portal-secundaria .portal-hero-title,.portal-secundaria .hero-text .portal-hero-subtitle {
+    text-align:center;
+    }
+    .portal-secundaria .portal-hero-title {
+    font-size:5.5rem;
+    }
+    .portal-secundaria .ludio-city {
+    height:80%;
+    opacity:.6;
+    }
+    .portal-secundaria .mission-dashboard {
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    }
+    .portal-secundaria .mission-dashboard p {
+    grid-column:1/-1;
+    border-top:1px solid #6c589255;
+    padding:15px 23px;
+    }
+    .portal-secundaria .mission-dashboard p br {
+    display:none;
+    }
+    .portal-secundaria .orbit-label {
+    font-size:.56rem;
+    padding:10px;
+    }
+}
+@media (max-width:550px) {
+    .portal-secundaria .site-header {
+    inset:9px 10px auto;
+    border-radius:18px;
+    }
+    .portal-secundaria .header-inner {
+    min-height:76px;
+    padding:10px 12px;
+    gap:10px;
+    }
+    .portal-secundaria .brand {
+    gap:9px;
+    flex-shrink:1;
+    }
+    .portal-secundaria .brand-logo {
+    width:44px;
+    height:44px;
+    border-radius:12px;
+    }
+    .portal-secundaria .brand-name {
+    font-size:1.2rem;
+    }
+    .portal-secundaria .brand-tagline {
+    font-size:.52rem;
+    }
+    .portal-secundaria .nav-overline {
+    font-size:.4rem;
+    letter-spacing:.06em;
+    }
+    .portal-secundaria .sound-toggle {
+    top:104px;
+    right:14px;
+    width:40px;
+    height:40px;
+    }
+    .portal-secundaria .hero-secundaria {
+    padding:145px 22px 100px;
+    }
+    .portal-secundaria .hero-character {
+    min-height:295px;
+    width:300px;
+    max-width:100%;
+    }
+    .portal-secundaria .hero-character .robot-display {
+    max-width:230px;
+    }
+    .portal-secundaria .hero-text {
+    gap:19px;
+    }
+    .portal-secundaria .portal-hero-title {
+    font-size:4.8rem;
+    }
+    .portal-secundaria .hero-badge {
+    font-size:.6rem;
+    padding:9px 10px;
+    }
+    .portal-secundaria .hero-text .portal-hero-subtitle {
+    font-size:.87rem;
+    }
+    .portal-secundaria .ludio-dialogue {
+    font-size:.8rem;
+    padding:12px;
+    }
+    .portal-secundaria .btn-hero-secundaria {
+    padding:16px;
+    font-size:.77rem;
+    gap:12px;
+    }
+    .portal-secundaria .ludio-hero-strip {
+    gap:13px;
+    font-size:.43rem;
+    letter-spacing:.04em;
+    padding:13px 16px;
+    bottom:25px;
+    }
+    .portal-secundaria .games-area {
+    padding:44px 14px;
+    }
+    .portal-secundaria .section-title {
+    font-size:1.9rem;
+    gap:12px;
+    }
+    .portal-secundaria .section-title-ico {
+    width:44px;
+    height:44px;
+    font-size:1.3rem;
+    }
+    .portal-secundaria .section-subtitle {
+    font-size:.81rem;
+    }
+    .portal-secundaria .mission-dashboard>div {
+    padding:17px 12px;
+    }
+    .portal-secundaria .mission-dashboard b {
+    font-size:1.8rem;
+    }
+    .portal-secundaria .mission-dashboard div span {
+    font-size:.45rem;
+    line-height:1.7;
+    letter-spacing:.04em;
+    }
+    .portal-secundaria .mission-dashboard p {
+    font-size:.7rem;
+    padding:12px;
+    }
+    .portal-secundaria .filters {
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:10px;
+    margin-bottom:30px;
+    }
+    .portal-secundaria .filter-btn {
+    min-height:62px;
+    padding:10px;
+    font-size:.7rem;
+    gap:6px;
+    }
+    .portal-secundaria .games-section {
+    padding:17px 12px;
+    border-radius:20px;
+    margin-bottom:30px;
+    }
+    .portal-secundaria .games-section-head {
+    gap:10px;
+    align-items:flex-start;
+    }
+    .portal-secundaria .games-section-ico {
+    width:38px;
+    height:38px;
+    font-size:1.1rem;
+    border-radius:10px;
+    }
+    .portal-secundaria .games-section-title {
+    font-size:1.23rem;
+    }
+    .portal-secundaria .games-section-desc {
+    font-size:.69rem;
+    }
+    .portal-secundaria .games-section-count {
+    min-width:38px;
+    padding:6px;
+    font-size:.65rem;
+    }
+    .portal-secundaria .games-grid {
+    grid-template-columns:minmax(0,1fr);
+    gap:20px;
+    }
+    .portal-secundaria .game-card-body {
+    padding:21px;
+    }
+    .portal-secundaria .help-section {
+    padding:42px 20px;
+    }
+    .portal-secundaria .help-grid {
+    grid-template-columns:minmax(0,1fr);
+    }
+}
+@media (prefers-reduced-motion:reduce) {
+    .portal-secundaria *, .portal-secundaria *::before,.portal-secundaria *::after {
+    animation:none!important;
+    transition:none!important;
+    scroll-behavior:auto!important;
+    }
+}
+
+/* ============================================================
+   SECUNDARIA · CÓDIGO + CIRCUITOS + NEÓN
+   Ajuste del pie: cada elemento comparte el mismo eje central.
+   ============================================================ */
+.portal-secundaria {
+    --font-title: 'Nunito', sans-serif;
+    --lab-mono: 'Consolas', 'SFMono-Regular', 'Liberation Mono', monospace;
+}
+.portal-secundaria .hero-secundaria {
+    background: radial-gradient(ellipse at 15% 20%, #48218488, transparent 48%),
+                radial-gradient(ellipse at 85% 28%, #13458688, transparent 45%),
+                linear-gradient(180deg, #0c1028, #151335 65%, #0d1735);
+}
+.portal-secundaria .ludio-circuit-network {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -1;
+}
+.portal-secundaria .ludio-city {
+    opacity: .75;
+}
+.portal-secundaria .brand-name,
+.portal-secundaria .portal-hero-title,
+.portal-secundaria .section-title,
+.portal-secundaria .games-section-title,
+.portal-secundaria .game-title,
+.portal-secundaria .help-title {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 900;
+}
+.portal-secundaria .brand-name {
+    font-size: 1.4rem;
+    letter-spacing: .045em;
+}
+.portal-secundaria .portal-hero-title {
+    font-size: clamp(4rem, 7vw, 7rem);
+    letter-spacing: -.065em;
+}
+.portal-secundaria .portal-hero-title-line {
+    font-family: var(--lab-mono);
+    font-weight: 700;
+    font-size: .22em;
+    letter-spacing: .18em;
+}
+.portal-secundaria .portal-hero-title-accent {
+    font-family: 'Nunito', sans-serif;
+    font-size: 1em;
+    letter-spacing: -.06em;
+    color: #8cf6ff;
+    text-shadow: 0 0 22px #32d9ff66, 3px 3px 0 #8250bd;
+}
+.portal-secundaria .hero-badge,
+.portal-secundaria .orbit-label,
+.portal-secundaria .mission-overline,
+.portal-secundaria .ludio-hero-strip {
+    font-family: var(--lab-mono);
+    border-radius: 6px;
+}
+.portal-secundaria .hero-badge {
+    background: #101b33;
+    border-color: #51d2f0;
+}
+.portal-secundaria .ludio-orbit {
+    border-color: #76deff;
+    box-shadow: 0 0 24px #43c9ff22, inset 0 0 24px #43c9ff16;
+}
+.portal-secundaria .platform-cyber {
+    border-color: #5feaff;
+    box-shadow: 0 0 22px #36d4ff44, 0 12px 0 #141631;
+}
+.portal-secundaria .hero-text {
+    gap: 20px;
+    min-width: 0;
+}
+
+.portal-secundaria .btn-hero-secundaria {
+    border-radius: 8px;
+    background: #5deaff;
+    box-shadow: 0 0 20px #42dcff2e;
+}
+.portal-secundaria .games-area {
+    background: linear-gradient(#1b214d22 1px, transparent 1px),
+                linear-gradient(90deg, #1b214d22 1px, transparent 1px),
+                radial-gradient(ellipse at 0 0, #49217855, transparent 38%), #0e1226;
+    background-size: 38px 38px, 38px 38px, auto, auto;
+}
+.portal-secundaria .mission-overline { color: #a1b5ef; }
+.portal-secundaria .mission-overline > span { color: #69edff; margin-right: 9px; }
+.portal-secundaria .mission-dashboard { border-radius: 12px; background: linear-gradient(120deg, #252046, #132b3d); }
+.portal-secundaria .mission-dashboard b { font-family: var(--lab-mono); font-weight: 700; }
+.portal-secundaria .filter-btn { border-radius: 9px; background: #1b233c; }
+.portal-secundaria .filter-btn.is-active { background: #352758; box-shadow: 0 0 15px #b37aff20; }
+.portal-secundaria .games-section { border-radius: 14px; background: linear-gradient(140deg, var(--area-dark), #151b30 45%); }
+.portal-secundaria .games-section-ico { border-radius: 9px; }
+.portal-secundaria .game-card { border-radius: 12px; }
+.portal-secundaria .game-card:hover { box-shadow: 0 0 18px color-mix(in srgb, var(--area) 20%, transparent); }
+.portal-secundaria .game-card-body { background: linear-gradient(135deg, #252c46, #181c31); }
+.portal-secundaria .game-title { font-size: 1.15rem; line-height: 1.4; }
+.portal-secundaria .game-play { border-radius: 6px; }
+.portal-secundaria .help-section { background: linear-gradient(115deg, #1e2044, #152638); }
+.portal-secundaria .help-card { background: #1a2237; border-radius: 12px; }
+
+/* Pie completamente centrado: neutraliza el layout de styles.css. */
+.portal-secundaria .site-footer {
+    position: relative;
+    padding: 46px 24px 32px;
+    background: radial-gradient(ellipse at 50% 0, #34316544, transparent 60%), #0b1020;
+    border-top: 1px solid #56738d;
+    text-align: center;
+}
+.portal-secundaria .site-footer .footer-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    max-width: 1360px;
+    width: 100%;
+    margin: 0 auto;
+    text-align: center;
+}
+.portal-secundaria .footer-code-label {
+    display: block;
+    color: #8299ba;
+    font: .65rem var(--lab-mono);
+    letter-spacing: .09em;
+}
+.portal-secundaria .site-footer .footer-brand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    width: 100%;
+    margin: 0;
+}
+.portal-secundaria .footer-ludio-image { width: 44px; height: 44px; object-fit: contain; }
+.portal-secundaria .footer-brand-txt {
+    color: #e6f6ff;
+    background: none;
+    -webkit-text-fill-color: currentColor;
+    font: 900 1.3rem 'Nunito', sans-serif;
+    letter-spacing: .07em;
+}
+.portal-secundaria .footer-code-slash { color: #5feaff; }
+.portal-secundaria .site-footer .footer-msg {
+    width: min(640px, 100%);
+    max-width: 640px;
+    margin: 0 auto;
+    text-align: center;
+    color: #b2bfd5;
+    font-size: .88rem;
+    line-height: 1.8;
+}
+.portal-secundaria .site-footer .footer-nav {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    margin: 0;
+    font: 800 .8rem 'Nunito', sans-serif;
+}
+.portal-secundaria .site-footer .footer-nav-link { padding: 8px 12px; color: #b8d4eb; }
+.portal-secundaria .site-footer .footer-copy {
+    width: 100%;
+    max-width: none;
+    margin: 4px auto 0;
+    text-align: center;
+    color: #9aaac5;
+    font-size: .73rem;
+    line-height: 1.8;
+}
+@media (max-width: 800px) {
+    .portal-secundaria .ludio-circuit-network { opacity: .5; }
+    .portal-secundaria .hero-text { width: 100%; }
+}
+@media (max-width: 550px) {
+    .portal-secundaria .brand-name { font-size: 1.15rem; }
+    .portal-secundaria .portal-hero-title { font-size: 4.6rem; }
+    .portal-secundaria .site-footer { padding: 34px 18px 25px; }
+    .portal-secundaria .site-footer .footer-nav { gap: 4px; }
+    .portal-secundaria .site-footer .footer-nav-link { padding: 8px 7px; font-size: .73rem; }
+    .portal-secundaria .site-footer .footer-msg { font-size: .8rem; }
+    .portal-secundaria .site-footer .footer-copy { font-size: .66rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+}
+
+/* CÓDIGO BINARIO AMBIENTAL: detrás de Ludio, libre de interacción. */
+.portal-secundaria .binary-rain {
+    display: block;
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+    opacity: .64;
+    mask-image: linear-gradient(90deg, #000a 0%, #000 25%, #0008 48%, #0002 72%, #0005 100%);
+    -webkit-mask-image: linear-gradient(90deg, #000a 0%, #000 25%, #0008 48%, #0002 72%, #0005 100%);
+}
+.portal-secundaria .binary-drop {
+    position: absolute;
+    top: -340px;
+    font-family: var(--lab-mono);
+    font-weight: 500;
+    line-height: 1.9;
+    white-space: pre;
+    letter-spacing: .1em;
+    text-shadow: 0 0 7px currentColor;
+    animation-name: ludioBinaryFall;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    user-select: none;
+}
+@keyframes ludioBinaryFall {
+    0% { transform: translateY(0); opacity: 0; }
+    12%, 85% { opacity: .9; }
+    100% { transform: translateY(var(--binary-travel, 1500px)); opacity: 0; }
+}
+@media (max-width: 800px) {
+    .portal-secundaria .binary-rain {
+        opacity: .36;
+        mask-image: linear-gradient(#000 0%, #000 40%, #0002 75%, transparent);
+        -webkit-mask-image: linear-gradient(#000 0%, #000 40%, #0002 75%, transparent);
+    }
+}
+@media (prefers-reduced-motion: reduce) {
+    .portal-secundaria .binary-drop { animation: none!important; }
+}

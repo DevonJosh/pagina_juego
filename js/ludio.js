@@ -194,13 +194,17 @@ const Sound = (() => {
 (function initSoundToggle() {
     const btn = $('#soundToggle');
     if (!btn) return;
-
-    if (!Sound.isEnabled()) btn.classList.add('is-muted');
-
+    function sync() {
+        const enabled = Sound.isEnabled();
+        btn.classList.toggle('is-muted', !enabled);
+        btn.setAttribute('aria-pressed', String(enabled));
+        btn.setAttribute('aria-label', enabled ? 'Silenciar efectos de sonido' : 'Activar efectos de sonido');
+        btn.title = enabled ? 'Silenciar sonido' : 'Activar sonido';
+    }
+    sync();
     btn.addEventListener('click', () => {
-        const isNowOn = Sound.toggle();
-        btn.classList.toggle('is-muted', !isNowOn);
-        if (isNowOn) Sound.tone(1400, 0.10, 'square', 0.10);
+        if (Sound.toggle()) Sound.click();
+        sync();
     });
 })();
 
@@ -259,31 +263,27 @@ const Sound = (() => {
     const toggleBtn = $('#menuToggle');
     const mainNav = $('.main-nav');
     if (!toggleBtn || !mainNav) return;
-
-    function close() {
+    function close(restoreFocus = false) {
         mainNav.classList.remove('is-open');
         toggleBtn.setAttribute('aria-expanded', 'false');
+        toggleBtn.setAttribute('aria-label', 'Abrir menú');
+        if (restoreFocus) toggleBtn.focus();
     }
-
-    toggleBtn.addEventListener('click', (e) => {
+    toggleBtn.addEventListener('click', e => {
         e.stopPropagation();
-        const isOpen = mainNav.classList.toggle('is-open');
-        toggleBtn.setAttribute('aria-expanded', String(isOpen));
+        const open = mainNav.classList.toggle('is-open');
+        toggleBtn.setAttribute('aria-expanded', String(open));
+        toggleBtn.setAttribute('aria-label', open ? 'Cerrar menú' : 'Abrir menú');
         Sound.click();
     });
-
-    $$('.nav-btn', mainNav).forEach(link => {
-        link.addEventListener('click', close);
-    });
-
-    document.addEventListener('click', (e) => {
-        if (!mainNav.classList.contains('is-open')) return;
+    $$('.nav-btn', mainNav).forEach(link => link.addEventListener('click', () => close()));
+    document.addEventListener('click', e => {
         if (!mainNav.contains(e.target) && !toggleBtn.contains(e.target)) close();
     });
-
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') close();
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape' && mainNav.classList.contains('is-open')) close(true);
     });
+    window.matchMedia('(max-width: 1100px)').addEventListener('change', () => close());
 })();
 
 
@@ -381,7 +381,7 @@ const Sound = (() => {
 
     // Sonido al abrir un juego (arranque cyber)
     $$('.game-card-link').forEach(link => {
-        link.addEventListener('click', () => Sound.openGame());
+        link.addEventListener('click', () => { if (!link.closest('.disabled')) Sound.openGame(); });
     });
 })();
 
@@ -457,7 +457,7 @@ const Sound = (() => {
         filterBtns.forEach(btn => {
             const isActive = btn.dataset.filter === filter;
             btn.classList.toggle('is-active', isActive);
-            btn.setAttribute('aria-selected', String(isActive));
+            btn.setAttribute('aria-pressed', String(isActive));
         });
     }
 
@@ -642,8 +642,13 @@ const Sound = (() => {
 
     /* ---- 12.3 BINARY RAIN ---- */
     const binaryRain = $('#binaryRain');
-    if (binaryRain && !prefersReducedMotion) {
-        const totalDrops = window.innerWidth < 700 ? 20 : 45;
+    if (binaryRain) {
+        const totalDrops = window.innerWidth < 700 ? 14 : 30;
+        function updateTravel() {
+            binaryRain.style.setProperty('--binary-travel', `${binaryRain.clientHeight + 700}px`);
+        }
+        updateTravel();
+        window.addEventListener('resize', updateTravel, {passive:true});
         const fragment = document.createDocumentFragment();
 
         for (let i = 0; i < totalDrops; i++) {
@@ -654,15 +659,16 @@ const Sound = (() => {
             const length = 8 + Math.floor(Math.random() * 12);
             let bits = '';
             for (let j = 0; j < length; j++) {
-                bits += Math.random() > 0.5 ? '1' : '0';
+                bits += (Math.random() > 0.5 ? '1' : '0') + (j < length - 1 ? '\n' : '');
             }
             drop.textContent = bits;
 
-            const duration = (6 + Math.random() * 8).toFixed(1);
-            const delay = (Math.random() * 10).toFixed(1);
+            const duration = (14 + Math.random() * 12).toFixed(1);
+            const delay = (-Math.random() * Number(duration)).toFixed(1);
 
             Object.assign(drop.style, {
-                left: `${Math.random() * 100}%`,
+                left: `${(i + 0.5) * 100 / totalDrops}%`,
+                top: prefersReducedMotion ? `${(i * 17) % 70}%` : '-340px',
                 animationDuration: `${duration}s`,
                 animationDelay: `${delay}s`,
                 opacity: (0.3 + Math.random() * 0.5).toFixed(2),
@@ -838,7 +844,103 @@ window.LudioPortal = {
    16. LOG DE BIENVENIDA
    ============================================================ */
 console.log(
-    '%c 🤖 AVENTURAS DE LUDIO %c 20 juegos · 5 categorías · Sistema cyber iniciado',
+    '%c 🤖 AVENTURAS DE LUDIO %c 21 misiones · 5 categorías · Sistema cyber iniciado',
     'background: linear-gradient(90deg, #00e5ff, #b14aed, #ff5e7e); color: #ffffff; padding: 6px 14px; border-radius: 8px; font-weight: 900; font-family: monospace; letter-spacing: 0.05em;',
     'color: #00e5ff; font-weight: 700; padding: 4px 8px; font-family: monospace;'
 );
+
+/* ============================================================
+   VISOR · conserva las rutas y descarga el juego al volver
+   ============================================================ */
+(function initGameViewer() {
+    const visor = $('#visor-juego');
+    const frame = $('#frame-juego');
+    const exit = $('#ludioExitGame');
+    if (!visor || !frame || !exit) return;
+    let trigger = null;
+    let pausedMedia = [];
+    function close() {
+        if (!visor.classList.contains('activo')) return;
+        visor.classList.remove('activo');
+        document.body.classList.remove('ludio-game-open');
+        frame.src = '';
+        if (document.fullscreenElement === visor && document.exitFullscreen) {
+            Promise.resolve(document.exitFullscreen()).catch(() => {});
+        }
+        pausedMedia.forEach(media => { Promise.resolve(media.play()).catch(() => {}); });
+        pausedMedia = [];
+        if (trigger) trigger.focus();
+    }
+    $$('.game-card-link').forEach(link => {
+        if (link.closest('.disabled')) {
+            link.removeAttribute('href');
+            link.setAttribute('aria-disabled', 'true');
+            link.setAttribute('tabindex', '-1');
+            return;
+        }
+        link.addEventListener('click', e => {
+            e.preventDefault();
+            trigger = link;
+            pausedMedia = $$('audio, video').filter(media => !media.paused);
+            pausedMedia.forEach(media => media.pause());
+            frame.src = link.getAttribute('href');
+            frame.title = link.getAttribute('aria-label') || 'Juego seleccionado';
+            visor.classList.add('activo');
+            document.body.classList.add('ludio-game-open');
+            if (visor.requestFullscreen) Promise.resolve(visor.requestFullscreen()).catch(() => {});
+            exit.focus();
+        });
+    });
+    exit.addEventListener('click', () => { Sound.click(); close(); });
+    // Escape can first leave native fullscreen; the portal button stays available.
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape' && visor.classList.contains('activo')) close();
+        if (e.key === 'Tab' && document.activeElement === exit && e.shiftKey) {
+            e.preventDefault(); frame.focus();
+        }
+    });
+    frame.addEventListener('keydown', e => {
+        if (e.key === 'Tab' && e.shiftKey) { e.preventDefault(); exit.focus(); }
+    });
+    window.cerrarJuego = close;
+})();
+
+/* Miniaturas en 1920 × 1080, centradas y silenciosas.
+   Los recursos permanecen en sus rutas originales. */
+(function initSilentPreviews() {
+    $$('.dynamic-thumb').forEach(frame => {
+        const thumb = frame.parentElement;
+        function resize() {
+            frame.style.setProperty('--thumb-scale', String(thumb.clientWidth / 1920));
+        }
+        resize();
+        if ('ResizeObserver' in window) new ResizeObserver(resize).observe(thumb);
+        else window.addEventListener('resize', resize, {passive:true});
+        frame.addEventListener('load', () => {
+            try {
+                const doc = frame.contentDocument;
+                const win = frame.contentWindow;
+                if (!doc || !win) return;
+                function silence(media) {
+                    media.muted = true;
+                    media.volume = 0;
+                    media.pause();
+                    media.addEventListener('play', () => { media.muted = true; media.pause(); });
+                }
+                doc.querySelectorAll('audio, video').forEach(silence);
+                doc.addEventListener('play', event => {
+                    if (event.target.matches('audio, video')) { event.target.muted = true; event.target.pause(); }
+                }, true);
+                if (win.Howler) win.Howler.mute(true);
+                new win.MutationObserver(records => {
+                    records.forEach(record => record.addedNodes.forEach(node => {
+                        if (node.nodeType !== 1) return;
+                        if (node.matches('audio, video')) silence(node);
+                        node.querySelectorAll('audio, video').forEach(silence);
+                    }));
+                    if (win.Howler) win.Howler.mute(true);
+                }).observe(doc.documentElement, {childList:true, subtree:true});
+            } catch (_) { /* Cross-origin previews remain protected by autoplay policy. */ }
+        });
+    });
+})();
