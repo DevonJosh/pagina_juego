@@ -13,16 +13,17 @@
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/home.css">
 
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='24' fill='%23b14aed'/><path d='M25 35h50M25 50h50M25 65h50' stroke='white' stroke-width='6' stroke-linecap='round'/></svg>">
 </head>
-<body>
+<body class="home-portal">
 
 <!-- ============================================================
      BOTÓN FLOTANTE: SONIDO
      ============================================================ -->
-<audio id="mainMusic" src="assets/musicaFondo/cancion17.mp3" loop autoplay preload="auto"></audio>
-<button id="soundToggle" class="sound-toggle" aria-label="Activar o desactivar sonido" title="Sonido">
+<audio id="mainMusic" src="assets/musicaFondo/cancion17.mp3" loop preload="auto"></audio>
+<button id="soundToggle" class="sound-toggle" type="button" aria-pressed="true" aria-label="Activar o desactivar sonido" title="Sonido">
     <span class="sound-icon sound-on" aria-hidden="true">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
@@ -60,11 +61,11 @@
             </div>
             <div class="brand-text">
                 <h1 class="brand-name">AVENTURA EDUCATIVA</h1>
-                <p class="brand-tagline">Aprende jugando, descubre y supera nuevos desafíos.</p>
+                <p class="brand-tagline">Tres robots. Un mundo de posibilidades.</p>
             </div>
         </a>
 
-        <nav class="main-nav" aria-label="Navegación principal">
+        <nav id="homeNavigation" class="main-nav" aria-label="Navegación principal">
             <span class="nav-indicator" aria-hidden="true"></span>
 
             <a href="#hero" class="nav-btn nav-inicio" data-nav="hero">
@@ -78,44 +79,22 @@
             </a>
 
             <a href="#inicial" class="nav-btn nav-beebot nav-inicial" data-nav="inicial">
-                <span class="nav-btn-ico" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M12 22V12"/>
-                        <path d="M12 12C12 8 9 5 4 5c0 5 3 7 8 7z"/>
-                        <path d="M12 12c0-4 3-7 8-7 0 5-3 7-8 7z"/>
-                    </svg>
-                </span>
+                <img class="home-nav-robot" src="assets/robots/beebot.png" alt="" width="28" height="28">
                 <span class="nav-btn-txt">Bee-Bot</span>
             </a>
 
             <a href="#primaria" class="nav-btn nav-rayet nav-primaria" data-nav="primaria">
-                <span class="nav-btn-ico" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
-                        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
-                    </svg>
-                </span>
+                <img class="home-nav-robot" src="assets/robots/rayet.png" alt="" width="28" height="28">
                 <span class="nav-btn-txt">Rugged</span>
             </a>
 
             <a href="#secundaria" class="nav-btn nav-ludio nav-secundaria" data-nav="secundaria">
-                <span class="nav-btn-ico" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="4" y="4" width="16" height="16" rx="2"/>
-                        <rect x="9" y="9" width="6" height="6"/>
-                        <path d="M9 2v2M15 2v2M9 20v2M15 20v2M2 9h2M2 15h2M20 9h2M20 15h2"/>
-                    </svg>
-                </span>
+                <img class="home-nav-robot" src="assets/robots/ludio.png" alt="" width="28" height="28">
                 <span class="nav-btn-txt">Ludio</span>
             </a>
 
             <a href="#recursos" class="nav-btn nav-recursos" data-nav="recursos">
-                <span class="nav-btn-ico" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
-                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
-                    </svg>
-                </span>
+                <img class="home-nav-robot home-professor-nav" src="assets/robots/profesor.png" alt="" width="32" height="32">
                 <span class="nav-btn-txt">Profesores</span>
             </a>
 
@@ -131,7 +110,7 @@
             </a>
         </nav>
 
-        <button class="menu-toggle" id="menuToggle" aria-label="Abrir menú" aria-expanded="false">
+        <button class="menu-toggle" id="menuToggle" type="button" aria-controls="homeNavigation" aria-label="Abrir menú" aria-expanded="false">
             <span></span><span></span><span></span>
         </button>
     </div>
@@ -237,6 +216,7 @@
             <span class="btn-arrow">›</span>
         </button>
 
+        <p class="home-explore-label">ELIGE TU PUNTO DE PARTIDA</p>
         <!-- Preview de los 3 robots -->
         <div class="hero-worlds" aria-label="Elige una sección de la página">
             <a href="#inicial" class="world-preview wp-inicial" aria-label="Ir a inicial" style="--delay: .5s;">
@@ -263,7 +243,7 @@
                 <span class="wp-stage">EDUCACIÓN SECUNDARIA</span>
             </a>
             <a href="#recursos" class="world-preview wp-recursos" aria-label="Ir a recursos para profesores" style="--delay: 1.1s;">
-                <span class="wp-orb wp-teacher-icon" aria-hidden="true">📚</span>
+                <div class="wp-orb wp-teacher-icon"><img src="assets/robots/profesor.png" alt="" class="wp-robot-img professor-preview" width="100" height="100"></div>
                 <span class="wp-label">PROFESORES</span>
                 <span class="wp-stage">RECURSOS PARA EL AULA</span>
             </a>
@@ -280,72 +260,21 @@
 <!-- ============================================================
      TRANSICIÓN 1: Hero (noche) → Jardín BeeBot
      ============================================================ -->
-<div class="transition transition-1" aria-hidden="true">
-    <div class="t1-sky"></div>
-    <div class="t1-mountains-far"></div>
-    <div class="t1-mountains-near"></div>
-    <div class="t1-hills"></div>
-    <div class="t1-houses"></div>
-    <div class="t1-road"></div>
-</div>
+<div class="home-journey">
+<div class="transition transition-1" aria-hidden="true"><span class="home-route-line"></span><span class="home-route-caption"><i></i>UN VIAJE PARA CADA ETAPA<i></i></span><span class="home-route-line"></span></div>
 
 
 <!-- ============================================================
      SECCIÓN 1 — JUEGA CON BEEBOT (#inicial)
      ============================================================ -->
 <section id="inicial" class="world world-inicial">
+<div class="world-illustration scene-garden" aria-hidden="true"><svg viewBox="0 0 1600 850" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="newGardenSky" x2="0" y2="1"><stop stop-color="#b6eff7"/><stop offset=".7" stop-color="#e8ffbb"/><stop offset="1" stop-color="#9dda77"/></linearGradient><linearGradient id="newGardenLeaf" x2="1" y2="1"><stop stop-color="#6ad44b"/><stop offset="1" stop-color="#168c67"/></linearGradient></defs><rect width="1600" height="850" fill="url(#newGardenSky)"/><g fill="#fff" opacity=".65"><path d="M40 155h190a28 28 0 0 0-35-38 55 55 0 0 0-105-14 35 35 0 0 0-50 52Z"/><path d="M1100 120h260a25 25 0 0 0-35-40 60 60 0 0 0-120-5 55 55 0 0 0-105 45Z"/></g><g class="new-garden-sun"><circle cx="1380" cy="180" r="83" fill="#fff2a3"/><circle cx="1380" cy="180" r="58" fill="#ffcf36"/><path d="M1360 185q5 6 10 0m20 0q5 6 10 0m-28 16q8 9 16 0" fill="none" stroke="#be7825" stroke-width="4" stroke-linecap="round"/></g><path d="M0 620Q200 400 500 570T1050 540T1600 560V850H0Z" fill="#92dd68"/><path d="M0 710Q250 560 550 675T1100 670T1600 630V850H0Z" fill="#62c56b"/><path d="M90 850Q180 700 430 710T600 610" fill="none" stroke="#f6d794" stroke-width="78"/><path d="M90 850Q180 700 430 710T600 610" fill="none" stroke="#fff0c1" stroke-width="56"/>
+<g transform="translate(1450 470)"><path d="M0 220V-70m0 110 75-55" stroke="#9c633a" stroke-width="28"/><g fill="url(#newGardenLeaf)"><circle cx="-50" cy="-80" r="90"/><circle cx="65" cy="-50" r="94"/><circle cy="-140" r="85"/></g><g transform="translate(80 40)"><path d="M0-25v-36" stroke="#8b652a" stroke-width="5"/><path d="M-42 48q-20-8-10-27-16-16 0-30-6-20 13-29 4-24 39-24t39 24q19 9 13 29 16 14 0 30 10 19-10 27Z" fill="#ffc957" stroke="#cf9130" stroke-width="3"/><path d="M-37-17h74m-82 20h90m-82 20h74" stroke="#e3a63c" stroke-width="5"/><ellipse cy="26" rx="14" ry="18" fill="#805527"/></g></g><g class="new-garden-flower" style="--sway:0.0s" transform="translate(65 700)"><path d="M0 0v90m0-10q-55-30-40-48q35 0 40 48m0-25q45-25 35-42q-35 0-35 42" stroke="#238a55" stroke-width="6" fill="#4bb05a"/><g fill="#ff74b5"><ellipse cy="-29.25" rx="17.55" ry="29.25" transform="rotate(0)"/><ellipse cy="-29.25" rx="17.55" ry="29.25" transform="rotate(60)"/><ellipse cy="-29.25" rx="17.55" ry="29.25" transform="rotate(120)"/><ellipse cy="-29.25" rx="17.55" ry="29.25" transform="rotate(180)"/><ellipse cy="-29.25" rx="17.55" ry="29.25" transform="rotate(240)"/><ellipse cy="-29.25" rx="17.55" ry="29.25" transform="rotate(300)"/></g><circle r="16.2" fill="#ffd43d"/></g><g class="new-garden-flower" style="--sway:0.5s" transform="translate(220 790)"><path d="M0 0v90m0-10q-55-30-40-48q35 0 40 48m0-25q45-25 35-42q-35 0-35 42" stroke="#238a55" stroke-width="6" fill="#4bb05a"/><g fill="#fff9e0"><ellipse cy="-26.0" rx="15.600000000000001" ry="26.0" transform="rotate(0)"/><ellipse cy="-26.0" rx="15.600000000000001" ry="26.0" transform="rotate(60)"/><ellipse cy="-26.0" rx="15.600000000000001" ry="26.0" transform="rotate(120)"/><ellipse cy="-26.0" rx="15.600000000000001" ry="26.0" transform="rotate(180)"/><ellipse cy="-26.0" rx="15.600000000000001" ry="26.0" transform="rotate(240)"/><ellipse cy="-26.0" rx="15.600000000000001" ry="26.0" transform="rotate(300)"/></g><circle r="14.399999999999999" fill="#ffd43d"/></g><g class="new-garden-flower" style="--sway:1.0s" transform="translate(550 790)"><path d="M0 0v90m0-10q-55-30-40-48q35 0 40 48m0-25q45-25 35-42q-35 0-35 42" stroke="#238a55" stroke-width="6" fill="#4bb05a"/><g fill="#b288ff"><ellipse cy="-22.1" rx="13.26" ry="22.1" transform="rotate(0)"/><ellipse cy="-22.1" rx="13.26" ry="22.1" transform="rotate(60)"/><ellipse cy="-22.1" rx="13.26" ry="22.1" transform="rotate(120)"/><ellipse cy="-22.1" rx="13.26" ry="22.1" transform="rotate(180)"/><ellipse cy="-22.1" rx="13.26" ry="22.1" transform="rotate(240)"/><ellipse cy="-22.1" rx="13.26" ry="22.1" transform="rotate(300)"/></g><circle r="12.24" fill="#ffd43d"/></g><g class="new-garden-flower" style="--sway:1.5s" transform="translate(1340 780)"><path d="M0 0v90m0-10q-55-30-40-48q35 0 40 48m0-25q45-25 35-42q-35 0-35 42" stroke="#238a55" stroke-width="6" fill="#4bb05a"/><g fill="#ff9a45"><ellipse cy="-29.25" rx="17.55" ry="29.25" transform="rotate(0)"/><ellipse cy="-29.25" rx="17.55" ry="29.25" transform="rotate(60)"/><ellipse cy="-29.25" rx="17.55" ry="29.25" transform="rotate(120)"/><ellipse cy="-29.25" rx="17.55" ry="29.25" transform="rotate(180)"/><ellipse cy="-29.25" rx="17.55" ry="29.25" transform="rotate(240)"/><ellipse cy="-29.25" rx="17.55" ry="29.25" transform="rotate(300)"/></g><circle r="16.2" fill="#ffd43d"/></g><g class="new-garden-flower" style="--sway:2.0s" transform="translate(1530 720)"><path d="M0 0v90m0-10q-55-30-40-48q35 0 40 48m0-25q45-25 35-42q-35 0-35 42" stroke="#238a55" stroke-width="6" fill="#4bb05a"/><g fill="#fff9e0"><ellipse cy="-32.5" rx="19.5" ry="32.5" transform="rotate(0)"/><ellipse cy="-32.5" rx="19.5" ry="32.5" transform="rotate(60)"/><ellipse cy="-32.5" rx="19.5" ry="32.5" transform="rotate(120)"/><ellipse cy="-32.5" rx="19.5" ry="32.5" transform="rotate(180)"/><ellipse cy="-32.5" rx="19.5" ry="32.5" transform="rotate(240)"/><ellipse cy="-32.5" rx="19.5" ry="32.5" transform="rotate(300)"/></g><circle r="18.0" fill="#ffd43d"/></g><g class="new-garden-butterfly" transform="translate(680 160)"><path d="M0 0q-45-65-52-20t45 33q-40 35-3 45t10-48q30 50 48 18T8 7q50-10 30-45T0 0" fill="#ba78e6" stroke="#8852b7" stroke-width="2"/></g></svg></div>
 
     <!-- ======================================================
          ESCENARIO EN CAPAS (Jardín)
          ====================================================== -->
-    <div class="world-bg garden-bg" aria-hidden="true">
-
-        <!-- CAPA 1: Cielo — Sol con rayos + nubes -->
-        <div class="layer layer-sky">
-            <div class="sun">
-                <span class="sun-rays"></span>
-            </div>
-            <div class="cloud cloud-a"></div>
-            <div class="cloud cloud-b"></div>
-            <div class="cloud cloud-c"></div>
-        </div>
-
-        <!-- CAPA 2: Montañas lejanas y cercanas -->
-        <div class="layer layer-mountains">
-            <div class="mountains-far"></div>
-            <div class="mountains-near"></div>
-        </div>
-
-        <!-- CAPA 3: Árboles y arbustos -->
-        <div class="layer layer-trees">
-            <div class="tree tree-1"></div>
-            <div class="tree tree-2"></div>
-            <div class="tree tree-3"></div>
-            <div class="bush bush-1"></div>
-            <div class="bush bush-2"></div>
-        </div>
-
-        <!-- CAPA 4: Flores, mariposas y abejas -->
-        <div class="layer layer-deco">
-            <div class="flower flower-1"></div>
-            <div class="flower flower-2"></div>
-            <div class="flower flower-3"></div>
-            <div class="flower flower-4"></div>
-            <div class="flower flower-5"></div>
-            <div class="flower flower-6"></div>
-            <div class="butterfly bf-1"></div>
-            <div class="butterfly bf-2"></div>
-            <div class="butterfly bf-3"></div>
-            <div class="bee bee-1"></div>
-            <div class="bee bee-2"></div>
-        </div>
-
-        <!-- CAPA 5: Césped y caminito -->
-        <div class="layer layer-ground">
-            <div class="grass-strip"></div>
-            <div class="garden-path"></div>
-        </div>
-    </div>
+    
 
     <!-- ======================================================
          CONTENIDO (Robot + Tarjeta HUD)
@@ -353,8 +282,11 @@
     <div class="world-content">
 
         <!-- ESCENARIO DEL ROBOT -->
-        <div class="robot-stage reveal-child" data-reveal="1">
-            <div class="robot-portal portal-garden" aria-hidden="true"></div>
+        <div data-robot-name="BeeBot" data-greeting="Toca a BeeBot para saludar" class="robot-stage reveal-child" data-reveal="1">
+
+
+
+            
             <div class="robot-platform platform-garden" aria-hidden="true"></div>
             <div class="robot-display has-image" data-robot="beebot">
                 <img src="assets/robots/beebot.png" alt="BeeBot — Robot explorador del jardín" class="robot-img">
@@ -458,73 +390,34 @@
 <!-- ============================================================
      TRANSICIÓN 2: Jardín BeeBot → Ciudad Rugged
      ============================================================ -->
-<div class="transition transition-2" aria-hidden="true">
-    <div class="t2-sky"></div>
-    <div class="t2-skyline-back"></div>
-    <div class="t2-skyline-mid"></div>
-    <div class="t2-skyline-front"></div>
-    <div class="t2-lights"></div>
-    <div class="t2-digital"></div>
-</div>
+<div class="transition transition-2" aria-hidden="true"><span class="home-route-line"></span><span class="home-route-caption"><i></i>LA CURIOSIDAD SIGUE CRECIENDO<i></i></span><span class="home-route-line"></span></div>
 
 
 <!-- ============================================================
      SECCIÓN 2 — JUEGA CON RUGGED (#primaria)
      ============================================================ -->
 <section id="primaria" class="world world-primaria">
+<div class="world-illustration scene-race" aria-hidden="true"><svg viewBox="0 0 1600 850" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="newRaceSky" x2="0" y2="1"><stop stop-color="#bfdafa"/><stop offset=".65" stop-color="#a3c7fa"/><stop offset="1" stop-color="#799bd4"/></linearGradient><pattern id="raceChecks" width="40" height="40" patternUnits="userSpaceOnUse"><rect width="40" height="40" fill="#fff7dc"/><path d="M0 0h20v20H0ZM20 20h20v20H20Z" fill="#27344e"/></pattern></defs><rect width="1600" height="850" fill="url(#newRaceSky)"/><path d="M0 460 160 330l150 120 170-210 240 220 180-150 240 170 180-270 280 250v390H0Z" fill="#698cc5" opacity=".4"/>
+<g fill="#527ab7"><path d="M1020 520V300h110v220m25 0V250h90v270m20 0V350h130v170m20 0V280h100v240"/></g><g stroke="#abcaff" stroke-width="5" opacity=".8"><path d="M1040 340h70m-70 35h70m-70 35h70m65-120h50m-50 35h50m-50 35h50m60 30h90m-90 35h90m55-110h60m-60 35h60"/></g>
+<path d="M-180 810Q-80 440 350 510T900 670T1770 460" fill="none" stroke="#ff9a37" stroke-width="206"/><path d="M-180 810Q-80 440 350 510T900 670T1770 460" fill="none" stroke="#fff5de" stroke-width="184" stroke-dasharray="24 18"/><path d="M-180 810Q-80 440 350 510T900 670T1770 460" fill="none" stroke="#3a4667" stroke-width="158"/><path class="race-moving-dashes" d="M-180 810Q-80 440 350 510T900 670T1770 460" fill="none" stroke="#fff4b5" stroke-width="5" stroke-dasharray="32 28"/>
+<g transform="translate(110 160)"><path d="M0 380V50h475v350" fill="none" stroke="#ff9a32" stroke-width="26"/><rect x="-20" y="0" width="515" height="95" rx="18" fill="#23426b" stroke="#ffb449" stroke-width="5"/><text x="237" y="37" text-anchor="middle" fill="#fff4d1" font-family="sans-serif" font-size="22" font-weight="900">RUGGED</text><text x="237" y="73" text-anchor="middle" fill="#ffcc5c" font-family="sans-serif" font-size="27" font-weight="900" letter-spacing="7">RACING</text><path d="M5 100h48v270H5Zm417 0h48v290h-48Z" fill="url(#raceChecks)"/></g>
+<path d="M0 150Q400 50 820 140t780-30" fill="none" stroke="#5b77a4" stroke-width="3"/><path d="M0 120l34 8-25 40Z" fill="#ff9143"/><path d="M145 132l34 8-25 40Z" fill="#fff19a"/><path d="M290 144l34 8-25 40Z" fill="#4b9fff"/><path d="M435 120l34 8-25 40Z" fill="#ff9143"/><path d="M580 132l34 8-25 40Z" fill="#fff19a"/><path d="M725 144l34 8-25 40Z" fill="#4b9fff"/><path d="M870 120l34 8-25 40Z" fill="#ff9143"/><path d="M1015 132l34 8-25 40Z" fill="#fff19a"/><path d="M1160 144l34 8-25 40Z" fill="#4b9fff"/><path d="M1305 120l34 8-25 40Z" fill="#ff9143"/><path d="M1450 132l34 8-25 40Z" fill="#fff19a"/><path d="M1595 144l34 8-25 40Z" fill="#4b9fff"/><g transform="translate(1420 600)"><path d="M0 0v-110" stroke="#294b75" stroke-width="8"/><path d="M0-110q45-30 90-5v65q-45-25-90 5Z" fill="url(#raceChecks)"/></g><g fill="#ff953c" stroke="#fff0bc" stroke-width="3"><path d="m75 760 18-50 18 50Z"/><path d="m630 770 18-50 18 50Z"/><path d="m1370 800 18-50 18 50Z"/></g></svg></div>
 
     <!-- ======================================================
          ESCENARIO EN CAPAS (Ciudad)
          ====================================================== -->
-    <div class="world-bg city-bg" aria-hidden="true">
-
-        <!-- CAPA 1: Cielo urbano — sol cálido + nubes -->
-        <div class="layer layer-sky">
-            <div class="city-sun"></div>
-            <div class="cloud cloud-a"></div>
-            <div class="cloud cloud-b"></div>
-        </div>
-
-        <!-- CAPA 2: Skyline lejano -->
-        <div class="layer layer-mountains">
-            <div class="city-skyline-back"></div>
-        </div>
-
-        <!-- CAPA 3: Edificios cercanos + señales + semáforo -->
-        <div class="layer layer-trees">
-            <div class="city-skyline-front"></div>
-            <div class="road-sign sign-1"></div>
-            <div class="road-sign sign-2"></div>
-            <div class="traffic-light tl-1">
-                <span class="tl-red"></span>
-                <span class="tl-yellow"></span>
-                <span class="tl-green"></span>
-            </div>
-        </div>
-
-        <!-- CAPA 4: Árboles urbanos -->
-        <div class="layer layer-deco">
-            <div class="urban-tree ut-1"></div>
-            <div class="urban-tree ut-2"></div>
-            <div class="urban-tree ut-3"></div>
-        </div>
-
-        <!-- CAPA 5: Acera + carretera con líneas -->
-        <div class="layer layer-ground">
-            <div class="sidewalk"></div>
-            <div class="road">
-                <div class="road-lines"></div>
-            </div>
-        </div>
-    </div>
+    
 
     <!-- ======================================================
          CONTENIDO (Robot + Tarjeta HUD)
          ====================================================== -->
     <div class="world-content">
 
-        <div class="robot-stage reveal-child" data-reveal="1">
-            <div class="robot-portal portal-road" aria-hidden="true"></div>
+        <div data-robot-name="Rugged" data-greeting="Toca a Rugged para saludar" class="robot-stage reveal-child" data-reveal="1">
+
+
+
+            
             <div class="robot-platform platform-road" aria-hidden="true"></div>
             <div class="robot-display has-image" data-robot="rayet">
                 <img src="assets/robots/rayet.png" alt="Rugged — Robot urbano de misiones" class="robot-img">
@@ -622,71 +515,36 @@
 <!-- ============================================================
      TRANSICIÓN 3: Ciudad Rugged → Cyber Ludio
      ============================================================ -->
-<div class="transition transition-3" aria-hidden="true">
-    <div class="t3-sky"></div>
-    <div class="t3-neon-city"></div>
-    <div class="t3-grid"></div>
-    <div class="t3-neon-lines"></div>
-</div>
+<div class="transition transition-3" aria-hidden="true"><span class="home-route-line"></span><span class="home-route-caption"><i></i>NUEVAS IDEAS, NUEVOS DESAFÍOS<i></i></span><span class="home-route-line"></span></div>
 
 
 <!-- ============================================================
      SECCIÓN 3 — JUEGA CON LUDIO (#secundaria)
      ============================================================ -->
 <section id="secundaria" class="world world-secundaria">
+<div class="world-illustration scene-lab" aria-hidden="true"><svg viewBox="0 0 1600 850" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="newLabSky" x2="0" y2="1"><stop stop-color="#171d55"/><stop offset=".55" stop-color="#24215b"/><stop offset="1" stop-color="#101c3d"/></linearGradient><linearGradient id="newLabFloor"><stop stop-color="#54e9ff"/><stop offset=".5" stop-color="#b575ff"/><stop offset="1" stop-color="#ff62c7"/></linearGradient></defs><rect width="1600" height="850" fill="url(#newLabSky)"/>
+<g fill="none" stroke="#5074a8" opacity=".45"><path d="M0 820 800 400l800 420M0 720 800 300l800 420M0 620 800 200l800 420M0 520 800 100l800 420M0 420 800 0l800 420M80 850 880 430m-620 420 800-420m-600 420 800-420M1520 850 720 430m620 420-800-420m600 420-800-420"/></g>
+<g fill="#2c2a67" stroke="#7754ba" stroke-width="2"><path d="m50 460 75-40 75 40v220l-75 40-75-40Z"/><path d="m530 220 55-30 55 30v220l-55 30-55-30Z"/><path d="m1400 180 65-35 65 35v290l-65 35-65-35Z"/></g><g class="lab-energy-lines" fill="none" stroke="url(#newLabFloor)" stroke-width="4"><path d="M125 420v300l210 110M585 190v280l-160 90M1465 145v360l-210 110M0 375h260l95 95h120M1600 650h-180l-80-80h-150"/></g>
+<path d="m130 630 200-108 260 140-200 108Z" fill="#203a65" stroke="#75eaff" stroke-width="4"/><path d="M130 630v32l260 140 200-108v-32L390 770Z" fill="#4b3091" stroke="#a490ff" stroke-width="2"/><path d="m165 630 165-89 220 121-160 86Z" fill="none" stroke="#7ae5ff" stroke-width="2" stroke-dasharray="16 7"/>
+<g fill="#5fe5ff" opacity=".55" font-family="monospace" font-size="22"><text x="120" y="180">01001010</text><text x="175" y="220">10110101</text><text x="85" y="260">00101100</text><text x="1260" y="320">11001001</text><text x="1335" y="360">01010110</text></g>
+<g fill="none" stroke="#e46eea" stroke-width="3" opacity=".65"><path d="m70 100 35-20 35 20v40l-35 20-35-20ZM680 120l24-14 24 14v28l-24 14-24-14ZM1160 70l45-25 45 25v50l-45 25-45-25Z"/></g><g class="lab-light-points" fill="#88fff2"><circle cx="260" cy="375" r="6"/><circle cx="475" cy="470" r="6"/><circle cx="1190" cy="570" r="6"/><circle cx="585" cy="190" r="6"/></g></svg></div>
 
     <!-- ======================================================
          ESCENARIO EN CAPAS (Cyber)
          ====================================================== -->
-    <div class="world-bg cyber-bg" aria-hidden="true">
-
-        <!-- CAPA 1: Nebulosas cian y violeta -->
-        <div class="layer layer-sky">
-            <div class="cyber-nebula nebula-1"></div>
-            <div class="cyber-nebula nebula-2"></div>
-        </div>
-
-        <!-- CAPA 2: Grid cyber pulsante -->
-        <div class="layer layer-mountains">
-            <div class="cyber-grid"></div>
-        </div>
-
-        <!-- CAPA 3: Circuitos + hologramas giratorios -->
-        <div class="layer layer-trees">
-            <div class="circuit-lines"></div>
-            <div class="holo holo-1"></div>
-            <div class="holo holo-2"></div>
-            <div class="holo holo-3"></div>
-        </div>
-
-        <!-- CAPA 4: Paneles digitales + partículas -->
-        <div class="layer layer-deco">
-            <div class="particles" id="cyberParticles"></div>
-            <div class="data-panel panel-1">
-                <span class="panel-header">SYS.LOG</span>
-                <span>01001</span>
-                <span>11010</span>
-            </div>
-            <div class="data-panel panel-2">
-                <span class="panel-header">LINK</span>
-                <span>10110</span>
-                <span>00111</span>
-            </div>
-        </div>
-
-        <!-- CAPA 5: Piso cyber con glow -->
-        <div class="layer layer-ground">
-            <div class="cyber-floor"></div>
-        </div>
-    </div>
+    
 
     <!-- ======================================================
          CONTENIDO (Robot + Tarjeta HUD)
          ====================================================== -->
-    <div class="world-content">
+    <div class="home-binary-field" aria-hidden="true"><span style="--x:2%;--delay:-0.0s">10101010101010</span><span style="--x:10%;--delay:-1.7s">01010101010101</span><span style="--x:18%;--delay:-3.4s">10101010101010</span><span style="--x:26%;--delay:-5.1s">01010101010101</span><span style="--x:34%;--delay:-6.8s">10101010101010</span><span style="--x:42%;--delay:-8.5s">01010101010101</span><span style="--x:50%;--delay:-10.2s">10101010101010</span><span style="--x:58%;--delay:-11.9s">01010101010101</span><span style="--x:66%;--delay:-13.6s">10101010101010</span><span style="--x:74%;--delay:-15.299999999999999s">01010101010101</span><span style="--x:82%;--delay:-17.0s">10101010101010</span><span style="--x:90%;--delay:-18.7s">01010101010101</span></div>
+<div class="world-content">
 
-        <div class="robot-stage reveal-child" data-reveal="1">
-            <div class="robot-portal portal-cyber" aria-hidden="true"></div>
+        <div data-robot-name="Ludio" data-greeting="Toca a Ludio para saludar" class="robot-stage reveal-child" data-reveal="1">
+
+
+
+            
             <div class="robot-platform platform-cyber" aria-hidden="true"></div>
             <div class="robot-display has-image" data-robot="ludio">
                 <img src="assets/robots/ludio.png" alt="Ludio — Robot de desafíos para secundaria" class="robot-img">
@@ -784,10 +642,12 @@
 <!-- ============================================================
      RECURSOS PARA EL PROFESOR
      ============================================================ -->
+</div><!-- Fin del recorrido de mundos -->
 <section id="recursos" class="recursos">
     <div class="recursos-inner">
 
         <header class="section-head reveal-child" data-reveal="1">
+<img class="teacher-section-mascot" src="assets/robots/profesor.png" alt="" width="130" height="130" loading="lazy">
             <span class="section-eyebrow">Recursos para el profesor</span>
             <h2 class="section-title">Herramientas para el aula</h2>
             <p class="section-subtitle">
@@ -1030,14 +890,14 @@
                     <h4 class="footer-col-title">Herramientas</h4>
                     <ul class="footer-list">
                         <li>
-                            <a href="temporizador.html"
+                            <a href="Recursos_profesores/CronometrosPujllay/index.html"
                                target="_blank"
                                rel="noopener noreferrer">
                                 Temporizador
                             </a>
                         </li>
                         <li>
-                            <a href="tabla-competencia.html"
+                            <a href="Recursos_profesores/competencia.html"
                                target="_blank"
                                rel="noopener noreferrer">
                                 Tabla de competencia
@@ -1061,6 +921,21 @@
 </footer>
 
 
+<!-- Recursos de profesores: visor con el mismo control lateral de los juegos. -->
+<div id="teacherViewer" class="teacher-viewer" role="dialog" aria-modal="true" aria-label="Recurso para profesores" hidden>
+    <iframe id="teacherFrame" title="Recurso para profesores" src="" allow="fullscreen" allowfullscreen></iframe>
+    <button id="teacherExitTab" class="teacher-exit-tab" type="button" aria-label="Opciones del recurso" aria-controls="teacherExitPanel" aria-expanded="false" title="Toca para ver opciones · Arrastra para mover">›</button>
+    <div id="teacherExitPanel" class="teacher-exit-panel" role="group" aria-label="Opciones del recurso" hidden>
+        <span class="teacher-panel-kicker">RECURSOS PARA EL AULA</span>
+        <h2 id="teacherResourceTitle">Tu recurso</h2>
+        <p>¿Quieres continuar o volver al portal?</p>
+        <div class="teacher-exit-actions">
+            <button id="teacherContinue" type="button">Seguir usando</button>
+            <button id="teacherFullscreen" type="button">⛶ Pantalla completa</button>
+            <button id="teacherClose" type="button">← Volver a recursos</button>
+        </div>
+    </div>
+</div>
 <script src="js/main.js"></script>
 
 </body>

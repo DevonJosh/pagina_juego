@@ -853,24 +853,78 @@ console.log(
    VISOR · conserva las rutas y descarga el juego al volver
    ============================================================ */
 (function initGameViewer() {
-    const visor = $('#visor-juego');
+    const viewer = $('#visor-juego');
     const frame = $('#frame-juego');
-    const exit = $('#ludioExitGame');
-    if (!visor || !frame || !exit) return;
-    let trigger = null;
-    let pausedMedia = [];
-    function close() {
-        if (!visor.classList.contains('activo')) return;
-        visor.classList.remove('activo');
-        document.body.classList.remove('ludio-game-open');
-        frame.src = '';
-        if (document.fullscreenElement === visor && document.exitFullscreen) {
-            Promise.resolve(document.exitFullscreen()).catch(() => {});
-        }
-        pausedMedia.forEach(media => { Promise.resolve(media.play()).catch(() => {}); });
-        pausedMedia = [];
-        if (trigger) trigger.focus();
+    const tab = $('#ludioExitTab');
+    const panel = $('#ludioExitPanel');
+    const resume = $('#ludioContinue');
+    const fullscreen = $('#ludioFullscreen');
+    const closeButton = $('#ludioExitGame');
+    const title = $('#ludioGameTitle');
+    const music = $('#mainMusic');
+    if (!viewer || !frame || !tab || !panel || !resume || !fullscreen || !closeButton) return;
+    let launchLink = null;
+    let resumeMusic = false;
+    let siblings = [];
+    let moving = false;
+    let dragged = false;
+    let pointerY = 0;
+    let initialTop = 0;
+    function currentFullscreen() {
+        return document.fullscreenElement || document.webkitFullscreenElement;
     }
+    function syncFullscreen() {
+        fullscreen.textContent = currentFullscreen() ? '⛶ Salir de pantalla completa' : '⛶ Pantalla completa';
+    }
+    function showPanel(show) {
+        panel.hidden = !show;
+        frame.inert = show;
+        tab.setAttribute('aria-expanded', String(show));
+        syncFullscreen();
+        if (show) resume.focus();
+        else tab.focus();
+    }
+    function setBackgroundInactive(inactive) {
+        if (inactive) {
+            siblings = Array.from(document.body.children)
+                .filter(el => el !== viewer && !['SCRIPT', 'STYLE', 'AUDIO'].includes(el.tagName))
+                .map(el => ({el, inert: el.inert}));
+            siblings.forEach(({el}) => { el.inert = true; });
+        } else {
+            siblings.forEach(({el, inert}) => { el.inert = inert; });
+            siblings = [];
+        }
+    }
+    function enterFullscreen() {
+        try {
+            const request = viewer.requestFullscreen || viewer.webkitRequestFullscreen;
+            if (request) Promise.resolve(request.call(viewer)).catch(() => {});
+        } catch (_) { /* El visor sigue ocupando la ventana si el navegador lo bloquea. */ }
+    }
+    function leaveFullscreen() {
+        try {
+            const exit = document.exitFullscreen || document.webkitExitFullscreen;
+            if (currentFullscreen() && exit) Promise.resolve(exit.call(document)).catch(() => {});
+        } catch (_) {}
+    }
+    function close() {
+        if (viewer.hidden) return;
+        leaveFullscreen();
+        viewer.hidden = true;
+        panel.hidden = true;
+        frame.inert = false;
+        frame.src = '';
+        tab.setAttribute('aria-expanded', 'false');
+        document.body.classList.remove('ludio-game-open');
+        setBackgroundInactive(false);
+        launchLink?.focus({preventScroll:true});
+        if (resumeMusic && music && Sound.isEnabled() && !document.hidden) {
+            Promise.resolve(music.play()).catch(() => {});
+        }
+        resumeMusic = false;
+    }
+    // Incluye las tarjetas y los accesos equivalentes del pie.
+    window.cerrarJuego = close;
     $$('.game-card-link').forEach(link => {
         if (link.closest('.disabled')) {
             link.removeAttribute('href');
@@ -878,31 +932,89 @@ console.log(
             link.setAttribute('tabindex', '-1');
             return;
         }
-        link.addEventListener('click', e => {
-            e.preventDefault();
-            trigger = link;
-            pausedMedia = $$('audio, video').filter(media => !media.paused);
-            pausedMedia.forEach(media => media.pause());
-            frame.src = link.getAttribute('href');
-            frame.title = link.getAttribute('aria-label') || 'Juego seleccionado';
-            visor.classList.add('activo');
+        link.addEventListener('click', event => {
+            // Ctrl/Cmd/clic central conserva la posibilidad de abrir una pestaña aparte.
+            if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey || event.button > 0) return;
+            event.preventDefault();
+            if (!viewer.hidden) return;
+            launchLink = link;
+            const label = link.closest('.game-card')?.querySelector('.game-title')?.textContent.trim()
+                || link.textContent.trim();
+            if (title) title.textContent = label;
+            frame.title = label;
+            resumeMusic = Boolean(music && !music.paused);
             document.body.classList.add('ludio-game-open');
-            if (visor.requestFullscreen) Promise.resolve(visor.requestFullscreen()).catch(() => {});
-            exit.focus();
+            if (music) music.pause();
+            setBackgroundInactive(true);
+            viewer.hidden = false;
+            panel.hidden = true;
+            frame.inert = false;
+            tab.setAttribute('aria-expanded', 'false');
+            tab.style.top = '50%';
+            frame.src = link.getAttribute('href');
+            enterFullscreen();
+            tab.focus();
+            syncFullscreen();
         });
     });
-    exit.addEventListener('click', () => { Sound.click(); close(); });
-    // Escape can first leave native fullscreen; the portal button stays available.
-    document.addEventListener('keydown', e => {
-        if (e.key === 'Escape' && visor.classList.contains('activo')) close();
-        if (e.key === 'Tab' && document.activeElement === exit && e.shiftKey) {
-            e.preventDefault(); frame.focus();
+    tab.addEventListener('pointerdown', event => {
+        if (event.button !== 0) return;
+        moving = true;
+        dragged = false;
+        pointerY = event.clientY;
+        initialTop = tab.getBoundingClientRect().top - viewer.getBoundingClientRect().top;
+        tab.setPointerCapture(event.pointerId);
+    });
+    tab.addEventListener('pointermove', event => {
+        if (!moving) return;
+        const distance = event.clientY - pointerY;
+        if (Math.abs(distance) > 7) dragged = true;
+        if (dragged) tab.style.top = Math.max(0, Math.min(viewer.clientHeight - tab.offsetHeight, initialTop + distance)) + 'px';
+    });
+    tab.addEventListener('pointerup', () => { moving = false; });
+    tab.addEventListener('pointercancel', () => { moving = false; dragged = false; });
+    tab.addEventListener('click', event => {
+        if (dragged) { event.preventDefault(); dragged = false; return; }
+        Sound.click();
+        showPanel(panel.hidden);
+    });
+    resume.addEventListener('click', () => { Sound.click(); showPanel(false); });
+    closeButton.addEventListener('click', () => { Sound.click(); close(); });
+    fullscreen.addEventListener('click', () => {
+        Sound.click();
+        if (currentFullscreen()) leaveFullscreen();
+        else enterFullscreen();
+        showPanel(false);
+    });
+    function keyboard(event) {
+        if (viewer.hidden) return;
+        if (event.key === 'Escape') {
+            event.preventDefault();
+            showPanel(panel.hidden);
+        }
+        if (event.key === 'Tab' && !panel.hidden) {
+            const controls = [resume, fullscreen, closeButton];
+            const active = document.activeElement;
+            if (event.shiftKey && active === controls[0]) {
+                event.preventDefault(); controls[2].focus();
+            } else if (!event.shiftKey && active === controls[2]) {
+                event.preventDefault(); controls[0].focus();
+            }
+        }
+    }
+    document.addEventListener('keydown', keyboard);
+    frame.addEventListener('load', () => {
+        try { frame.contentDocument?.addEventListener('keydown', keyboard); }
+        catch (_) { /* El control lateral continúa disponible. */ }
+    });
+    document.addEventListener('fullscreenchange', syncFullscreen);
+    document.addEventListener('webkitfullscreenchange', syncFullscreen);
+    // Salir del fullscreen conserva el recurso; solo Volver descarga su contenido.
+    window.addEventListener('resize', () => {
+        if (!viewer.hidden && tab.style.top.endsWith('px')) {
+            tab.style.top = Math.max(0, Math.min(viewer.clientHeight - tab.offsetHeight, parseFloat(tab.style.top))) + 'px';
         }
     });
-    frame.addEventListener('keydown', e => {
-        if (e.key === 'Tab' && e.shiftKey) { e.preventDefault(); exit.focus(); }
-    });
-    window.cerrarJuego = close;
 })();
 
 /* Miniaturas en 1920 × 1080, centradas y silenciosas.

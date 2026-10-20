@@ -1213,9 +1213,19 @@
 </footer>
 
 <!-- Visor de juegos: salida siempre accesible en mouse y pantalla táctil. -->
-<div id="visor-juego" role="dialog" aria-modal="true" aria-label="Juego abierto" tabindex="-1">
-    <button id="ludioExitGame" class="ludio-exit-game" type="button">← Volver al portal</button>
-    <iframe id="frame-juego" title="Juego seleccionado" src="" allow="fullscreen" allowfullscreen></iframe>
+<div id="visor-juego" class="teacher-viewer" role="dialog" aria-modal="true" aria-label="Juego educativo" hidden>
+    <iframe id="frame-juego" title="Juego educativo" src="" allow="fullscreen" allowfullscreen></iframe>
+    <button id="ludioExitTab" class="teacher-exit-tab" type="button" aria-label="Opciones del juego" aria-controls="ludioExitPanel" aria-expanded="false" title="Toca para ver opciones · Arrastra para mover">›</button>
+    <div id="ludioExitPanel" class="teacher-exit-panel" role="group" aria-label="Opciones del juego" hidden>
+        <span class="teacher-panel-kicker">AVENTURAS DE LUDIO</span>
+        <h2 id="ludioGameTitle">Tu juego</h2>
+        <p>¿Quieres seguir jugando o volver a Ludio?</p>
+        <div class="teacher-exit-actions">
+            <button id="ludioContinue" type="button">Seguir jugando</button>
+            <button id="ludioFullscreen" type="button">⛶ Pantalla completa</button>
+            <button id="ludioExitGame" type="button">← Volver a Ludio</button>
+        </div>
+    </div>
 </div>
 <script src="js/ludio.js"></script>
 </body>

@@ -132,13 +132,15 @@ const Sound = (() => {
     const btn = $('#soundToggle');
     if (!btn) return;
 
-    if (!Sound.isEnabled()) {
-        btn.classList.add('is-muted');
-    }
+    btn.classList.toggle('is-muted', !Sound.isEnabled());
+    btn.setAttribute('aria-pressed', String(Sound.isEnabled()));
+    btn.setAttribute('aria-label', Sound.isEnabled() ? 'Silenciar sonido' : 'Activar sonido');
 
     btn.addEventListener('click', () => {
         const isNowOn = Sound.toggle();
         btn.classList.toggle('is-muted', !isNowOn);
+        btn.setAttribute('aria-pressed', String(isNowOn));
+        btn.setAttribute('aria-label', isNowOn ? 'Silenciar sonido' : 'Activar sonido');
         if (isNowOn) {
             Sound.tone(880, 0.12, 'sine', 0.12);
         }
@@ -174,12 +176,7 @@ const Sound = (() => {
             progress.style.width = percentage + '%';
         }
 
-        // Ocultar al bajar, mostrar al subir
-        if (currentY > 400 && currentY > lastScrollY + 10) {
-            header.style.transform = 'translateY(-140%)';
-        } else if (currentY < lastScrollY - 10 || currentY < 400) {
-            header.style.transform = 'translateY(0)';
-        }
+        header.style.transform = 'none';
 
         lastScrollY = currentY;
         isTicking = false;
@@ -202,38 +199,29 @@ const Sound = (() => {
    ============================================================ */
 (function initMobileMenu() {
     const toggleBtn = $('#menuToggle');
-    const mainNav   = $('.main-nav');
+    const mainNav = $('.main-nav');
     if (!toggleBtn || !mainNav) return;
-
-    function closeMenu() {
+    function closeMenu(restoreFocus = false) {
         mainNav.classList.remove('is-open');
         toggleBtn.setAttribute('aria-expanded', 'false');
+        toggleBtn.setAttribute('aria-label', 'Abrir menú');
+        if (restoreFocus) toggleBtn.focus();
     }
-
-    toggleBtn.addEventListener('click', (e) => {
+    toggleBtn.addEventListener('click', e => {
         e.stopPropagation();
-        const isOpen = mainNav.classList.toggle('is-open');
-        toggleBtn.setAttribute('aria-expanded', String(isOpen));
+        const open = mainNav.classList.toggle('is-open');
+        toggleBtn.setAttribute('aria-expanded', String(open));
+        toggleBtn.setAttribute('aria-label', open ? 'Cerrar menú' : 'Abrir menú');
         Sound.click();
     });
-
-    // Cerrar al pulsar cualquier enlace del menú
-    $$('.nav-btn', mainNav).forEach(link => {
-        link.addEventListener('click', closeMenu);
+    $$('.nav-btn', mainNav).forEach(link => link.addEventListener('click', () => closeMenu()));
+    document.addEventListener('click', e => {
+        if (!mainNav.contains(e.target) && !toggleBtn.contains(e.target)) closeMenu();
     });
-
-    // Cerrar al pulsar fuera
-    document.addEventListener('click', (e) => {
-        if (!mainNav.classList.contains('is-open')) return;
-        if (!mainNav.contains(e.target) && !toggleBtn.contains(e.target)) {
-            closeMenu();
-        }
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape' && mainNav.classList.contains('is-open')) closeMenu(true);
     });
-
-    // Cerrar con Escape
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') closeMenu();
-    });
+    window.matchMedia('(max-width: 1200px)').addEventListener('change', () => closeMenu());
 })();
 
 
@@ -505,6 +493,8 @@ const Sound = (() => {
             const href = link.getAttribute('href');
             const isActive = (href === targetId);
             link.classList.toggle('is-active', isActive);
+            if (isActive) link.setAttribute('aria-current', 'location');
+            else link.removeAttribute('aria-current');
             if (isActive) matchedLink = link;
         });
 
@@ -675,9 +665,10 @@ console.log(
  let userStarted=false;
  const enabled=()=>Sound.isEnabled();
  async function start(){
-  if(!enabled()||document.hidden)return;
+  if(!enabled()||document.hidden||document.body.classList.contains('teacher-resource-open'))return;
   try{
    await music.play();
+   if(!enabled()||document.hidden||document.body.classList.contains('teacher-resource-open')){music.pause();return;}
    userStarted=true;
   }catch(e){
    // Chrome/Brave y otros navegadores pueden bloquear audio con sonido
@@ -696,4 +687,204 @@ console.log(
  if(toggle)toggle.addEventListener('click',()=>{if(enabled())start();else music.pause()});
  document.addEventListener('visibilitychange',()=>{if(document.hidden)music.pause();else if(userStarted&&enabled())start()});
  window.addEventListener('pagehide',()=>music.pause());
+})();
+
+
+/* ============================================================
+   RECURSOS DOCENTES · visor con pestaña lateral desplazable
+   La página del recurso conserva sus archivos y su URL originales.
+   ============================================================ */
+(function initTeacherViewer() {
+    const viewer = $('#teacherViewer');
+    const frame = $('#teacherFrame');
+    const tab = $('#teacherExitTab');
+    const panel = $('#teacherExitPanel');
+    const resume = $('#teacherContinue');
+    const fullscreen = $('#teacherFullscreen');
+    const closeButton = $('#teacherClose');
+    const title = $('#teacherResourceTitle');
+    const music = $('#mainMusic');
+    if (!viewer || !frame || !tab || !panel || !resume || !fullscreen || !closeButton) return;
+    let launchLink = null;
+    let resumeMusic = false;
+    let siblings = [];
+    let moving = false;
+    let dragged = false;
+    let pointerY = 0;
+    let initialTop = 0;
+    function currentFullscreen() {
+        return document.fullscreenElement || document.webkitFullscreenElement;
+    }
+    function syncFullscreen() {
+        fullscreen.textContent = currentFullscreen() ? '⛶ Salir de pantalla completa' : '⛶ Pantalla completa';
+    }
+    function showPanel(show) {
+        panel.hidden = !show;
+        frame.inert = show;
+        tab.setAttribute('aria-expanded', String(show));
+        syncFullscreen();
+        if (show) resume.focus();
+        else tab.focus();
+    }
+    function setBackgroundInactive(inactive) {
+        if (inactive) {
+            siblings = Array.from(document.body.children)
+                .filter(el => el !== viewer && !['SCRIPT', 'STYLE', 'AUDIO'].includes(el.tagName))
+                .map(el => ({el, inert: el.inert}));
+            siblings.forEach(({el}) => { el.inert = true; });
+        } else {
+            siblings.forEach(({el, inert}) => { el.inert = inert; });
+            siblings = [];
+        }
+    }
+    function enterFullscreen() {
+        try {
+            const request = viewer.requestFullscreen || viewer.webkitRequestFullscreen;
+            if (request) Promise.resolve(request.call(viewer)).catch(() => {});
+        } catch (_) { /* El visor sigue ocupando la ventana si el navegador lo bloquea. */ }
+    }
+    function leaveFullscreen() {
+        try {
+            const exit = document.exitFullscreen || document.webkitExitFullscreen;
+            if (currentFullscreen() && exit) Promise.resolve(exit.call(document)).catch(() => {});
+        } catch (_) {}
+    }
+    function close() {
+        if (viewer.hidden) return;
+        leaveFullscreen();
+        viewer.hidden = true;
+        panel.hidden = true;
+        frame.inert = false;
+        frame.src = '';
+        tab.setAttribute('aria-expanded', 'false');
+        document.body.classList.remove('teacher-resource-open');
+        setBackgroundInactive(false);
+        launchLink?.focus({preventScroll:true});
+        if (resumeMusic && music && Sound.isEnabled() && !document.hidden) {
+            Promise.resolve(music.play()).catch(() => {});
+        }
+        resumeMusic = false;
+    }
+    // Incluye las tarjetas y los accesos equivalentes del pie.
+    $$('a[href^="Recursos_profesores/"]').forEach(link => {
+        link.addEventListener('click', event => {
+            // Ctrl/Cmd/clic central conserva la posibilidad de abrir una pestaña aparte.
+            if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey || event.button > 0) return;
+            event.preventDefault();
+            if (!viewer.hidden) return;
+            launchLink = link;
+            const label = link.closest('.resource-card')?.querySelector('.resource-title')?.textContent.trim()
+                || link.textContent.trim();
+            if (title) title.textContent = label;
+            frame.title = label;
+            resumeMusic = Boolean(music && !music.paused);
+            document.body.classList.add('teacher-resource-open');
+            if (music) music.pause();
+            setBackgroundInactive(true);
+            viewer.hidden = false;
+            panel.hidden = true;
+            frame.inert = false;
+            tab.setAttribute('aria-expanded', 'false');
+            tab.style.top = '50%';
+            frame.src = link.getAttribute('href');
+            enterFullscreen();
+            tab.focus();
+            syncFullscreen();
+        });
+    });
+    tab.addEventListener('pointerdown', event => {
+        if (event.button !== 0) return;
+        moving = true;
+        dragged = false;
+        pointerY = event.clientY;
+        initialTop = tab.getBoundingClientRect().top - viewer.getBoundingClientRect().top;
+        tab.setPointerCapture(event.pointerId);
+    });
+    tab.addEventListener('pointermove', event => {
+        if (!moving) return;
+        const distance = event.clientY - pointerY;
+        if (Math.abs(distance) > 7) dragged = true;
+        if (dragged) tab.style.top = Math.max(0, Math.min(viewer.clientHeight - tab.offsetHeight, initialTop + distance)) + 'px';
+    });
+    tab.addEventListener('pointerup', () => { moving = false; });
+    tab.addEventListener('pointercancel', () => { moving = false; dragged = false; });
+    tab.addEventListener('click', event => {
+        if (dragged) { event.preventDefault(); dragged = false; return; }
+        Sound.click();
+        showPanel(panel.hidden);
+    });
+    resume.addEventListener('click', () => { Sound.click(); showPanel(false); });
+    closeButton.addEventListener('click', () => { Sound.click(); close(); });
+    fullscreen.addEventListener('click', () => {
+        Sound.click();
+        if (currentFullscreen()) leaveFullscreen();
+        else enterFullscreen();
+        showPanel(false);
+    });
+    function keyboard(event) {
+        if (viewer.hidden) return;
+        if (event.key === 'Escape') {
+            event.preventDefault();
+            showPanel(panel.hidden);
+        }
+        if (event.key === 'Tab' && !panel.hidden) {
+            const controls = [resume, fullscreen, closeButton];
+            const active = document.activeElement;
+            if (event.shiftKey && active === controls[0]) {
+                event.preventDefault(); controls[2].focus();
+            } else if (!event.shiftKey && active === controls[2]) {
+                event.preventDefault(); controls[0].focus();
+            }
+        }
+    }
+    document.addEventListener('keydown', keyboard);
+    frame.addEventListener('load', () => {
+        try { frame.contentDocument?.addEventListener('keydown', keyboard); }
+        catch (_) { /* El control lateral continúa disponible. */ }
+    });
+    document.addEventListener('fullscreenchange', syncFullscreen);
+    document.addEventListener('webkitfullscreenchange', syncFullscreen);
+    // Salir del fullscreen conserva el recurso; solo Volver descarga su contenido.
+    window.addEventListener('resize', () => {
+        if (!viewer.hidden && tab.style.top.endsWith('px')) {
+            tab.style.top = Math.max(0, Math.min(viewer.clientHeight - tab.offsetHeight, parseFloat(tab.style.top))) + 'px';
+        }
+    });
+})();
+
+
+/* Saludos de los robots y respuesta sonora discreta de los botones. */
+(function initHomeRobotGreetings() {
+    $$('.home-portal .robot-stage').forEach(stage => {
+        const name = stage.dataset.robotName || 'tu robot';
+        stage.setAttribute('role', 'button');
+        stage.setAttribute('tabindex', '0');
+        stage.setAttribute('aria-label', `Saludar a ${name}`);
+        let busy = false;
+        function greet() {
+            if (busy) return;
+            busy = true;
+            const base = name === 'BeeBot' ? 660 : name === 'Rugged' ? 330 : 880;
+            Sound.tone(base, .12, 'sine', .10);
+            setTimeout(() => Sound.tone(base * 1.25, .12, 'sine', .08), 110);
+            stage.classList.add('is-greeting');
+            setTimeout(() => { stage.classList.remove('is-greeting'); busy = false; }, 650);
+        }
+        stage.addEventListener('click', greet);
+        stage.addEventListener('keydown', event => {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault(); greet();
+            }
+        });
+    });
+    if (!window.matchMedia('(hover:hover) and (pointer:fine)').matches) return;
+    let lastHover = 0;
+    $$('.home-portal .btn, .home-portal .world-preview, .home-portal .nav-btn').forEach(button => {
+        button.addEventListener('pointerenter', () => {
+            const now = Date.now();
+            if (now - lastHover < 250) return;
+            lastHover = now;
+            Sound.tone(740, .045, 'sine', .025);
+        });
+    });
 })();
